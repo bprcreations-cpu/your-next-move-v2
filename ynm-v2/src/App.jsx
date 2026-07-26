@@ -468,6 +468,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
   .feature-strip{grid-template-columns:1fr;}
   .feature-strip>div[style]{display:none;}
   .feat{padding:18px 20px;border-bottom:1px solid #F0EDEB;}
+  [style*="repeat(3,1fr)"]{grid-template-columns:1fr!important;}
   .nav-name{font-size:16px;}
   .nav-by{font-size:9px;}
   .nav-btn{padding:6px 12px;font-size:10px;}
@@ -540,6 +541,7 @@ export default function App() {
   const [editSection,  setEditSection]  = useState(null);
   const [editDraft,    setEditDraft]    = useState("");
   const [fbDone,       setFbDone]       = useState(false);
+  const [welcomeEmail, setWelcomeEmail] = useState("");
   const [fbRating,     setFbRating]     = useState(null);
   const [fbAns,        setFbAns]        = useState({});
   const [autoSaved,    setAutoSaved]    = useState(false);
@@ -656,6 +658,9 @@ export default function App() {
   }
   async function completeOnboarding(name){
     if(name&&name.trim())await saveFirstName(name.trim());
+    if(welcomeEmail&&welcomeEmail.trim()){
+      try{await window.storage.set("user-email",welcomeEmail.trim());}catch(e){}
+    }
     try{await window.storage.set("has-onboarded","1");}catch(e){}
     setHasOnboarded(true);go("home");setTimeout(()=>{const el=document.querySelector(".cats");if(el){el.scrollIntoView({behavior:"smooth",block:"start"});}},150);
   }
@@ -838,63 +843,98 @@ Respond with exactly these sections:
       {screen!=="loading"&&(
         <div className="nav-actions">
           {isSubscribed&&<span className="sub-badge"><span className="sub-dot"/>Member</span>}
-          {savedPlans.length>0&&<>
-            <button className="nav-link" onClick={()=>go("advisor")}>Ask Your Advisor</button>
-            <button className="nav-link" onClick={()=>go("hub")}>Industry Hub</button>
-            <button className="nav-link" onClick={()=>go("plans")}>
-              My Strategies{savedPlans.length>0&&<span className="nav-badge">{savedPlans.length}</span>}
-            </button>
-          </>}
-          <button className="nav-btn" style={{background:"#B0728A",color:"#fff",borderColor:"#B0728A",fontWeight:600}} onClick={()=>{if(!hasOnboarded)go("welcome");else window.scrollTo({top:document.querySelector(".cats")?.offsetTop-80||400,behavior:"smooth"});}}>
-            {savedPlans.length>0?"New Strategy":"Get Started Free →"}
+          <button className="nav-link" onClick={()=>go("advisor")}>Ask Your Advisor</button>
+          <button className="nav-link" onClick={()=>go("hub")}>Industry Hub</button>
+          <button className="nav-link" onClick={()=>go("plans")}>
+            My Strategies{savedPlans.length>0&&<span className="nav-badge">{savedPlans.length}</span>}
           </button>
+          {savedPlans.length>0&&<button className="nav-btn" onClick={restart}>New Strategy</button>}
         </div>
       )}
     </nav>
 
-    {/* ══ HOME ══ */}
+        {/* ══ HOME ══ */}
     {screen==="home"&&<>
+
+      {/* HERO — one job: get them to click */}
       <section className="hero">
         {savedPlans.length>0&&firstName?(<>
           <span className="hero-eye">Welcome back</span>
           <h1 className="hero-h1">{firstName}<em>.</em></h1>
           <p className="hero-sub">Your last strategy was {Math.floor((Date.now()-(savedPlans[0]?.createdAt||Date.now()))/(1000*60*60*24))} days ago. Ready to build what's next?</p>
           <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
-            <button className="hero-cta" onClick={()=>go("industry")}>New Strategy <span className="hero-arr">→</span></button>
+            <button className="hero-cta" onClick={()=>go("welcome")}>New Strategy <span className="hero-arr">→</span></button>
             <button className="btn-out" style={{padding:"13px 24px",fontSize:11}} onClick={()=>go("plans")}>Review My Strategies</button>
           </div>
         </>):(<>
           <span className="hero-eye">Strategic Clarity On Demand</span>
           <h1 className="hero-h1">Your Personal<br/><em>Strategist.</em></h1>
           <p className="hero-sub">A guided strategy experience that helps entrepreneurs, professionals, and creatives gain clarity and move forward with confidence.</p>
-          <button className="hero-cta" onClick={()=>{if(!hasOnboarded)go("welcome");else{const el=document.querySelector(".cats");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});}}}>
+          <button className="hero-cta" onClick={()=>go("welcome")}>
             Create My Strategy <span className="hero-arr">→</span>
           </button>
-          {!isSubscribed&&<p style={{fontSize:12,color:"#A8A29E",marginTop:14}}>First strategy free · Then $19/month · Cancel anytime</p>}
+          <p style={{fontSize:12,color:"#A8A29E",marginTop:14}}>First strategy free · Then $19/month · Cancel anytime</p>
         </>)}
       </section>
 
-      <div className="feature-strip">
-        <div className="feat" onClick={()=>go("advisor")}>
-          <div style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1C1917",marginBottom:4}}>Ask Your Advisor</div>
-          <div style={{fontSize:12,color:"#A8A29E",fontWeight:300}}>Get a direct answer to your specific question</div>
-        </div>
-        <div style={{width:1,background:"#EEEAE7",alignSelf:"stretch"}}/>
-        <div className="feat" onClick={()=>go("hub")}>
-          <div style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1C1917",marginBottom:4}}>Industry Hub</div>
-          <div style={{fontSize:12,color:"#A8A29E",fontWeight:300}}>Browse questions built for your field</div>
-        </div>
-        <div style={{width:1,background:"#EEEAE7",alignSelf:"stretch"}}/>
-        <div className="feat" onClick={()=>go("plans")}>
-          <div style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1C1917",marginBottom:4}}>My Strategies</div>
-          <div style={{fontSize:12,color:"#A8A29E",fontWeight:300}}>Review and continue your past plans</div>
-        </div>
-      </div>
+      {/* WHAT THIS IS — three cards explaining the product */}
+      {savedPlans.length===0&&(
+        <section style={{padding:"0 32px 64px",maxWidth:1080,margin:"0 auto",width:"100%"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:2,borderTop:"1px solid #F0EDEB"}}>
+            {[
+              {
+                num:"01",
+                title:"Create My Strategy",
+                desc:"Answer a short series of questions about your focus area, industry, and goals. In under a minute, you receive a personalized 8-section strategy built specifically for you.",
+                cta:"Start here →",
+                action:()=>go("welcome"),
+                accent:true
+              },
+              {
+                num:"02",
+                title:"Ask Your Advisor",
+                desc:"Have a specific challenge you need help with right now? Ask one focused question and get a direct, personalized answer — no lengthy session required.",
+                cta:"Ask a question →",
+                action:()=>go("advisor"),
+                accent:false
+              },
+              {
+                num:"03",
+                title:"Industry Hub",
+                desc:"Browse curated questions built for your specific field. Real Estate, Creative, Healthcare, Finance and more — each with 15 questions written for that industry.",
+                cta:"Explore your field →",
+                action:()=>go("hub"),
+                accent:false
+              }
+            ].map(c=>(
+              <div key={c.num} onClick={c.action} style={{
+                padding:"36px 28px",
+                background:c.accent?"#1A1916":"#FAFAF8",
+                cursor:"pointer",
+                transition:"all 0.2s",
+                borderRight:"1px solid #EEEAE7",
+                display:"flex",
+                flexDirection:"column",
+                gap:0,
+              }}
+              onMouseEnter={e=>{e.currentTarget.style.background=c.accent?"#2A2420":"#fff";}}
+              onMouseLeave={e=>{e.currentTarget.style.background=c.accent?"#1A1916":"#FAFAF8";}}
+              >
+                <div style={{fontFamily:"'Cormorant',serif",fontSize:13,fontWeight:500,color:c.accent?"#5A5350":"#C4B5AD",letterSpacing:"0.06em",marginBottom:16}}>{c.num}</div>
+                <div style={{fontFamily:"'Cormorant',serif",fontSize:26,fontWeight:600,color:c.accent?"#fff":"#1C1917",marginBottom:12,lineHeight:1.2,letterSpacing:"-0.01em"}}>{c.title}</div>
+                <div style={{fontSize:13,color:c.accent?"#8A7E78":"#78716C",fontWeight:300,lineHeight:1.7,flex:1,marginBottom:24}}>{c.desc}</div>
+                <div style={{fontSize:11,fontWeight:600,letterSpacing:"0.12em",textTransform:"uppercase",color:c.accent?"#C4A0B0":"#B0728A"}}>{c.cta}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
+      {/* FOCUS AREAS */}
       <section className="cats">
         <div className="cats-top">
           <h2 className="cats-h2">Where would you like to <em>focus?</em></h2>
-          <p className="cats-sub">Choose a focus area to build your personalized strategy.</p>
+          <p className="cats-sub">Choose a focus area to begin your personalized strategy session.</p>
         </div>
         <div className="cats-row1">
           {CATEGORIES.slice(0,3).map(c=>(
@@ -924,24 +964,60 @@ Respond with exactly these sections:
       </section>
     </>}
 
-    {/* ══ WELCOME ══ */}
+        {/* ══ WELCOME ══ */}
     {screen==="welcome"&&(
       <div className="welcome">
         <div className="welcome-rule"/>
         <span className="welcome-eye">Your Next Move</span>
         <h1 className="welcome-h">Let's build your<br/><em>personalized strategy.</em></h1>
-        <p className="welcome-sub">No blank page. No vague advice. We guide the entire session — then build a strategy specific to you.</p>
-        <div className="welcome-name-wrap">
-          <span className="welcome-name-label">Your first name (optional)</span>
-          <input className="welcome-name-input" placeholder="e.g. Sarah" value={firstName} onChange={e=>setFirstName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&completeOnboarding(firstName)} autoFocus/>
+        <p className="welcome-sub">Answer a few questions about your situation and receive a strategy built specifically for you — your industry, your goals, your next move.</p>
+
+        <div style={{width:"100%",maxWidth:360,margin:"0 auto 12px"}}>
+          <span className="welcome-name-label">Your first name</span>
+          <input
+            className="welcome-name-input"
+            placeholder="e.g. Sarah"
+            value={firstName}
+            onChange={e=>setFirstName(e.target.value)}
+            autoFocus
+          />
         </div>
+
+        <div style={{width:"100%",maxWidth:360,margin:"0 auto 28px"}}>
+          <span className="welcome-name-label">Your email <span style={{color:"#C4B5AD",fontWeight:300}}>(optional — we'll send your strategy here)</span></span>
+          <input
+            className="welcome-name-input"
+            placeholder="e.g. sarah@email.com"
+            type="email"
+            value={welcomeEmail}
+            onChange={e=>setWelcomeEmail(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&completeOnboarding(firstName)}
+          />
+        </div>
+
         <div className="welcome-steps">
-          {[{n:"01",t:<>Choose a <strong>focus area</strong> and your <strong>industry</strong></>},{n:"02",t:<>Answer <strong>4–5 targeted questions</strong> about your situation</>},{n:"03",t:<>Receive a <strong>personalized strategy</strong> in under a minute</>}].map(s=>(
-            <div className="welcome-step" key={s.n}><span className="welcome-step-num">{s.n}</span><span className="welcome-step-text">{s.t}</span></div>
+          {[
+            {n:"01",t:<>Choose a <strong>focus area</strong> and your <strong>industry</strong></>},
+            {n:"02",t:<>Answer <strong>4–5 targeted questions</strong> about your situation</>},
+            {n:"03",t:<>Receive your <strong>personalized 8-section strategy</strong></>},
+          ].map(s=>(
+            <div className="welcome-step" key={s.n}>
+              <span className="welcome-step-num">{s.n}</span>
+              <span className="welcome-step-text">{s.t}</span>
+            </div>
           ))}
         </div>
-        <p className="welcome-time">Takes about 5 minutes · Your strategy is yours to keep</p>
-        <button className="btn" style={{padding:"15px 44px",fontSize:12}} onClick={()=>completeOnboarding(firstName)}>Let's begin →</button>
+
+        <p className="welcome-time">Takes about 5 minutes · Free to start · No credit card needed</p>
+        <button
+          className="btn"
+          style={{padding:"16px 52px",fontSize:12}}
+          onClick={()=>completeOnboarding(firstName)}
+          disabled={!firstName.trim()}
+        >
+          Let's begin →
+        </button>
+        {!firstName.trim()&&<p style={{fontSize:11,color:"#C4B5AD",marginTop:10}}>Enter your first name to continue</p>}
       </div>
     )}
 
