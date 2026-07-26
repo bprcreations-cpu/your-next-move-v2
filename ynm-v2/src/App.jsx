@@ -80,12 +80,12 @@ function parseResult(raw){
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-webkit-font-smoothing:antialiased;overflow-x:hidden;max-width:100vw;}
 
 .nav{position:sticky;top:0;z-index:200;height:60px;padding:0 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-bottom:1px solid #F0EDEB;}
-.nav-brand{display:flex;flex-direction:column;gap:1px;cursor:pointer;}
-.nav-by{font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:#C4B5AD;}
-.nav-name{font-family:'Cormorant',serif;font-size:22px;font-weight:600;color:#1C1917;line-height:1;letter-spacing:-0.01em;}
+.nav-brand{display:flex;align-items:center;cursor:pointer;}
+
+.nav-name{font-family:'Cormorant',serif;font-size:24px;font-weight:600;color:#1C1917;line-height:1;letter-spacing:-0.01em;}
 .nav-actions{display:flex;align-items:center;gap:6px;}
 .nav-link{display:flex;align-items:center;gap:5px;padding:7px 14px;background:transparent;color:#78716C;font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;transition:all 0.2s;white-space:nowrap;}
 .nav-link:hover{background:#FAFAF8;color:#1C1917;}
@@ -104,7 +104,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .brow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 
 /* HOME */
-.hero{padding:100px 48px 80px;max-width:780px;margin:0 auto;text-align:center;}
+.hero{padding:80px 32px 64px;max-width:780px;margin:0 auto;text-align:center;width:100%;}
 .hero-eye{font-size:10px;font-weight:600;letter-spacing:0.38em;text-transform:uppercase;color:#B0728A;margin-bottom:32px;display:block;}
 .hero-h1{font-family:'Cormorant',serif;font-size:clamp(52px,8vw,100px);font-weight:600;line-height:0.96;color:#1C1917;margin-bottom:24px;letter-spacing:-0.03em;}
 .hero-h1 em{font-style:italic;color:#B0728A;}
@@ -115,21 +115,21 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .hero-cta:hover .hero-arr{transform:translateX(4px);}
 
 /* FEATURE STRIP */
-.feature-strip{display:flex;justify-content:center;gap:32px;padding:32px 48px;border-top:1px solid #F0EDEB;border-bottom:1px solid #F0EDEB;margin-bottom:0;flex-wrap:wrap;}
-.feat{display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 16px;border-radius:8px;transition:background 0.15s;}
+.feature-strip{display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;align-items:stretch;border-top:1px solid #F0EDEB;border-bottom:1px solid #F0EDEB;margin-bottom:0;}
+.feat{display:flex;flex-direction:column;justify-content:center;cursor:pointer;padding:24px 32px;transition:background 0.15s;}
 .feat:hover{background:#FAFAF8;}
 .feat-icon{font-size:18px;color:#B0728A;}
 .feat-label{font-size:12px;font-weight:500;color:#57534E;letter-spacing:0.04em;}
 .feat-label span{font-size:11px;color:#A8A29E;font-weight:300;margin-left:4px;}
 
 /* CATEGORIES */
-.cats{padding:48px 48px 80px;max-width:1080px;margin:0 auto;}
+.cats{padding:36px 24px 64px;max-width:1080px;margin:0 auto;width:100%;}
 .cats-top{margin-bottom:44px;}
 .cats-h2{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,48px);font-weight:600;color:#1C1917;margin-bottom:8px;letter-spacing:-0.02em;}
 .cats-h2 em{font-style:italic;color:#B0728A;}
 .cats-sub{font-size:14px;color:#78716C;font-weight:300;line-height:1.7;}
 .cats-row1{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:2px;}
-.cats-row2{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;max-width:66.7%;margin:0 auto;}
+.cats-row2{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;max-width:66.7%;margin:0 auto;width:100%;}
 .cat-card{padding:28px 24px 24px;cursor:pointer;border:1px solid #EEEAE7;background:#FAFAF8;position:relative;overflow:hidden;transition:background 0.2s;display:flex;flex-direction:column;}
 .cat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--acc);transform:scaleX(0);transform-origin:left;transition:transform 0.28s ease;}
 .cat-card:hover{background:#fff;}
@@ -404,19 +404,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .hub-card-cta{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#B0728A;}
 
 /* INDUSTRY QUESTIONS PAGE */
-.hub-q-page{max-width:720px;margin:0 auto;padding:48px 28px 80px;}
+.hub-q-page{max-width:1000px;margin:0 auto;padding:48px 32px 80px;}
 .hub-q-h1{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,40px);font-weight:600;color:#1C1917;margin-bottom:6px;letter-spacing:-0.01em;}
 .hub-q-sub{font-size:14px;color:#78716C;font-weight:300;line-height:1.7;margin-bottom:28px;}
-.hub-search{width:100%;padding:12px 16px;border:1px solid #EEEAE7;border-radius:100px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:#1A1916;outline:none;background:#FAFAF8;margin-bottom:24px;transition:border-color 0.15s;}
+.hub-search{width:100%;padding:13px 18px 13px 44px;border:1px solid #EEEAE7;border-radius:6px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:#1A1916;outline:none;background:#FAFAF8;margin-bottom:24px;transition:border-color 0.15s;}
 .hub-search:focus{border-color:#B0728A;background:#fff;}
 .hub-search::placeholder{color:#C4B5AD;}
-.hub-q-list{display:flex;flex-direction:column;gap:6px;}
-.hub-q-item{padding:16px 20px;border:1px solid #EEEAE7;background:#fff;border-radius:4px;cursor:pointer;transition:all 0.15s;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
-.hub-q-item:hover{border-color:#E8C4D4;background:#FDF7F9;}
-.hub-q-item-left{flex:1;}
-.hub-q-item-title{font-size:14px;font-weight:500;color:#1C1917;margin-bottom:3px;line-height:1.35;}
-.hub-q-item-desc{font-size:12px;color:#A8A29E;font-weight:300;line-height:1.5;}
-.hub-q-item-cta{font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B0728A;white-space:nowrap;flex-shrink:0;padding-top:2px;}
+.hub-q-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.hub-q-card{padding:22px 20px;border:1px solid #EEEAE7;background:#fff;border-radius:6px;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;gap:0;}
+.hub-q-card:hover{border-color:#E8C4D4;background:#FDF7F9;box-shadow:0 2px 12px rgba(176,114,138,0.08);transform:translateY(-1px);}
+.hub-q-card-tag{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#B0728A;background:rgba(176,114,138,0.08);border:1px solid rgba(176,114,138,0.15);padding:3px 10px;border-radius:100px;display:inline-block;margin-bottom:12px;align-self:flex-start;}
+.hub-q-card-title{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:#1C1917;margin-bottom:8px;line-height:1.3;letter-spacing:-0.01em;}
+.hub-q-card-desc{font-size:12px;color:#78716C;font-weight:300;line-height:1.6;flex:1;margin-bottom:16px;}
+.hub-q-card-cta{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B0728A;margin-top:auto;}
 
 /* ASK YOUR ADVISOR */
 .advisor-page{max-width:680px;margin:0 auto;padding:52px 28px 80px;}
@@ -453,12 +453,21 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 /* RESPONSIVE */
 @media(max-width:860px){
   .res-cover,.sec,.sec-dark,.res-footer,.fb-wrap{padding-left:28px;padding-right:28px;}
+  .hub-q-grid{grid-template-columns:repeat(2,1fr);}
+  .nav-link{font-size:10px;padding:6px 8px;letter-spacing:0.06em;}
   .cards-2{grid-template-columns:1fr;}
   .roadmap-grid{grid-template-columns:1fr 1fr;}
   .hub-grid{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:640px){
   .nav{padding:0 16px;height:54px;}
+  .nav-by{display:none;}
+  .nav-link{display:none;}
+  .sub-badge{display:none;}
+  .nav-name{font-size:18px;}
+  .feature-strip{grid-template-columns:1fr;}
+  .feature-strip>div[style]{display:none;}
+  .feat{padding:18px 20px;border-bottom:1px solid #F0EDEB;}
   .nav-name{font-size:16px;}
   .nav-by{font-size:9px;}
   .nav-btn{padding:6px 12px;font-size:10px;}
@@ -495,6 +504,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
   .checkin-banner{flex-direction:column;gap:12px;}
   .checkin-btn{width:100%;text-align:center;}
   .hub-grid{grid-template-columns:1fr;}
+  .hub-q-grid{grid-template-columns:1fr;}
   .hub-page,.hub-q-page,.advisor-page{padding:32px 16px 60px;}
 }
 @media print{
@@ -647,7 +657,7 @@ export default function App() {
   async function completeOnboarding(name){
     if(name&&name.trim())await saveFirstName(name.trim());
     try{await window.storage.set("has-onboarded","1");}catch(e){}
-    setHasOnboarded(true);go("home");
+    setHasOnboarded(true);go("home");setTimeout(()=>{const el=document.querySelector(".cats");if(el){el.scrollIntoView({behavior:"smooth",block:"start"});}},150);
   }
   function pickCat(id){setCatId(id);setIndustry(null);setCustomInd("");setJourneyStage(null);setAnswers({});setQIdx(0);go("industry");}
   function togglePill(val,multi){
@@ -823,18 +833,21 @@ Respond with exactly these sections:
     {/* NAV */}
     <nav className="nav">
       <div className="nav-brand" onClick={restart}>
-        <span className="nav-by">Chat It Up</span>
         <span className="nav-name">Your Next Move</span>
       </div>
       {screen!=="loading"&&(
         <div className="nav-actions">
           {isSubscribed&&<span className="sub-badge"><span className="sub-dot"/>Member</span>}
-          <button className="nav-link" onClick={()=>go("hub")}>Industry Hub</button>
-          <button className="nav-link" onClick={()=>go("advisor")}>Ask Your Advisor</button>
-          <button className="nav-link" onClick={()=>go("plans")}>
-            My Strategies{savedPlans.length>0&&<span className="nav-badge">{savedPlans.length}</span>}
+          {savedPlans.length>0&&<>
+            <button className="nav-link" onClick={()=>go("advisor")}>Ask Your Advisor</button>
+            <button className="nav-link" onClick={()=>go("hub")}>Industry Hub</button>
+            <button className="nav-link" onClick={()=>go("plans")}>
+              My Strategies{savedPlans.length>0&&<span className="nav-badge">{savedPlans.length}</span>}
+            </button>
+          </>}
+          <button className="nav-btn" style={{background:"#B0728A",color:"#fff",borderColor:"#B0728A",fontWeight:600}} onClick={()=>{if(!hasOnboarded)go("welcome");else window.scrollTo({top:document.querySelector(".cats")?.offsetTop-80||400,behavior:"smooth"});}}>
+            {savedPlans.length>0?"New Strategy":"Get Started Free →"}
           </button>
-          <button className="nav-btn" onClick={restart}>New Strategy</button>
         </div>
       )}
     </nav>
@@ -854,7 +867,7 @@ Respond with exactly these sections:
           <span className="hero-eye">Strategic Clarity On Demand</span>
           <h1 className="hero-h1">Your Personal<br/><em>Strategist.</em></h1>
           <p className="hero-sub">A guided strategy experience that helps entrepreneurs, professionals, and creatives gain clarity and move forward with confidence.</p>
-          <button className="hero-cta" onClick={()=>{if(!hasOnboarded)go("welcome");else go("home");}}>
+          <button className="hero-cta" onClick={()=>{if(!hasOnboarded)go("welcome");else{const el=document.querySelector(".cats");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});}}}>
             Create My Strategy <span className="hero-arr">→</span>
           </button>
           {!isSubscribed&&<p style={{fontSize:12,color:"#A8A29E",marginTop:14}}>First strategy free · Then $19/month · Cancel anytime</p>}
@@ -862,17 +875,19 @@ Respond with exactly these sections:
       </section>
 
       <div className="feature-strip">
-        <div className="feat" onClick={()=>go("hub")}>
-          <span className="feat-icon">◈</span>
-          <span className="feat-label">Industry Hub <span>Explore questions for your field</span></span>
-        </div>
         <div className="feat" onClick={()=>go("advisor")}>
-          <span className="feat-icon">◇</span>
-          <span className="feat-label">Ask Your Advisor <span>Get help with one specific question</span></span>
+          <div style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1C1917",marginBottom:4}}>Ask Your Advisor</div>
+          <div style={{fontSize:12,color:"#A8A29E",fontWeight:300}}>Get a direct answer to your specific question</div>
         </div>
+        <div style={{width:1,background:"#EEEAE7",alignSelf:"stretch"}}/>
+        <div className="feat" onClick={()=>go("hub")}>
+          <div style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1C1917",marginBottom:4}}>Industry Hub</div>
+          <div style={{fontSize:12,color:"#A8A29E",fontWeight:300}}>Browse questions built for your field</div>
+        </div>
+        <div style={{width:1,background:"#EEEAE7",alignSelf:"stretch"}}/>
         <div className="feat" onClick={()=>go("plans")}>
-          <span className="feat-icon">◎</span>
-          <span className="feat-label">My Strategies <span>Review and continue past plans</span></span>
+          <div style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1C1917",marginBottom:4}}>My Strategies</div>
+          <div style={{fontSize:12,color:"#A8A29E",fontWeight:300}}>Review and continue your past plans</div>
         </div>
       </div>
 
@@ -1040,11 +1055,11 @@ Respond with exactly these sections:
       <div className="hub-page">
         <div className="bc"><span onClick={restart}>Home</span></div>
         <h1 className="hub-h1">Industry <em>Hub.</em></h1>
-        <p className="hub-sub">Choose your field and explore helpful questions designed to help you move forward. Each question generates a personalized answer through Ask Your Advisor.</p>
+        <p className="hub-sub">Browse curated questions built specifically for your industry. Each one is pre-researched and ready to go — just add your context and get a focused answer.</p>
         <div className="hub-grid">
           {HUB_CATEGORIES.map(c=>(
             <div key={c.id} className="hub-card" onClick={()=>{setHubCatId(c.id);setHubSearch("");setHubQuestion(null);setHubContext("");}}>
-              <div className="hub-card-icon">{c.icon}</div>
+              <div style={{fontFamily:"'Cormorant',serif",fontSize:13,fontWeight:600,color:"#C4B5AD",letterSpacing:"0.06em",marginBottom:10}}>{c.icon}</div>
               <div className="hub-card-label">{c.label}</div>
               <div className="hub-card-desc">{c.description}</div>
               <div className="hub-card-cta">{c.questions.length} questions →</div>
@@ -1058,17 +1073,20 @@ Respond with exactly these sections:
     {screen==="hub"&&hubCatId&&!hubQuestion&&(
       <div className="hub-q-page">
         <div className="bc"><span onClick={restart}>Home</span><span className="bc-sep">›</span><span onClick={()=>setHubCatId(null)}>Industry Hub</span></div>
+        <button className="btn-out" style={{marginBottom:20,fontSize:10,padding:"8px 18px"}} onClick={()=>setHubCatId(null)}>← Back to Industry Hub</button>
         <h1 className="hub-q-h1">{hubCat?.label}</h1>
         <p className="hub-q-sub">Select a question to explore. You can add personal context before generating your answer.</p>
-        <input className="hub-search" placeholder="Search questions…" value={hubSearch} onChange={e=>setHubSearch(e.target.value)}/>
-        <div className="hub-q-list">
+        <div style={{position:"relative",marginBottom:24}}>
+          <span style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",color:"#C4B5AD",fontSize:14}}>⌕</span>
+          <input className="hub-search" style={{marginBottom:0}} placeholder="Search questions…" value={hubSearch} onChange={e=>setHubSearch(e.target.value)}/>
+        </div>
+        <div className="hub-q-grid">
           {filteredQuestions.map(q=>(
-            <div key={q.id} className="hub-q-item" onClick={()=>{setHubQuestion(q);setHubContext("");setAdvisorResult(null);}}>
-              <div className="hub-q-item-left">
-                <div className="hub-q-item-title">{q.title}</div>
-                <div className="hub-q-item-desc">{q.description}</div>
-              </div>
-              <div className="hub-q-item-cta">Ask this →</div>
+            <div key={q.id} className="hub-q-card" onClick={()=>{setHubQuestion(q);setHubContext("");setAdvisorResult(null);}}>
+              <div className="hub-q-card-tag">{hubCat?.label}</div>
+              <div className="hub-q-card-title">{q.title}</div>
+              <div className="hub-q-card-desc">{q.description}</div>
+              <div className="hub-q-card-cta">Ask this →</div>
             </div>
           ))}
           {filteredQuestions.length===0&&<p style={{color:"#A8A29E",fontSize:13,padding:"20px 0"}}>No questions match your search.</p>}
@@ -1153,14 +1171,23 @@ Respond with exactly these sections:
       <div className="advisor-page">
         <div className="bc"><span onClick={restart}>Home</span></div>
         <h1 className="advisor-h1">Ask Your <em>Advisor.</em></h1>
-        <p className="advisor-sub">Ask a question, describe a challenge, or tell us what you are working on. The more specific you are, the more useful your answer will be.</p>
+        <p className="advisor-sub">Have a specific situation you need help with? Type it in your own words and get a direct, personalized answer — no browsing required.</p>
         <textarea className="advisor-ta" rows={5} placeholder="e.g. I have been a real estate agent for 2 years and I cannot figure out how to get consistent listings. I have tried open houses and cold calling but nothing is working…" value={advisorQ} onChange={e=>setAdvisorQ(e.target.value)}/>
         <p className="advisor-hint">Type your question above or choose a suggested question below.</p>
         <div className="advisor-suggested">
-          <div className="advisor-suggested-label">Suggested questions</div>
+          <div className="advisor-suggested-label">Common questions — tap to use</div>
           <div className="advisor-suggestions">
-            {["How do I get my first paying clients?","How do I raise my prices without losing clients?","How do I build a referral system?","How do I stand out in a crowded market?","How do I stay motivated when growth is slow?"].map(s=>(
-              <button key={s} className="advisor-sugg" onClick={()=>setAdvisorQ(s)}>{s}</button>
+            {[
+              "How do I get my first paying clients?",
+              "How do I raise my prices without losing clients?",
+              "How do I build a referral system that actually works?",
+              "How do I stand out in a crowded market?",
+              "How do I stay motivated when growth is slow?",
+              "Should I niche down or stay broad?",
+              "When should I hire help?",
+              "How do I make my revenue more consistent?"
+            ].map(s=>(
+              <button key={s} className="advisor-sugg" onClick={()=>{setAdvisorQ(s);window.scrollTo({top:0,behavior:"smooth"});}}>{s}</button>
             ))}
           </div>
         </div>
