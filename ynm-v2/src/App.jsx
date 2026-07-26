@@ -411,10 +411,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .hub-search:focus{border-color:#B0728A;background:#fff;}
 .hub-search::placeholder{color:#C4B5AD;}
 .hub-q-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.hub-q-card{padding:22px 20px;border:1px solid #EEEAE7;background:#fff;border-radius:6px;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;gap:0;}
+.hub-q-card{padding:22px 20px;border:1px solid #EEEAE7;background:#fff;border-radius:6px;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;gap:0;min-height:140px;}
 .hub-q-card:hover{border-color:#E8C4D4;background:#FDF7F9;box-shadow:0 2px 12px rgba(176,114,138,0.08);transform:translateY(-1px);}
 .hub-q-card-tag{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#B0728A;background:rgba(176,114,138,0.08);border:1px solid rgba(176,114,138,0.15);padding:3px 10px;border-radius:100px;display:inline-block;margin-bottom:12px;align-self:flex-start;}
-.hub-q-card-title{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:#1C1917;margin-bottom:8px;line-height:1.3;letter-spacing:-0.01em;}
+.hub-q-card-title{font-family:'Cormorant',serif;font-size:16px;font-weight:600;color:#1C1917;margin-bottom:0;line-height:1.45;letter-spacing:-0.005em;flex:1;}
 .hub-q-card-desc{font-size:12px;color:#78716C;font-weight:300;line-height:1.6;flex:1;margin-bottom:16px;}
 .hub-q-card-cta{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B0728A;margin-top:auto;}
 
@@ -549,6 +549,9 @@ export default function App() {
 
   // Industry Hub state
   const [hubCatId,     setHubCatId]     = useState(null);
+  const [hubSearchResult, setHubSearchResult] = useState(null);
+  const [hubSearchLoading, setHubSearchLoading] = useState(false);
+  const [hubSearchQuery, setHubSearchQuery] = useState("");
   const [hubSearch,    setHubSearch]    = useState("");
   const [hubQuestion,  setHubQuestion]  = useState(null);
   const [hubContext,   setHubContext]   = useState("");
@@ -824,6 +827,50 @@ Respond with exactly these sections:
       try{localStorage.setItem("advisor-history",JSON.stringify(newHistory));}catch(e){}
     }catch(e){setAdvisorResult({error:"Something went wrong. Please try again.",question,date:""});}
     finally{setAdvisorLoading(false);}
+  }
+
+  async function askHubSearch(query){
+    if(!query.trim())return;
+    setHubSearchLoading(true);setHubSearchResult(null);
+    const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry.`:"";
+    const prompt=`You are a trusted business, career, and professional development advisor. Answer the following question with depth, clarity, and practical insight. Be direct and specific — no generic advice.
+
+${firstName?`The person's name is ${firstName}.`:""} ${context}
+
+Question: ${query}
+
+Respond with exactly these four sections. Be specific and actionable.
+
+**Direct Answer**
+2–3 clear, direct sentences answering the question. No fluff.
+
+**Why It Matters**
+1–2 sentences explaining the significance or impact.
+
+**Next Steps**
+3 specific, actionable steps numbered 1, 2, 3.
+
+**Do This First**
+1 sentence — the single most important immediate action.`;
+
+    try{
+      const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
+      if(!res.ok)throw new Error("Failed");
+      const data=await res.json();
+      const text=data.text||"";
+      const directMatch=text.match(/\*\*Direct Answer\*\*\s*([\s\S]*?)(?=\*\*Why It Matters\*\*|$)/i);
+      const whyMatch=text.match(/\*\*Why It Matters\*\*\s*([\s\S]*?)(?=\*\*Next Steps\*\*|$)/i);
+      const stepsMatch=text.match(/\*\*Next Steps\*\*\s*([\s\S]*?)(?=\*\*Do This First\*\*|$)/i);
+      const firstMatch=text.match(/\*\*Do This First\*\*\s*([\s\S]*?)(?=$)/i);
+      setHubSearchResult({
+        query,
+        direct:(directMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        why:(whyMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        steps:lines((stepsMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
+        first:(firstMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+      });
+    }catch(e){setHubSearchResult({query,error:"Something went wrong. Please try again."});}
+    finally{setHubSearchLoading(false);}
   }
 
   // ─── RENDER ──────────────────────────────────────────────────────────────
@@ -1132,9 +1179,44 @@ Respond with exactly these sections:
         <div className="bc"><span onClick={restart}>Home</span></div>
         <h1 className="hub-h1">Industry <em>Hub.</em></h1>
         <p className="hub-sub">Browse curated questions built specifically for your industry. Each one is pre-researched and ready to go — just add your context and get a focused answer.</p>
+        {/* Global search on landing page too */}
+        <div style={{marginBottom:32}}>
+          <div style={{position:"relative",display:"flex",gap:0}}>
+            <div style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",color:"#C4B5AD",fontSize:15,zIndex:1}}>⌕</div>
+            <input
+              className="hub-search"
+              style={{marginBottom:0,paddingLeft:44,paddingRight:120,borderRadius:"6px 0 0 6px",flex:1}}
+              placeholder="Ask any question and get an instant AI answer…"
+              value={hubSearchQuery}
+              onChange={e=>{setHubSearchQuery(e.target.value);setHubSearchResult(null);}}
+              onKeyDown={e=>{if(e.key==="Enter"&&hubSearchQuery.trim())askHubSearch(hubSearchQuery);}}
+            />
+            <button
+              onClick={()=>{if(hubSearchQuery.trim())askHubSearch(hubSearchQuery);}}
+              disabled={hubSearchLoading||!hubSearchQuery.trim()}
+              style={{padding:"0 20px",background:"#1A1916",color:"#fff",border:"none",borderRadius:"0 6px 6px 0",fontSize:11,fontWeight:500,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"'Plus Jakarta Sans',sans-serif"}}
+            >{hubSearchLoading?"Searching…":"Ask →"}</button>
+          </div>
+          <p style={{fontSize:11,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Ask anything — or browse by industry below</p>
+        </div>
+        {hubSearchLoading&&<div style={{textAlign:"center",padding:"32px 0"}}><div className="load-ring" style={{margin:"0 auto 14px"}}/><p style={{fontSize:13,color:"#78716C"}}>Finding your answer…</p></div>}
+        {hubSearchResult&&!hubSearchResult.error&&(
+          <div style={{marginBottom:28,border:"1px solid #EEEAE7",borderRadius:6,overflow:"hidden"}}>
+            <div style={{background:"#1A1916",padding:"16px 22px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>AI Answer</p><p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:500,color:"#fff"}}>"{hubSearchResult.query}"</p></div>
+              <button onClick={()=>{setHubSearchResult(null);setHubSearchQuery("");}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"5px 14px",color:"#A8A29E",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Clear</button>
+            </div>
+            {hubSearchResult.direct&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Direct Answer</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.direct}</p></div>}
+            {hubSearchResult.why&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Why It Matters</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.why}</p></div>}
+            {hubSearchResult.steps?.length>0&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Next Steps</p><div style={{display:"flex",flexDirection:"column",gap:10}}>{hubSearchResult.steps.map((s,i)=><div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}><div style={{width:22,height:22,borderRadius:"50%",background:"#B0728A",color:"#fff",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div><p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p></div>)}</div></div>}
+            {hubSearchResult.first&&<div style={{padding:"18px 22px",background:"#FAFAF8"}}><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Do This First</p><p style={{fontSize:14,color:"#1A1916",fontWeight:500,lineHeight:1.6}}>{hubSearchResult.first}</p></div>}
+          </div>
+        )}
+
+        <h2 style={{fontFamily:"'Cormorant',serif",fontSize:20,fontWeight:600,color:"#1C1917",marginBottom:16,letterSpacing:"-0.01em"}}>Browse by Industry</h2>
         <div className="hub-grid">
           {HUB_CATEGORIES.map(c=>(
-            <div key={c.id} className="hub-card" onClick={()=>{setHubCatId(c.id);setHubSearch("");setHubQuestion(null);setHubContext("");}}>
+            <div key={c.id} className="hub-card" onClick={()=>{setHubCatId(c.id);setHubSearch("");setHubSearchQuery("");setHubSearchResult(null);setHubQuestion(null);setHubContext("");}}>
               <div style={{fontFamily:"'Cormorant',serif",fontSize:13,fontWeight:600,color:"#C4B5AD",letterSpacing:"0.06em",marginBottom:10}}>{c.icon}</div>
               <div className="hub-card-label">{c.label}</div>
               <div className="hub-card-desc">{c.description}</div>
@@ -1152,17 +1234,88 @@ Respond with exactly these sections:
         <button className="btn-out" style={{marginBottom:20,fontSize:10,padding:"8px 18px"}} onClick={()=>setHubCatId(null)}>← Back to Industry Hub</button>
         <h1 className="hub-q-h1">{hubCat?.label}</h1>
         <p className="hub-q-sub">Select a question to explore. You can add personal context before generating your answer.</p>
-        <div style={{position:"relative",marginBottom:24}}>
-          <span style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",color:"#C4B5AD",fontSize:14}}>⌕</span>
-          <input className="hub-search" style={{marginBottom:0}} placeholder="Search questions…" value={hubSearch} onChange={e=>setHubSearch(e.target.value)}/>
+        {/* AI-POWERED SEARCH BAR */}
+        <div style={{marginBottom:28}}>
+          <div style={{position:"relative",display:"flex",gap:0}}>
+            <div style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",color:"#C4B5AD",fontSize:15,zIndex:1}}>⌕</div>
+            <input
+              className="hub-search"
+              style={{marginBottom:0,paddingLeft:44,paddingRight:120,borderRadius:"6px 0 0 6px",flex:1}}
+              placeholder="Ask anything — or search existing prompts…"
+              value={hubSearchQuery||hubSearch}
+              onChange={e=>{const v=e.target.value;setHubSearchQuery(v);setHubSearch(v);setHubSearchResult(null);}}
+              onKeyDown={e=>{if(e.key==="Enter"&&(hubSearchQuery||hubSearch).trim()){askHubSearch(hubSearchQuery||hubSearch);}}}
+            />
+            <button
+              onClick={()=>{const q=hubSearchQuery||hubSearch;if(q.trim())askHubSearch(q);}}
+              disabled={hubSearchLoading||!(hubSearchQuery||hubSearch).trim()}
+              style={{padding:"0 20px",background:"#1A1916",color:"#fff",border:"none",borderRadius:"0 6px 6px 0",fontSize:11,fontWeight:500,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"'Plus Jakarta Sans',sans-serif",transition:"background 0.2s"}}
+              onMouseEnter={e=>e.target.style.background="#B0728A"}
+              onMouseLeave={e=>e.target.style.background="#1A1916"}
+            >
+              {hubSearchLoading?"Searching…":"Ask →"}
+            </button>
+          </div>
+          <p style={{fontSize:11,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Press Enter or click Ask → to get a full AI answer to any question</p>
         </div>
+
+        {/* AI SEARCH RESULT */}
+        {hubSearchLoading&&(
+          <div style={{textAlign:"center",padding:"32px 0",marginBottom:24}}>
+            <div className="load-ring" style={{margin:"0 auto 14px"}}/>
+            <p style={{fontSize:13,color:"#78716C"}}>Finding your answer…</p>
+          </div>
+        )}
+        {hubSearchResult&&!hubSearchResult.error&&(
+          <div style={{marginBottom:28,border:"1px solid #EEEAE7",borderRadius:6,overflow:"hidden"}}>
+            <div style={{background:"#1A1916",padding:"16px 22px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>AI Answer</p>
+                <p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:500,color:"#fff",lineHeight:1.3}}>"{hubSearchResult.query}"</p>
+              </div>
+              <button onClick={()=>{setHubSearchResult(null);setHubSearchQuery("");setHubSearch("");}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"5px 14px",color:"#A8A29E",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.08em",textTransform:"uppercase"}}>Clear</button>
+            </div>
+            {hubSearchResult.direct&&(
+              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Direct Answer</p>
+                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.direct}</p>
+              </div>
+            )}
+            {hubSearchResult.why&&(
+              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Why It Matters</p>
+                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.why}</p>
+              </div>
+            )}
+            {hubSearchResult.steps?.length>0&&(
+              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Next Steps</p>
+                <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                  {hubSearchResult.steps.map((s,i)=>(
+                    <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}>
+                      <div style={{width:22,height:22,borderRadius:"50%",background:"#B0728A",color:"#fff",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div>
+                      <p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {hubSearchResult.first&&(
+              <div style={{padding:"18px 22px",background:"#FAFAF8"}}>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Do This First</p>
+                <p style={{fontSize:14,color:"#1A1916",fontWeight:500,lineHeight:1.6}}>{hubSearchResult.first}</p>
+              </div>
+            )}
+          </div>
+        )}
+        {hubSearchResult?.error&&<div className="err" style={{marginBottom:20}}>⚠ {hubSearchResult.error}</div>}
         <div className="hub-q-grid">
           {filteredQuestions.map(q=>(
             <div key={q.id} className="hub-q-card" onClick={()=>{setHubQuestion(q);setHubContext("");setAdvisorResult(null);}}>
               <div className="hub-q-card-tag">{hubCat?.label}</div>
-              <div className="hub-q-card-title">{q.title}</div>
-              <div className="hub-q-card-desc">{q.description}</div>
-              <div className="hub-q-card-cta">Ask this →</div>
+              <div className="hub-q-card-title">{q.question.length > 80 ? q.question.substring(0,78)+"…" : q.question}</div>
+
+              <div className="hub-q-card-cta">Use this prompt →</div>
             </div>
           ))}
           {filteredQuestions.length===0&&<p style={{color:"#A8A29E",fontSize:13,padding:"20px 0"}}>No questions match your search.</p>}
@@ -1189,7 +1342,7 @@ Respond with exactly these sections:
         />
         <p className="advisor-hint">The more context you add, the more specific your answer will be.</p>
         <div style={{display:"flex",gap:8,marginBottom:24,flexWrap:"wrap"}}>
-          <button className="btn" disabled={advisorLoading||!hubContext.trim()} onClick={()=>askAdvisor(hubQuestion.question.replace("{context}",hubContext))}>
+          <button className="btn" disabled={advisorLoading||!hubContext.trim()} onClick={()=>askAdvisor(hubQuestion.question + (hubContext.trim() ? " Here is my specific context: " + hubContext.trim() : ""))}>
             {advisorLoading?"Generating your answer…":"Get My Answer →"}
           </button>
           <button className="btn-out" onClick={()=>setHubQuestion(null)}>← Back to questions</button>
