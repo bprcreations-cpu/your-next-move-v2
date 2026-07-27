@@ -958,7 +958,6 @@ Respond with exactly these five sections. Use clear headers. Be specific and met
         </button>
       </>)}
     </nav>
-    </nav>
     {/* Mobile slide-out menu */}
     <div className={`mobile-menu${mobileMenuOpen?" open":""}`}>
       <button className="mobile-menu-link" onClick={()=>go("home")}>Home <span>→</span></button>
@@ -1937,8 +1936,8 @@ Respond with exactly these five sections. Use clear headers. Be specific and met
             {nextMove&&(
               <div style={{background:"#1A1916",borderRadius:8,padding:"22px 26px",maxWidth:500,margin:"0 auto 22px",textAlign:"left"}}>
                 <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.16em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:8}}>Your commitment</p>
-                <p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(14px,2.2vw,18px)",fontWeight:500,fontStyle:"italic",color:"#fff",lineHeight:1.45}}>{'"'}{nextMove.replace(/\*\*/g,"").split(".")[0]}.{'"'}</p>
-                <button style={{marginTop:12,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"6px 16px",color:"#C4A0B0",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.1em",textTransform:"uppercase"}} onClick={()=>{const txt=`"${nextMove.replace(/\*\*/g,"").split(".")[0]}." — My strategy from Your Next Move`;if(navigator.clipboard)navigator.clipboard.writeText(txt);}}>Share this →</button>
+                <p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(14px,2.2vw,18px)",fontWeight:500,fontStyle:"italic",color:"#fff",lineHeight:1.45}}>{'"'}{(nextMove||"").split("**").join("").split(".")[0]}.{'"'}</p>
+                <button style={{marginTop:12,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"6px 16px",color:"#C4A0B0",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.1em",textTransform:"uppercase"}} onClick={()=>{const txt='"'+(nextMove||"").split("**").join("").split(".")[0]+'." — My strategy from Your Next Move';if(navigator.clipboard)navigator.clipboard.writeText(txt);}}>Share this →</button>
               </div>
             )}
             <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginBottom:12}}>
