@@ -84,16 +84,25 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 
 .nav{position:sticky;top:0;z-index:200;height:60px;padding:0 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-bottom:1px solid #F0EDEB;}
 .nav-brand{display:flex;align-items:center;cursor:pointer;}
-
 .nav-name{font-family:'Cormorant',serif;font-size:24px;font-weight:600;color:#1C1917;line-height:1;letter-spacing:-0.01em;}
 .nav-actions{display:flex;align-items:center;gap:6px;}
 .nav-link{display:flex;align-items:center;gap:5px;padding:7px 14px;background:transparent;color:#78716C;font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;transition:all 0.2s;white-space:nowrap;}
 .nav-link:hover{background:#FAFAF8;color:#1C1917;}
-.nav-badge{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;background:#B0728A;color:#fff;font-size:9px;font-weight:500;border-radius:100px;}
+.nav-badge{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;background:#B0728A;color:#fff;font-size:11px;font-weight:500;border-radius:100px;}
 .nav-btn{padding:7px 18px;background:transparent;color:#1C1917;font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #D4CECC;cursor:pointer;border-radius:100px;transition:all 0.2s;white-space:nowrap;}
 .nav-btn:hover{background:#1A1916;color:#fff;border-color:#1A1916;}
 .sub-badge{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#6A9E8A;padding:5px 12px;border-radius:100px;border:1px solid rgba(106,158,138,0.25);background:rgba(106,158,138,0.05);}
 .sub-dot{width:6px;height:6px;border-radius:50%;background:#6A9E8A;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;background:none;border:none;}
+.hamburger span{display:block;width:22px;height:2px;background:#1A1916;border-radius:2px;transition:all 0.25s;}
+.mobile-menu{display:none;position:fixed;top:60px;left:0;right:0;bottom:0;background:rgba(255,255,255,0.98);backdrop-filter:blur(20px);z-index:199;flex-direction:column;padding:32px 24px;gap:4px;border-top:1px solid #F0EDEB;}
+.mobile-menu.open{display:flex;}
+.mobile-menu-link{display:flex;align-items:center;justify-content:space-between;padding:18px 0;font-size:22px;font-family:'Cormorant',serif;font-weight:600;color:#1C1917;border-bottom:1px solid #F0EDEB;cursor:pointer;letter-spacing:-0.01em;background:none;border-left:none;border-right:none;border-top:none;text-align:left;width:100%;}
+.mobile-menu-link:last-of-type{border-bottom:none;}
+.mobile-menu-link:hover{color:#B0728A;}
+.mobile-menu-link span{font-size:20px;color:#C4B5AD;}
+.mobile-menu-cta{margin-top:24px;width:100%;padding:16px;background:#1A1916;color:#fff;font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;}
+.mobile-menu-cta:hover{background:#B0728A;}
 
 .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:#1A1916;color:#fff;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;transition:all 0.2s;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;}
 .btn:hover{background:#B0728A;}
@@ -105,7 +114,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 
 /* HOME */
 .hero{padding:80px 32px 64px;max-width:780px;margin:0 auto;text-align:center;width:100%;}
-.hero-eye{font-size:10px;font-weight:600;letter-spacing:0.38em;text-transform:uppercase;color:#B0728A;margin-bottom:32px;display:block;}
+.hero-eye{font-size:11px;font-weight:600;letter-spacing:0.38em;text-transform:uppercase;color:#B0728A;margin-bottom:32px;display:block;}
 .hero-h1{font-family:'Cormorant',serif;font-size:clamp(52px,8vw,100px);font-weight:600;line-height:0.96;color:#1C1917;margin-bottom:24px;letter-spacing:-0.03em;}
 .hero-h1 em{font-style:italic;color:#B0728A;}
 .hero-sub{font-size:16px;line-height:1.8;color:#6A6560;font-weight:300;max-width:460px;margin:0 auto 44px;}
@@ -136,17 +145,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .cat-card:hover::before{transform:scaleX(1);}
 .cat-card:hover .cat-go{opacity:1;}
 .cat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.cat-num{font-family:'Cormorant',serif;font-size:12px;font-weight:500;color:#C4B5AD;letter-spacing:0.06em;}
-.cat-rec{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;background:rgba(176,114,138,0.1);color:#B0728A;border:1px solid rgba(176,114,138,0.2);padding:2px 9px;border-radius:100px;}
+.cat-num{font-family:'Cormorant',serif;font-size:14px;font-weight:500;color:#C4B5AD;letter-spacing:0.06em;}
+.cat-rec{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;background:rgba(176,114,138,0.1);color:#B0728A;border:1px solid rgba(176,114,138,0.2);padding:2px 9px;border-radius:100px;}
 .cat-label{font-family:'Cormorant',serif;font-size:24px;font-weight:600;color:#1C1917;margin-bottom:5px;letter-spacing:-0.01em;}
 .cat-tag{font-size:12px;color:#78716C;line-height:1.55;margin-bottom:8px;font-weight:300;}
 .cat-detail{font-size:11px;color:#A8A29E;line-height:1.6;font-weight:300;flex:1;margin-bottom:12px;}
-.cat-go{font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--acc);opacity:0;transition:opacity 0.2s;margin-top:auto;}
+.cat-go{font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--acc);opacity:0;transition:opacity 0.2s;margin-top:auto;}
 
 /* WELCOME */
 .welcome{min-height:78vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 40px;text-align:center;}
 .welcome-rule{width:1px;height:48px;background:linear-gradient(to bottom,transparent,#D4C8C0);margin:0 auto 32px;}
-.welcome-eye{font-size:10px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#B0728A;margin-bottom:18px;display:block;}
+.welcome-eye{font-size:11px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#B0728A;margin-bottom:18px;display:block;}
 .welcome-h{font-family:'Cormorant',serif;font-size:clamp(26px,5vw,44px);font-weight:600;color:#1A1916;line-height:1.1;margin-bottom:14px;letter-spacing:-0.02em;}
 .welcome-h em{font-style:italic;color:#B0728A;}
 .welcome-sub{font-size:15px;color:#6A6560;line-height:1.75;font-weight:300;max-width:420px;margin:0 auto 28px;}
@@ -164,7 +173,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 
 /* FLOW */
 .page{max-width:600px;margin:0 auto;padding:48px 24px 72px;}
-.bc{display:flex;align-items:center;gap:6px;margin-bottom:24px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#C4B5AD;flex-wrap:wrap;}
+.bc{display:flex;align-items:center;gap:6px;margin-bottom:24px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#C4B5AD;flex-wrap:wrap;}
 .bc span{cursor:pointer;transition:color 0.15s;}
 .bc span:hover{color:#B0728A;}
 .bc-sep{color:#DDD8D3;}
@@ -175,7 +184,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .prog-bar{height:2px;border-radius:2px;background:#EDE9E6;transition:all 0.3s;width:22px;}
 .prog-bar.done{background:#D8D0D4;}
 .prog-bar.active{background:#B0728A;width:32px;}
-.prog-label{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#C4B5AD;}
+.prog-label{font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#C4B5AD;}
 .igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:32px;}
 .ipill{padding:11px 8px;border:1px solid #EDE9E6;background:#fff;cursor:pointer;font-size:12px;color:#57534E;border-radius:3px;transition:all 0.15s;text-align:center;line-height:1.3;font-family:'Plus Jakarta Sans',sans-serif;}
 .ipill:hover{border-color:#E8A898;background:#FDF7F9;}
@@ -194,10 +203,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .q-shell{min-height:300px;}
 .q-in{animation:rise 0.32s cubic-bezier(0.22,0.61,0.36,1) both;}
 @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-.q-eye{font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:12px;}
+.q-eye{font-size:12px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:12px;}
 .q-text{font-family:'Cormorant',serif;font-size:clamp(22px,4vw,34px);font-weight:500;color:#1C1917;margin-bottom:10px;line-height:1.25;letter-spacing:-0.01em;}
 .q-hint-block{background:#FAFAF8;border:1px solid #EEEAE7;border-radius:4px;padding:12px 14px;margin-bottom:14px;}
-.q-hint-label{font-size:9px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#C4B5AD;margin-bottom:6px;}
+.q-hint-label{font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#C4B5AD;margin-bottom:6px;}
 .q-hint-text{font-size:12px;color:#78716C;font-weight:300;line-height:1.6;}
 .q-hint-example{font-size:11px;color:#A8A29E;font-style:italic;margin-top:6px;line-height:1.5;}
 .q-multi-hint{font-size:11px;color:#A8A29E;margin-bottom:8px;}
@@ -236,15 +245,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .res{max-width:860px;margin:0 auto;width:100%;}
 .res-cover{background:#1A1916;padding:56px 52px 48px;animation:coverReveal 0.4s ease both;}
 @keyframes coverReveal{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
-.res-eye{font-size:9px;font-weight:600;letter-spacing:0.4em;text-transform:uppercase;color:#5A5350;margin-bottom:16px;display:block;}
+.res-eye{font-size:11px;font-weight:600;letter-spacing:0.4em;text-transform:uppercase;color:#5A5350;margin-bottom:16px;display:block;}
 .res-h1{font-family:'Cormorant',serif;font-size:clamp(32px,5vw,56px);font-weight:600;color:#fff;line-height:1.05;margin-bottom:10px;letter-spacing:-0.02em;}
 .res-h1 em{font-style:italic;color:#E8C4D4;}
-.res-meta{font-size:10px;color:#5A5350;margin-bottom:12px;letter-spacing:0.04em;}
+.res-meta{font-size:12px;color:#5A5350;margin-bottom:12px;letter-spacing:0.04em;}
 .res-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px;}
-.res-tag{font-size:10px;color:#6A6060;border:1px solid #2E2926;padding:4px 12px;border-radius:100px;}
+.res-tag{font-size:12px;color:#6A6060;border:1px solid #2E2926;padding:4px 12px;border-radius:100px;}
 .res-tag-saved{color:#8FBFA8;border-color:#2A3A33;}
 .res-btns{display:flex;gap:7px;flex-wrap:wrap;}
-.res-btn{padding:8px 18px;font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border-radius:100px;cursor:pointer;transition:all 0.2s;background:transparent;color:#7A6E68;border:1px solid #2E2926;font-family:'Plus Jakarta Sans',sans-serif;}
+.res-btn{padding:9px 20px;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;border-radius:100px;cursor:pointer;transition:all 0.2s;background:transparent;color:#7A6E68;border:1px solid #2E2926;font-family:'Plus Jakarta Sans',sans-serif;}
 .res-btn:hover{border-color:#B0728A;color:#E8C4D4;}
 
 .sec{padding:44px 52px;border-bottom:1px solid #EEEAE7;}
@@ -252,9 +261,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .sec-dark{background:#1A1916;padding:52px;}
 .sec-light{background:#FAFAF8;}
 .sec-green{background:linear-gradient(135deg,#EFF7F3,#E6F2EC);border-top:2px solid #6A9E8A;}
-.sec-kicker{font-size:9px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#C4B5AD;margin-bottom:6px;display:flex;align-items:center;gap:12px;}
+.sec-kicker{font-size:11px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#C4B5AD;margin-bottom:6px;display:flex;align-items:center;gap:12px;}
 .sec-kicker-num{font-family:'Cormorant',serif;font-size:26px;font-weight:600;color:#DDD8D4;letter-spacing:-0.02em;line-height:1;}
-.sec-kicker-dark{color:#5A4A42;}
+.sec-kicker-dark{color:#6A5A52;}
 .sec-kicker-num-dark{color:#3A3330;}
 .sec-purpose{font-size:11px;color:#B8AFA8;margin-bottom:20px;font-style:italic;}
 .sec-purpose-dark{color:#5A5350;}
@@ -263,7 +272,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .cards-2{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:16px;}
 .card-sm{padding:20px 22px;background:#fff;border:1px solid #EEEAE7;}
 .card-sm-gap{border-left:2px solid #E8C4D4;}
-.card-sm-label{font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#B8AFA8;margin-bottom:8px;}
+.card-sm-label{font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#B8AFA8;margin-bottom:8px;}
 .card-sm-text{font-size:13px;color:#57534E;line-height:1.65;font-weight:300;}
 .opp-list{display:flex;flex-direction:column;gap:2px;margin-top:4px;}
 .opp-row{display:flex;overflow:hidden;border:1px solid #EEEAE7;}
@@ -277,22 +286,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .action-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#B0728A;flex-shrink:0;font-family:'Cormorant',serif;border:1.5px solid #E8C4D4;background:#F5E6EC;}
 .action-num.first{background:#B0728A;border-color:#B0728A;color:#fff;}
 .action-content{flex:1;}
-.action-priority{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:3px;}
+.action-priority{font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:3px;}
 .action-title{font-size:14px;font-weight:500;color:#1C1917;margin-bottom:3px;line-height:1.35;}
 .action-body{font-size:13px;color:#57534E;line-height:1.65;font-weight:300;}
 .action-why{margin-top:6px;padding-top:6px;border-top:1px solid #F0EDEB;font-size:12px;color:#B0728A;font-style:italic;line-height:1.55;}
 .deprioritize{margin-top:18px;padding:14px 18px;background:#FAFAF8;border:1px solid #EEEAE7;border-radius:4px;}
-.dep-label{font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:5px;}
+.dep-label{font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:5px;}
 .dep-text{font-size:13px;color:#78716C;font-weight:300;line-height:1.55;}
 .roadmap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:16px;}
 .wk{background:#201918;border:1px solid #2A2522;overflow:hidden;}
 .wk-head{padding:14px 16px 12px;border-bottom:1px solid #2E2926;}
 .wk-n{font-family:'Cormorant',serif;font-size:34px;font-weight:700;color:#2E2926;line-height:1;margin-bottom:5px;}
-.wk-theme-lbl{font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#5A5350;margin-bottom:2px;}
+.wk-theme-lbl{font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#5A5350;margin-bottom:2px;}
 .wk-theme{font-family:'Cormorant',serif;font-size:14px;font-weight:600;color:#C4A0B0;line-height:1.2;}
 .wk-body{padding:12px 16px 14px;}
 .wk-items{list-style:none;}
-.wk-item{font-size:11px;color:#7A6E68;line-height:1.6;padding:4px 0 4px 12px;border-bottom:1px solid #2A2522;position:relative;}
+.wk-item{font-size:12px;color:#7A6E68;line-height:1.6;padding:4px 0 4px 12px;border-bottom:1px solid #2A2522;position:relative;}
 .wk-item:last-child{border-bottom:none;}
 .wk-item::before{content:'›';position:absolute;left:0;color:#B0728A;font-size:12px;top:4px;}
 .look-list{display:flex;flex-direction:column;margin-top:4px;}
@@ -303,17 +312,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .look-title{font-family:'Cormorant',serif;font-size:16px;font-weight:600;color:#1C1917;margin-bottom:2px;}
 .look-body{font-size:13px;color:#78716C;line-height:1.6;font-weight:300;}
 .insight-block{margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);}
-.insight-label{font-size:9px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#C4A0B0;margin-bottom:12px;}
+.insight-label{font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#C4A0B0;margin-bottom:12px;}
 .insight-text{font-family:'Cormorant',serif;font-size:clamp(18px,3vw,26px);font-weight:600;font-style:italic;color:#fff;line-height:1.28;letter-spacing:-0.01em;}
 .insight-copy{margin-top:16px;padding:7px 18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:100px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#C4A0B0;cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
 .insight-copy:hover{background:rgba(255,255,255,0.1);color:#fff;}
-.nextmove-kicker{font-size:9px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#C4A0B0;margin-bottom:16px;display:block;}
+.nextmove-kicker{font-size:11px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#C4A0B0;margin-bottom:16px;display:block;}
 .nextmove-sub{font-family:'Cormorant',serif;font-size:13px;font-style:italic;color:#5A5350;margin-bottom:28px;display:block;line-height:1.65;}
 .nextmove-text{font-family:'Cormorant',serif;font-size:clamp(20px,3.5vw,36px);font-weight:500;font-style:italic;color:#fff;line-height:1.35;max-width:680px;margin:0 auto 36px;letter-spacing:-0.01em;text-align:center;}
 .nextmove-rule{width:40px;height:1px;background:#3A3330;margin:0 auto 18px;}
 .nextmove-footer{font-size:11px;color:#5A5350;letter-spacing:0.08em;text-transform:uppercase;font-weight:500;display:block;text-align:center;}
 .res-footer{display:flex;gap:8px;padding:28px 52px 52px;flex-wrap:wrap;border-top:1px solid #F0EDEB;}
-.edit-btn{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#B8AFA8;background:none;border:1px solid #EEEAE7;padding:5px 12px;border-radius:100px;cursor:pointer;transition:all 0.15s;margin-top:16px;font-family:'Plus Jakarta Sans',sans-serif;}
+.edit-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#B8AFA8;background:none;border:1px solid #EEEAE7;padding:5px 12px;border-radius:100px;cursor:pointer;transition:all 0.15s;margin-top:16px;font-family:'Plus Jakarta Sans',sans-serif;}
 .edit-btn:hover{border-color:#B0728A;color:#B0728A;}
 .edit-ta{width:100%;min-height:120px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:300;color:#1A1916;line-height:1.75;border:1.5px solid #B0728A;border-radius:4px;background:#FDFCFC;resize:vertical;outline:none;margin-top:12px;}
 .edit-acts{display:flex;gap:7px;margin-top:8px;}
@@ -347,16 +356,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .plan-body{flex:1;padding:16px 20px;min-width:0;}
 .plan-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
 .plan-tags{display:flex;gap:5px;flex-wrap:wrap;}
-.plan-tag{font-size:9px;color:#78716C;background:#F5F4F2;padding:3px 9px;border-radius:100px;}
-.plan-date{font-size:10px;color:#C4B5AD;flex-shrink:0;}
+.plan-tag{font-size:11px;color:#78716C;background:#F5F4F2;padding:3px 9px;border-radius:100px;}
+.plan-date{font-size:12px;color:#C4B5AD;flex-shrink:0;}
 .plan-title{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:#1C1917;margin-bottom:4px;}
 .plan-preview{font-size:12px;color:#78716C;line-height:1.55;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 .plan-actions-col{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;padding:14px 16px;flex-shrink:0;gap:6px;}
-.plan-open{font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#B0728A;background:none;border:none;cursor:pointer;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;}
+.plan-open{font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#B0728A;background:none;border:none;cursor:pointer;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;}
 .plan-del{width:24px;height:24px;border-radius:50%;background:transparent;border:1px solid #EEEAE7;color:#C4B5AD;font-size:10px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
 .plan-del:hover{border-color:#E0A898;color:#B0728A;}
 .checkin-banner{background:linear-gradient(135deg,#1C1917,#2A2420);border-radius:6px;padding:22px 26px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
-.checkin-eye{font-size:9px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:#C4A0B0;margin-bottom:6px;}
+.checkin-eye{font-size:11px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:#C4A0B0;margin-bottom:6px;}
 .checkin-title{font-family:'Cormorant',serif;font-size:22px;font-weight:600;color:#fff;margin-bottom:3px;}
 .checkin-sub{font-size:12px;color:#78716C;}
 .checkin-btn{padding:9px 20px;background:#fff;color:#1C1917;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;white-space:nowrap;flex-shrink:0;font-family:'Plus Jakarta Sans',sans-serif;}
@@ -370,7 +379,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .pw-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:560px;width:100%;margin-bottom:20px;}
 .pw-card{border:1px solid #EEEAE7;border-radius:6px;padding:24px 20px;background:#FAFAF8;position:relative;}
 .pw-card.pop{border-color:#B0728A;background:#fff;}
-.pw-pop-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;background:#B0728A;color:#fff;padding:3px 12px;border-radius:100px;white-space:nowrap;}
+.pw-pop-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;background:#B0728A;color:#fff;padding:3px 12px;border-radius:100px;white-space:nowrap;}
 .pw-label{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#A8A29E;margin-bottom:7px;}
 .pw-price{font-family:'Cormorant',serif;font-size:44px;font-weight:600;letter-spacing:-0.02em;color:#1C1917;line-height:1;margin-bottom:3px;}
 .pw-price span{font-size:16px;vertical-align:top;margin-top:5px;display:inline-block;}
@@ -400,8 +409,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .hub-card:hover{background:#fff;border-color:#E8C4D4;box-shadow:0 2px 12px rgba(176,114,138,0.08);}
 .hub-card-icon{font-size:22px;color:#B0728A;margin-bottom:12px;}
 .hub-card-label{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:#1C1917;margin-bottom:5px;line-height:1.2;}
-.hub-card-desc{font-size:12px;color:#A8A29E;font-weight:300;line-height:1.55;margin-bottom:14px;}
-.hub-card-cta{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#B0728A;}
+.hub-card-desc{font-size:13px;color:#A8A29E;font-weight:300;line-height:1.55;margin-bottom:14px;}
+.hub-card-cta{font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#B0728A;}
 
 /* INDUSTRY QUESTIONS PAGE */
 .hub-q-page{max-width:1000px;margin:0 auto;padding:48px 32px 80px;}
@@ -413,7 +422,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .hub-q-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .hub-q-card{padding:22px 20px;border:1px solid #EEEAE7;background:#fff;border-radius:6px;cursor:pointer;transition:all 0.18s;display:flex;flex-direction:column;gap:0;min-height:140px;}
 .hub-q-card:hover{border-color:#E8C4D4;background:#FDF7F9;box-shadow:0 2px 12px rgba(176,114,138,0.08);transform:translateY(-1px);}
-.hub-q-card-tag{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#B0728A;background:rgba(176,114,138,0.08);border:1px solid rgba(176,114,138,0.15);padding:3px 10px;border-radius:100px;display:inline-block;margin-bottom:12px;align-self:flex-start;}
+.hub-q-card-tag{font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#B0728A;background:rgba(176,114,138,0.08);border:1px solid rgba(176,114,138,0.15);padding:3px 10px;border-radius:100px;display:inline-block;margin-bottom:12px;align-self:flex-start;}
 .hub-q-card-title{font-family:'Cormorant',serif;font-size:16px;font-weight:600;color:#1C1917;margin-bottom:0;line-height:1.45;letter-spacing:-0.005em;flex:1;}
 .hub-q-card-desc{font-size:12px;color:#78716C;font-weight:300;line-height:1.6;flex:1;margin-bottom:16px;}
 .hub-q-card-cta{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B0728A;margin-top:auto;}
@@ -428,28 +437,39 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .advisor-ta::placeholder{color:#C4B5AD;}
 .advisor-hint{font-size:12px;color:#B8AFA8;margin-top:8px;font-style:italic;margin-bottom:16px;}
 .advisor-suggested{margin-bottom:28px;}
-.advisor-suggested-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:10px;}
+.advisor-suggested-label{font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:10px;}
 .advisor-suggestions{display:flex;flex-wrap:wrap;gap:7px;}
 .advisor-sugg{padding:8px 16px;border:1px solid #EEEAE7;background:#fff;border-radius:100px;font-size:12px;color:#57534E;cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
 .advisor-sugg:hover{border-color:#B0728A;color:#1C1917;background:#FDF7F9;}
 .advisor-result{margin-top:28px;border:1px solid #EEEAE7;border-radius:4px;overflow:hidden;}
 .advisor-result-header{background:#1A1916;padding:18px 24px;}
-.advisor-result-eye{font-size:9px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:#C4A0B0;}
+.advisor-result-eye{font-size:11px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:#C4A0B0;}
 .advisor-result-section{padding:20px 24px;border-bottom:1px solid #EEEAE7;}
 .advisor-result-section:last-child{border-bottom:none;}
-.advisor-result-label{font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:10px;}
+.advisor-result-label{font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:10px;}
 .advisor-result-text{font-size:14px;color:#3A3530;line-height:1.78;font-weight:300;}
 .advisor-result-steps{display:flex;flex-direction:column;gap:8px;}
 .advisor-result-step{display:flex;gap:10px;align-items:flex-start;}
 .advisor-result-step-num{width:22px;height:22px;border-radius:50%;background:#B0728A;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .advisor-result-step-text{font-size:13px;color:#57534E;line-height:1.65;font-weight:300;}
 .advisor-history{margin-top:32px;}
-.advisor-history-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:12px;}
+.advisor-history-label{font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:12px;}
 .advisor-history-item{padding:12px 16px;border:1px solid #EEEAE7;border-radius:4px;margin-bottom:6px;cursor:pointer;transition:all 0.15s;}
 .advisor-history-item:hover{border-color:#E8C4D4;background:#FDF7F9;}
 .advisor-history-q{font-size:13px;color:#1A1916;font-weight:400;line-height:1.4;margin-bottom:3px;}
-.advisor-history-date{font-size:10px;color:#C4B5AD;}
+.advisor-history-date{font-size:12px;color:#C4B5AD;}
 
+
+/* HAMBURGER + MOBILE MENU */
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:300;}
+.hamburger span{display:block;width:22px;height:2px;background:#1A1916;border-radius:2px;transition:all 0.25s ease;}
+.mobile-menu{position:fixed;top:54px;left:0;right:0;bottom:0;background:#fff;z-index:190;padding:24px 24px 40px;display:flex;flex-direction:column;gap:4px;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.22,0.61,0.36,1);overflow-y:auto;border-top:1px solid #F0EDEB;}
+.mobile-menu.open{transform:translateX(0);}
+.mobile-menu-link{display:flex;align-items:center;justify-content:space-between;width:100%;padding:18px 0;background:none;border:none;border-bottom:1px solid #F5F4F2;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:400;color:#1A1916;cursor:pointer;text-align:left;}
+.mobile-menu-link span{color:#C4B5AD;font-size:16px;}
+.mobile-menu-link:hover{color:#B0728A;}
+.mobile-menu-cta{margin-top:20px;width:100%;padding:16px;background:#1A1916;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;transition:background 0.2s;}
+.mobile-menu-cta:hover{background:#B0728A;}
 /* RESPONSIVE */
 @media(max-width:860px){
   .res-cover,.sec,.sec-dark,.res-footer,.fb-wrap{padding-left:28px;padding-right:28px;}
@@ -463,14 +483,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
   .nav{padding:0 16px;height:54px;}
   .nav-by{display:none;}
   .nav-link{display:none;}
+  .nav-btn{display:none;}
   .sub-badge{display:none;}
   .nav-name{font-size:18px;}
+  .hamburger{display:flex;}
   .feature-strip{grid-template-columns:1fr;}
   .feature-strip>div[style]{display:none;}
   .feat{padding:18px 20px;border-bottom:1px solid #F0EDEB;}
+  .feature-cards-grid{grid-template-columns:1fr!important;}
   [style*="repeat(3,1fr)"]{grid-template-columns:1fr!important;}
+  .feature-cards-grid{grid-template-columns:1fr!important;}
   .nav-name{font-size:16px;}
-  .nav-by{font-size:9px;}
+  .nav-by{font-size:11px;}
   .nav-btn{padding:6px 12px;font-size:10px;}
   .nav-link{font-size:10px;padding:6px 10px;}
   .hero{padding:56px 16px 44px;}
@@ -546,6 +570,7 @@ export default function App() {
   const [fbAns,        setFbAns]        = useState({});
   const [autoSaved,    setAutoSaved]    = useState(false);
   const [shortWarn,    setShortWarn]    = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Industry Hub state
   const [hubCatId,     setHubCatId]     = useState(null);
@@ -651,7 +676,7 @@ export default function App() {
     }catch(e){}
   }
 
-  function go(s){setScreen(s);window.scrollTo(0,0);}
+  function go(s){setScreen(s);window.scrollTo(0,0);setMobileMenuOpen(false);}
   function restart(){
     setCatId(null);setIndustry(null);setCustomInd("");setJourneyStage(null);
     setAnswers({});setQIdx(0);setResult(null);setError(null);
@@ -663,6 +688,18 @@ export default function App() {
     if(name&&name.trim())await saveFirstName(name.trim());
     if(welcomeEmail&&welcomeEmail.trim()){
       try{await window.storage.set("user-email",welcomeEmail.trim());}catch(e){}
+      // FORMSPREE: Replace YOUR_FORM_ID with your Formspree form ID
+      // Get it free at formspree.io → New Form → copy the ID
+      const FORMSPREE_ENDPOINT = "https://formspree.io/f/xnjelvwq";
+      if(!FORMSPREE_ENDPOINT.includes("YOUR_FORM_ID")){
+        try{
+          fetch(FORMSPREE_ENDPOINT,{
+            method:"POST",
+            headers:{"Content-Type":"application/json","Accept":"application/json"},
+            body:JSON.stringify({name:name.trim(),email:welcomeEmail.trim(),source:"YNM Beta",date:new Date().toISOString()})
+          });
+        }catch(e){}
+      }
     }
     try{await window.storage.set("has-onboarded","1");}catch(e){}
     setHasOnboarded(true);go("home");setTimeout(()=>{const el=document.querySelector(".cats");if(el){el.scrollIntoView({behavior:"smooth",block:"start"});}},150);
@@ -784,25 +821,25 @@ Sentence 3: What changes in 2 weeks if they do this.`;
     if(!question.trim())return;
     setAdvisorLoading(true);setAdvisorResult(null);
     const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry, ${savedPlans[0].journeyStage} stage.`:"";
-    const prompt=`You are a trusted business and career advisor giving a focused, personalized answer. Be direct, warm, and practical. No fluff.
+    const prompt=`You are a trusted personal advisor — warm, direct, and honest. You speak like a brilliant friend who happens to know business and careers deeply. You give one clear opinion, not a list of options. You reference what the person actually said back to them so they feel heard.
 
-${firstName?`The person's name is ${firstName}.`:""} ${context}
+${firstName?`The person's name is ${firstName}. Address them by name once.`:""} ${context}
 
-Question: ${question}
+Their situation: ${question}
 
-Respond with exactly these sections:
+Respond conversationally with these four parts. Do NOT use bullet points or numbered lists. Write in flowing sentences like a real advisor speaking.
 
-**Direct Answer**
-2–3 sentences. The most important thing they need to hear right now.
+**What I'm hearing**
+2 sentences that mirror back their situation so they feel understood. Start with their name if provided.
 
-**Why It Matters**
-1–2 sentences on why this is significant for their situation.
+**Here's what I think**
+3–4 sentences. One clear, direct opinion or recommendation. Be specific to their situation. Take a position — don't hedge.
 
-**Next Steps**
-3 specific steps they can take. Number them.
+**What this means for you**
+2–3 sentences explaining why this matters specifically for their situation, not in general.
 
-**Do This First**
-1 sentence. The single most important immediate action.`;
+**Your single next move**
+1 sentence. Not a list — the ONE thing they should do in the next 24 hours.`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
@@ -810,22 +847,31 @@ Respond with exactly these sections:
       const data=await res.json();
       const text=data.text||"";
       // Parse the advisor response
+      const hearingMatch=text.match(/\*\*What I'm hearing\*\*\s*([\s\S]*?)(?=\*\*Here's what I think\*\*|\*\*Direct Answer\*\*|$)/i);
+      const thinkMatch=text.match(/\*\*Here's what I think\*\*\s*([\s\S]*?)(?=\*\*What this means\*\*|\*\*Why It Matters\*\*|$)/i);
+      const meansMatch=text.match(/\*\*What this means for you\*\*\s*([\s\S]*?)(?=\*\*Your single next move\*\*|\*\*Do This First\*\*|$)/i);
+      const moveMatch=text.match(/\*\*Your single next move\*\*\s*([\s\S]*?)(?=$)/i);
+      // Fallback to old format
       const directMatch=text.match(/\*\*Direct Answer\*\*\s*([\s\S]*?)(?=\*\*Why It Matters\*\*|$)/i);
       const whyMatch=text.match(/\*\*Why It Matters\*\*\s*([\s\S]*?)(?=\*\*Next Steps\*\*|$)/i);
       const stepsMatch=text.match(/\*\*Next Steps\*\*\s*([\s\S]*?)(?=\*\*Do This First\*\*|$)/i);
       const firstMatch=text.match(/\*\*Do This First\*\*\s*([\s\S]*?)(?=$)/i);
       const parsed={
-        direct:(directMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        why:(whyMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        hearing:(hearingMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        think:(thinkMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        means:(meansMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        move:(moveMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        direct:(directMatch?.[1]||hearingMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        why:(whyMatch?.[1]||thinkMatch?.[1]||"").replace(/\*\*/g,"").trim(),
         steps:lines((stepsMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
-        first:(firstMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        first:(firstMatch?.[1]||moveMatch?.[1]||"").replace(/\*\*/g,"").trim(),
         question,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
       };
       setAdvisorResult(parsed);
       const newHistory=[parsed,...advisorHistory].slice(0,10);
       setAdvisorHistory(newHistory);
       try{localStorage.setItem("advisor-history",JSON.stringify(newHistory));}catch(e){}
-    }catch(e){setAdvisorResult({error:"Something went wrong. Please try again.",question,date:""});}
+    }catch(e){setAdvisorResult({error:"We hit a snag on our end. Your question is saved — try again when you're ready.",question,date:""});}
     finally{setAdvisorLoading(false);}
   }
 
@@ -833,43 +879,49 @@ Respond with exactly these sections:
     if(!query.trim())return;
     setHubSearchLoading(true);setHubSearchResult(null);
     const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry.`:"";
-    const prompt=`You are a trusted business, career, and professional development advisor. Answer the following question with depth, clarity, and practical insight. Be direct and specific — no generic advice.
+    const prompt=`You are a senior professional advisor creating a structured playbook for a specific professional challenge. Your output should feel like a professional reference document — authoritative, methodical, and referenceable. Not a conversation.
 
-${firstName?`The person's name is ${firstName}.`:""} ${context}
+${firstName?`Context: This is for ${firstName}.`:""} ${context}
 
-Question: ${query}
+Topic: ${query}
 
-Respond with exactly these four sections. Be specific and actionable.
+Respond with exactly these five sections. Use clear headers. Be specific and methodical.
 
-**Direct Answer**
-2–3 clear, direct sentences answering the question. No fluff.
+**The Framework**
+2–3 sentences explaining what this is, why it works, and what it's based on. Give it professional authority.
 
-**Why It Matters**
-1–2 sentences explaining the significance or impact.
+**Applied to Your Situation**
+2–3 sentences connecting this framework directly to the context provided. Be specific.
 
-**Next Steps**
-3 specific, actionable steps numbered 1, 2, 3.
+**Step-by-Step**
+5 numbered steps. Each step is one concrete action. Specific enough to start today.
 
-**Do This First**
-1 sentence — the single most important immediate action.`;
+**Common Mistakes**
+3 things people get wrong with this specific challenge. Short, direct, specific.
+
+**Your Starting Point**
+1 sentence. The single first action given their specific context.`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
       if(!res.ok)throw new Error("Failed");
       const data=await res.json();
       const text=data.text||"";
-      const directMatch=text.match(/\*\*Direct Answer\*\*\s*([\s\S]*?)(?=\*\*Why It Matters\*\*|$)/i);
-      const whyMatch=text.match(/\*\*Why It Matters\*\*\s*([\s\S]*?)(?=\*\*Next Steps\*\*|$)/i);
-      const stepsMatch=text.match(/\*\*Next Steps\*\*\s*([\s\S]*?)(?=\*\*Do This First\*\*|$)/i);
-      const firstMatch=text.match(/\*\*Do This First\*\*\s*([\s\S]*?)(?=$)/i);
+      const frameworkMatch=text.match(/\*\*The Framework\*\*\s*([\s\S]*?)(?=\*\*Applied to Your Situation\*\*|$)/i);
+      const appliedMatch=text.match(/\*\*Applied to Your Situation\*\*\s*([\s\S]*?)(?=\*\*Step-by-Step\*\*|$)/i);
+      const stepsMatch=text.match(/\*\*Step-by-Step\*\*\s*([\s\S]*?)(?=\*\*Common Mistakes\*\*|$)/i);
+      const mistakesMatch=text.match(/\*\*Common Mistakes\*\*\s*([\s\S]*?)(?=\*\*Your Starting Point\*\*|$)/i);
+      const startMatch=text.match(/\*\*Your Starting Point\*\*\s*([\s\S]*?)(?=$)/i);
       setHubSearchResult({
         query,
-        direct:(directMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        why:(whyMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        isPlaybook: true,
+        framework:(frameworkMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        applied:(appliedMatch?.[1]||"").replace(/\*\*/g,"").trim(),
         steps:lines((stepsMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
-        first:(firstMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        mistakes:lines((mistakesMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
+        start:(startMatch?.[1]||"").replace(/\*\*/g,"").trim(),
       });
-    }catch(e){setHubSearchResult({query,error:"Something went wrong. Please try again."});}
+    }catch(e){setHubSearchResult({query,error:"We hit a snag on our end. Please try again in a moment."});}
     finally{setHubSearchLoading(false);}
   }
 
@@ -887,7 +939,8 @@ Respond with exactly these four sections. Be specific and actionable.
       <div className="nav-brand" onClick={restart}>
         <span className="nav-name">Your Next Move</span>
       </div>
-      {screen!=="loading"&&(
+      {screen!=="loading"&&(<>
+        {/* Desktop nav */}
         <div className="nav-actions">
           {isSubscribed&&<span className="sub-badge"><span className="sub-dot"/>Member</span>}
           <button className="nav-link" onClick={()=>go("advisor")}>Ask Your Advisor</button>
@@ -897,8 +950,28 @@ Respond with exactly these four sections. Be specific and actionable.
           </button>
           {savedPlans.length>0&&<button className="nav-btn" onClick={restart}>New Strategy</button>}
         </div>
-      )}
+        {/* Mobile hamburger */}
+        <button className="hamburger" onClick={()=>setMobileMenuOpen(o=>!o)} aria-label="Menu">
+          <span style={{transform:mobileMenuOpen?"rotate(45deg) translate(5px,5px)":"none"}}/>
+          <span style={{opacity:mobileMenuOpen?0:1}}/>
+          <span style={{transform:mobileMenuOpen?"rotate(-45deg) translate(5px,-5px)":"none"}}/>
+        </button>
+      </>)}
     </nav>
+    </nav>
+    {/* Mobile slide-out menu */}
+    <div className={`mobile-menu${mobileMenuOpen?" open":""}`}>
+      <button className="mobile-menu-link" onClick={()=>go("home")}>Home <span>→</span></button>
+      <button className="mobile-menu-link" onClick={()=>go("advisor")}>Ask Your Advisor <span>→</span></button>
+      <button className="mobile-menu-link" onClick={()=>go("hub")}>Industry Hub <span>→</span></button>
+      <button className="mobile-menu-link" onClick={()=>go("plans")}>
+        My Strategies{savedPlans.length>0&&<span className="nav-badge" style={{marginLeft:8}}>{savedPlans.length}</span>} <span>→</span>
+      </button>
+      {savedPlans.length>0&&<button className="mobile-menu-link" onClick={restart}>New Strategy <span>→</span></button>}
+      <button className="mobile-menu-cta" onClick={()=>{setMobileMenuOpen(false);go("welcome");}}>
+        Create My Strategy →
+      </button>
+    </div>
 
         {/* ══ HOME ══ */}
     {screen==="home"&&<>
@@ -927,7 +1000,7 @@ Respond with exactly these four sections. Be specific and actionable.
       {/* WHAT THIS IS — three cards explaining the product */}
       {savedPlans.length===0&&(
         <section style={{padding:"0 32px 64px",maxWidth:1080,margin:"0 auto",width:"100%"}}>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:2,borderTop:"1px solid #F0EDEB"}}>
+          <div className="feature-cards-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:2,borderTop:"1px solid #F0EDEB"}}>
             {[
               {
                 num:"01",
@@ -979,6 +1052,28 @@ Respond with exactly these four sections. Be specific and actionable.
 
       {/* FOCUS AREAS */}
       <section className="cats">
+        {/* SAMPLE STRATEGY PREVIEW */}
+        {savedPlans.length===0&&(
+          <div style={{background:"#1A1916",borderRadius:8,padding:"32px 36px",marginBottom:44,position:"relative",overflow:"hidden"}}>
+            <p style={{fontSize:10,fontWeight:600,letterSpacing:"0.32em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:12}}>Sample Strategy Output</p>
+            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3vw,28px)",fontWeight:600,color:"#fff",marginBottom:16,letterSpacing:"-0.01em",lineHeight:1.2}}>Here's what your personalized strategy looks like</h3>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:2,marginBottom:20}}>
+              {[
+                {num:"01",label:"Strategic Assessment",preview:"Where you are today and the most important pattern in your answers."},
+                {num:"02",label:"Primary Challenge",preview:""The real issue isn't your offer — it's that you've been optimizing for the wrong client entirely.""},
+                {num:"03",label:"Best Opportunity",preview:"The highest-leverage move available to you right now given your industry and stage."},
+                {num:"05",label:"30-Day Plan",preview:"Week 1: Foundation → Week 2: Momentum → Week 3: Activation → Week 4: Scale"},
+              ].map((s,i)=>(
+                <div key={i} style={{background:"#201918",padding:"16px 18px",border:"1px solid #2A2522"}}>
+                  <p style={{fontSize:10,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#5A4A42",marginBottom:6}}>{s.num}</p>
+                  <p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:600,color:i===1?"#E8C4D4":"#C4A0B0",marginBottom:6,lineHeight:1.2}}>{s.label}</p>
+                  <p style={{fontSize:12,color:"#6A6060",lineHeight:1.6,fontWeight:300,fontStyle:i===1?"italic":"normal"}}>{s.preview}</p>
+                </div>
+              ))}
+            </div>
+            <p style={{fontSize:12,color:"#5A5350",fontStyle:"italic"}}>Your strategy will be built around your specific industry, goals, and situation — not a template.</p>
+          </div>
+        )}
         <div className="cats-top">
           <h2 className="cats-h2">Where would you like to <em>focus?</em></h2>
           <p className="cats-sub">Choose a focus area to begin your personalized strategy session.</p>
@@ -1031,7 +1126,7 @@ Respond with exactly these four sections. Be specific and actionable.
         </div>
 
         <div style={{width:"100%",maxWidth:360,margin:"0 auto 28px"}}>
-          <span className="welcome-name-label">Your email <span style={{color:"#C4B5AD",fontWeight:300}}>(optional — we'll send your strategy here)</span></span>
+          <span className="welcome-name-label">Your email <span style={{color:"#C4B5AD",fontWeight:300}}>(optional — keep a copy for yourself)</span></span>
           <input
             className="welcome-name-input"
             placeholder="e.g. sarah@email.com"
@@ -1186,7 +1281,7 @@ Respond with exactly these four sections. Be specific and actionable.
             <input
               className="hub-search"
               style={{marginBottom:0,paddingLeft:44,paddingRight:120,borderRadius:"6px 0 0 6px",flex:1}}
-              placeholder="Ask any question and get an instant AI answer…"
+              placeholder="Search prompts or ask any business question…"
               value={hubSearchQuery}
               onChange={e=>{setHubSearchQuery(e.target.value);setHubSearchResult(null);}}
               onKeyDown={e=>{if(e.key==="Enter"&&hubSearchQuery.trim())askHubSearch(hubSearchQuery);}}
@@ -1197,7 +1292,7 @@ Respond with exactly these four sections. Be specific and actionable.
               style={{padding:"0 20px",background:"#1A1916",color:"#fff",border:"none",borderRadius:"0 6px 6px 0",fontSize:11,fontWeight:500,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"'Plus Jakarta Sans',sans-serif"}}
             >{hubSearchLoading?"Searching…":"Ask →"}</button>
           </div>
-          <p style={{fontSize:11,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Ask anything — or browse by industry below</p>
+          <p style={{fontSize:12,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Search 164 professional prompts, or press Ask → for an AI-powered answer to any question</p>
         </div>
         {hubSearchLoading&&<div style={{textAlign:"center",padding:"32px 0"}}><div className="load-ring" style={{margin:"0 auto 14px"}}/><p style={{fontSize:13,color:"#78716C"}}>Finding your answer…</p></div>}
         {hubSearchResult&&!hubSearchResult.error&&(
@@ -1206,10 +1301,11 @@ Respond with exactly these four sections. Be specific and actionable.
               <div><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>AI Answer</p><p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:500,color:"#fff"}}>"{hubSearchResult.query}"</p></div>
               <button onClick={()=>{setHubSearchResult(null);setHubSearchQuery("");}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"5px 14px",color:"#A8A29E",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Clear</button>
             </div>
-            {hubSearchResult.direct&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Direct Answer</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.direct}</p></div>}
-            {hubSearchResult.why&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Why It Matters</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.why}</p></div>}
-            {hubSearchResult.steps?.length>0&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Next Steps</p><div style={{display:"flex",flexDirection:"column",gap:10}}>{hubSearchResult.steps.map((s,i)=><div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}><div style={{width:22,height:22,borderRadius:"50%",background:"#B0728A",color:"#fff",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div><p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p></div>)}</div></div>}
-            {hubSearchResult.first&&<div style={{padding:"18px 22px",background:"#FAFAF8"}}><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Do This First</p><p style={{fontSize:14,color:"#1A1916",fontWeight:500,lineHeight:1.6}}>{hubSearchResult.first}</p></div>}
+            {hubSearchResult.framework&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>The Framework</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.framework}</p></div>}
+            {hubSearchResult.applied&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Applied to Your Situation</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.applied}</p></div>}
+            {hubSearchResult.steps?.length>0&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Step-by-Step</p><div style={{display:"flex",flexDirection:"column",gap:10}}>{hubSearchResult.steps.map((s,i)=><div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}><div style={{width:24,height:24,borderRadius:"50%",background:"#1A1916",color:"#fff",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div><p style={{fontSize:14,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p></div>)}</div></div>}
+            {hubSearchResult.mistakes?.length>0&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FEF9F6"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#B8936A",marginBottom:12}}>Common Mistakes</p><div style={{display:"flex",flexDirection:"column",gap:8}}>{hubSearchResult.mistakes.map((m,i)=><div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}><span style={{color:"#B8936A",fontSize:14,fontWeight:700,flexShrink:0}}>!</span><p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{m}</p></div>)}</div></div>}
+            {hubSearchResult.start&&<div style={{padding:"18px 22px",background:"#FAFAF8",borderTop:"2px solid #1A1916"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Your Starting Point</p><p style={{fontSize:15,color:"#1A1916",fontWeight:600,lineHeight:1.5,fontFamily:"'Cormorant',serif"}}>{hubSearchResult.start}</p></div>}
           </div>
         )}
 
@@ -1220,7 +1316,7 @@ Respond with exactly these four sections. Be specific and actionable.
               <div style={{fontFamily:"'Cormorant',serif",fontSize:13,fontWeight:600,color:"#C4B5AD",letterSpacing:"0.06em",marginBottom:10}}>{c.icon}</div>
               <div className="hub-card-label">{c.label}</div>
               <div className="hub-card-desc">{c.description}</div>
-              <div className="hub-card-cta">{c.questions.length} questions →</div>
+              <div className="hub-card-cta">{c.questions.length} prompts →</div>
             </div>
           ))}
         </div>
@@ -1233,7 +1329,7 @@ Respond with exactly these four sections. Be specific and actionable.
         <div className="bc"><span onClick={restart}>Home</span><span className="bc-sep">›</span><span onClick={()=>setHubCatId(null)}>Industry Hub</span></div>
         <button className="btn-out" style={{marginBottom:20,fontSize:10,padding:"8px 18px"}} onClick={()=>setHubCatId(null)}>← Back to Industry Hub</button>
         <h1 className="hub-q-h1">{hubCat?.label}</h1>
-        <p className="hub-q-sub">Select a question to explore. You can add personal context before generating your answer.</p>
+        <p className="hub-q-sub">Select a prompt to explore. Add your personal context and get a structured playbook for your specific situation.</p>
         {/* AI-POWERED SEARCH BAR */}
         <div style={{marginBottom:28}}>
           <div style={{position:"relative",display:"flex",gap:0}}>
@@ -1241,7 +1337,7 @@ Respond with exactly these four sections. Be specific and actionable.
             <input
               className="hub-search"
               style={{marginBottom:0,paddingLeft:44,paddingRight:120,borderRadius:"6px 0 0 6px",flex:1}}
-              placeholder="Ask anything — or search existing prompts…"
+              placeholder="Search our prompt library — or ask any question…"
               value={hubSearchQuery||hubSearch}
               onChange={e=>{const v=e.target.value;setHubSearchQuery(v);setHubSearch(v);setHubSearchResult(null);}}
               onKeyDown={e=>{if(e.key==="Enter"&&(hubSearchQuery||hubSearch).trim()){askHubSearch(hubSearchQuery||hubSearch);}}}
@@ -1343,7 +1439,7 @@ Respond with exactly these four sections. Be specific and actionable.
         <p className="advisor-hint">The more context you add, the more specific your answer will be.</p>
         <div style={{display:"flex",gap:8,marginBottom:24,flexWrap:"wrap"}}>
           <button className="btn" disabled={advisorLoading||!hubContext.trim()} onClick={()=>askAdvisor(hubQuestion.question + (hubContext.trim() ? " Here is my specific context: " + hubContext.trim() : ""))}>
-            {advisorLoading?"Generating your answer…":"Get My Answer →"}
+            {advisorLoading?"Generating your answer…":"Build My Playbook →"}
           </button>
           <button className="btn-out" onClick={()=>setHubQuestion(null)}>← Back to questions</button>
         </div>
@@ -1355,40 +1451,40 @@ Respond with exactly these four sections. Be specific and actionable.
         )}
         {advisorResult&&!advisorResult.error&&(
           <div className="advisor-result">
-            <div className="advisor-result-header">
-              <div className="advisor-result-eye">Your Advisor Response</div>
+            <div className="advisor-result-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div>
+                <div className="advisor-result-eye" style={{marginBottom:6}}>Your Advisor</div>
+                <p style={{fontFamily:"'Cormorant',serif",fontSize:15,fontStyle:"italic",color:"#8A7E78",lineHeight:1.4}}>"{advisorResult.question.length>60?advisorResult.question.substring(0,58)+"…":advisorResult.question}"</p>
+              </div>
             </div>
-            {advisorResult.direct&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label">Direct Answer</div>
-                <div className="advisor-result-text">{advisorResult.direct}</div>
-              </div>
-            )}
-            {advisorResult.why&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label">Why It Matters</div>
-                <div className="advisor-result-text">{advisorResult.why}</div>
-              </div>
-            )}
-            {advisorResult.steps?.length>0&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label">Next Steps</div>
-                <div className="advisor-result-steps">
-                  {advisorResult.steps.map((s,i)=>(
-                    <div className="advisor-result-step" key={i}>
-                      <div className="advisor-result-step-num">{i+1}</div>
-                      <div className="advisor-result-step-text">{s}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {advisorResult.first&&(
+            {advisorResult.hearing&&(
               <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label">Do This First</div>
-                <div className="advisor-result-text" style={{fontWeight:500,color:"#1A1916"}}>{advisorResult.first}</div>
+                <div className="advisor-result-label">What I'm Hearing</div>
+                <div className="advisor-result-text" style={{fontStyle:"italic",color:"#57534E"}}>{advisorResult.hearing}</div>
               </div>
             )}
+            {advisorResult.think&&(
+              <div className="advisor-result-section">
+                <div className="advisor-result-label">Here's What I Think</div>
+                <div className="advisor-result-text">{advisorResult.think}</div>
+              </div>
+            )}
+            {advisorResult.means&&(
+              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
+                <div className="advisor-result-label">What This Means For You</div>
+                <div className="advisor-result-text">{advisorResult.means}</div>
+              </div>
+            )}
+            {(advisorResult.move||advisorResult.first)&&(
+              <div className="advisor-result-section" style={{borderTop:"2px solid #B0728A"}}>
+                <div className="advisor-result-label" style={{color:"#B0728A"}}>Your Single Next Move</div>
+                <div className="advisor-result-text" style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1A1916",lineHeight:1.4}}>{advisorResult.move||advisorResult.first}</div>
+              </div>
+            )}
+            {/* Follow-up prompt */}
+            <div style={{padding:"16px 24px",background:"#FAFAF8",borderTop:"1px solid #EEEAE7"}}>
+              <p style={{fontSize:13,color:"#A8A29E",fontStyle:"italic"}}>Does this resonate? Ask a follow-up or try a different question above.</p>
+            </div>
           </div>
         )}
         {advisorResult?.error&&<div className="err">⚠ {advisorResult.error}</div>}
@@ -1400,7 +1496,17 @@ Respond with exactly these four sections. Be specific and actionable.
       <div className="advisor-page">
         <div className="bc"><span onClick={restart}>Home</span></div>
         <h1 className="advisor-h1">Ask Your <em>Advisor.</em></h1>
-        <p className="advisor-sub">Have a specific situation you need help with? Type it in your own words and get a direct, personalized answer — no browsing required.</p>
+        <p className="advisor-sub">Your personal sounding board for the decisions, challenges, and moments that don't fit neatly into a plan. Describe what's on your mind and get a direct, honest response — like talking to a trusted advisor who actually knows what they're talking about.</p>
+        <div style={{display:"flex",gap:24,marginBottom:28,flexWrap:"wrap"}}>
+          {[{label:"Use this when",items:["You're weighing a specific decision","Something happened and you need to think it through","You want a second opinion before you act","You have one burning question"]},{label:"Use Industry Hub instead when",items:["You need a framework or process","You want to browse prompts for your field","You need a structured playbook, not a conversation"]}].map((col,i)=>(
+            <div key={i} style={{flex:1,minWidth:200}}>
+              <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.16em",textTransform:"uppercase",color:i===0?"#B0728A":"#A8A29E",marginBottom:8}}>{col.label}</p>
+              {col.items.map((item,j)=>(
+                <p key={j} style={{fontSize:13,color:"#78716C",fontWeight:300,lineHeight:1.65,paddingLeft:12,borderLeft:`2px solid ${i===0?"#E8C4D4":"#EEEAE7"}`,marginBottom:6}}>{item}</p>
+              ))}
+            </div>
+          ))}
+        </div>
         <textarea className="advisor-ta" rows={5} placeholder="e.g. I have been a real estate agent for 2 years and I cannot figure out how to get consistent listings. I have tried open houses and cold calling but nothing is working…" value={advisorQ} onChange={e=>setAdvisorQ(e.target.value)}/>
         <p className="advisor-hint">Type your question above or choose a suggested question below.</p>
         <div className="advisor-suggested">
@@ -1422,7 +1528,7 @@ Respond with exactly these four sections. Be specific and actionable.
         </div>
         <div style={{display:"flex",gap:8,marginBottom:24}}>
           <button className="btn" disabled={advisorLoading||!advisorQ.trim()} onClick={()=>askAdvisor(advisorQ)}>
-            {advisorLoading?"Getting your answer…":"Ask Your Advisor →"}
+            {advisorLoading?"Getting your answer…":"Get My Advice →"}
           </button>
           {advisorQ&&<button className="btn-out" onClick={()=>{setAdvisorQ("");setAdvisorResult(null);}}>Clear</button>}
         </div>
@@ -1434,40 +1540,40 @@ Respond with exactly these four sections. Be specific and actionable.
         )}
         {advisorResult&&!advisorResult.error&&(
           <div className="advisor-result">
-            <div className="advisor-result-header">
-              <div className="advisor-result-eye">Your Advisor Response</div>
+            <div className="advisor-result-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div>
+                <div className="advisor-result-eye" style={{marginBottom:6}}>Your Advisor</div>
+                <p style={{fontFamily:"'Cormorant',serif",fontSize:15,fontStyle:"italic",color:"#8A7E78",lineHeight:1.4}}>"{advisorResult.question.length>60?advisorResult.question.substring(0,58)+"…":advisorResult.question}"</p>
+              </div>
             </div>
-            {advisorResult.direct&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label">Direct Answer</div>
-                <div className="advisor-result-text">{advisorResult.direct}</div>
-              </div>
-            )}
-            {advisorResult.why&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label">Why It Matters</div>
-                <div className="advisor-result-text">{advisorResult.why}</div>
-              </div>
-            )}
-            {advisorResult.steps?.length>0&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label">Next Steps</div>
-                <div className="advisor-result-steps">
-                  {advisorResult.steps.map((s,i)=>(
-                    <div className="advisor-result-step" key={i}>
-                      <div className="advisor-result-step-num">{i+1}</div>
-                      <div className="advisor-result-step-text">{s}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {advisorResult.first&&(
+            {advisorResult.hearing&&(
               <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label">Do This First</div>
-                <div className="advisor-result-text" style={{fontWeight:500,color:"#1A1916"}}>{advisorResult.first}</div>
+                <div className="advisor-result-label">What I'm Hearing</div>
+                <div className="advisor-result-text" style={{fontStyle:"italic",color:"#57534E"}}>{advisorResult.hearing}</div>
               </div>
             )}
+            {advisorResult.think&&(
+              <div className="advisor-result-section">
+                <div className="advisor-result-label">Here's What I Think</div>
+                <div className="advisor-result-text">{advisorResult.think}</div>
+              </div>
+            )}
+            {advisorResult.means&&(
+              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
+                <div className="advisor-result-label">What This Means For You</div>
+                <div className="advisor-result-text">{advisorResult.means}</div>
+              </div>
+            )}
+            {(advisorResult.move||advisorResult.first)&&(
+              <div className="advisor-result-section" style={{borderTop:"2px solid #B0728A"}}>
+                <div className="advisor-result-label" style={{color:"#B0728A"}}>Your Single Next Move</div>
+                <div className="advisor-result-text" style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1A1916",lineHeight:1.4}}>{advisorResult.move||advisorResult.first}</div>
+              </div>
+            )}
+            {/* Follow-up prompt */}
+            <div style={{padding:"16px 24px",background:"#FAFAF8",borderTop:"1px solid #EEEAE7"}}>
+              <p style={{fontSize:13,color:"#A8A29E",fontStyle:"italic"}}>Does this resonate? Ask a follow-up or try a different question above.</p>
+            </div>
           </div>
         )}
         {advisorResult?.error&&<div className="err">⚠ {advisorResult.error}</div>}
@@ -1496,9 +1602,16 @@ Respond with exactly these four sections. Be specific and actionable.
           <p className="pg-sub">Every strategy you build is saved here automatically.</p>
           {latest&&daysSince>=1&&daysSince<28&&(
             <div style={{background:"#FAFAF8",border:"1px solid #EEEAE7",borderRadius:4,padding:"18px 22px",marginBottom:18,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
-              <div>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:5}}>Day {daysSince} of your plan</p>
-                <p style={{fontFamily:"'Cormorant',serif",fontSize:17,fontWeight:600,color:"#1A1916",marginBottom:3}}>How is it going?</p>
+              <div style={{flex:1}}>
+                <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:6}}>Day {daysSince} of your 30-day plan</p>
+                <p style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1A1916",marginBottom:4}}>
+                  {daysSince<=7?"Week 1 — Foundation":daysSince<=14?"Week 2 — Momentum":daysSince<=21?"Week 3 — Activation":"Week 4 — Scale & Review"}
+                </p>
+                <div style={{display:"flex",gap:4,marginBottom:6}}>
+                  {[7,14,21,30].map((d,i)=>(
+                    <div key={i} style={{height:4,flex:1,borderRadius:2,background:daysSince>=d?"#B0728A":"#EEEAE7",transition:"background 0.3s"}}/>
+                  ))}
+                </div>
                 <p style={{fontSize:12,color:"#78716C",fontWeight:300}}>{CATEGORIES.find(c=>c.id===latest.catId)?.label} · {latest.industry}</p>
               </div>
               <div style={{display:"flex",gap:7,flexShrink:0}}>
@@ -1559,6 +1672,7 @@ Respond with exactly these four sections. Be specific and actionable.
                         <span className="plan-date">{date}</span>
                       </div>
                       <div className="plan-title">{planCat?.label} — {plan.industry}</div>
+                      {(()=>{const d=Math.floor((Date.now()-plan.createdAt)/(1000*60*60*24));const wk=d<7?"Week 1: Foundation":d<14?"Week 2: Momentum":d<21?"Week 3: Activation":d<30?"Week 4: Scale & Review":"30-Day Plan Complete";const pct=Math.min(100,Math.round(d/30*100));return d>0&&d<=35?(<div style={{marginTop:8}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:5}}><span style={{fontSize:11,color:"#B0728A",fontWeight:500}}>{wk}</span><span style={{fontSize:11,color:"#C4B5AD"}}>Day {d}</span></div><div style={{height:3,background:"#EEEAE7",borderRadius:2}}><div style={{height:3,background:"#B0728A",borderRadius:2,width:`${pct}%`,transition:"width 0.3s"}}/></div></div>):null;})()}
                       {preview&&<div className="plan-preview">{preview}</div>}
                     </div>
                     <div className="plan-actions-col">
@@ -1696,8 +1810,8 @@ Respond with exactly these four sections. Be specific and actionable.
             {insightText&&<div className="insight-block"><div className="insight-label">The Insight</div><p className="insight-text">"{insightText}"</p></div>}
             <button id="copy-btn" className="insight-copy" onClick={()=>{
               const txt=insightText?`"${insightText}"`:blindTitle?`"${blindTitle}" — ${cleanBlind}`:cleanBlind;
-              if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById("copy-btn");if(b){b.textContent="✓ Copied";setTimeout(()=>{b.textContent="Copy this insight";},2200);}});}
-            }}>Copy this insight</button>
+              if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById("copy-btn");if(b){b.textContent="✓ Copied";setTimeout(()=>{b.textContent="Share this insight";},2200);}});}
+            }}>Share this insight →</button>
             <EC sk="primaryConstraint" lbl="Primary Challenge" val={result.primaryConstraint||result.blindSpot||""}/>
           </div>
 
@@ -1739,6 +1853,14 @@ Respond with exactly these four sections. Be specific and actionable.
             </div>
             {deprioritize&&<div className="deprioritize"><div className="dep-label">What to set aside for now</div><div className="dep-text">{deprioritize}</div></div>}
             <EC sk="recommendedActions" lbl="Recommended Actions" val={result.recommendedActions||result.actionPlan||""}/>
+            {/* BRIDGE TO HUB */}
+            <div style={{marginTop:20,padding:"14px 18px",background:"#FAFAF8",border:"1px solid #EEEAE7",borderRadius:4,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+              <div>
+                <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.14em",textTransform:"uppercase",color:"#B0728A",marginBottom:4}}>Go deeper</p>
+                <p style={{fontSize:13,color:"#57534E",fontWeight:300}}>Find structured playbooks for your specific challenges in the Industry Hub.</p>
+              </div>
+              <button className="btn-out" style={{fontSize:10,padding:"8px 16px",flexShrink:0,whiteSpace:"nowrap"}} onClick={()=>go("hub")}>Explore Industry Hub →</button>
+            </div>
           </div>
 
           {/* 05 */}
@@ -1791,12 +1913,44 @@ Respond with exactly these four sections. Be specific and actionable.
             <EC sk="yourNextMove" lbl="Your Next Move" val={result.yourNextMove||""}/>
           </div>
 
-          {/* FOOTER */}
-          <div className="res-footer">
-            <button className="btn" onClick={()=>window.print()}>Export PDF</button>
-            <button className="btn-out" onClick={restart}>New Strategy</button>
-            <button className="btn-out" onClick={()=>go("plans")}>My Strategies</button>
-            <button className="btn-out" onClick={()=>go("hub")}>Industry Hub</button>
+          {/* EXIT EXPERIENCE */}
+          <div style={{background:"#FAFAF8",borderTop:"1px solid #EEEAE7",padding:"48px 52px",textAlign:"center"}}>
+            <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#B0728A",marginBottom:12}}>You're ready.</p>
+            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(24px,3.5vw,36px)",fontWeight:600,color:"#1A1916",lineHeight:1.2,marginBottom:12,letterSpacing:"-0.01em"}}>Your strategy is saved.<br/>Now it's time to act.</h3>
+            <p style={{fontSize:15,color:"#78716C",fontWeight:300,lineHeight:1.7,maxWidth:440,margin:"0 auto 32px"}}>The most important thing you can do right now is take your single next move. Not tomorrow. Today.</p>
+            <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginBottom:32}}>
+              <button className="btn" onClick={()=>window.print()}>Export PDF</button>
+              <button className="btn-out" onClick={()=>go("advisor")}>Ask Your Advisor</button>
+              <button className="btn-out" onClick={()=>go("hub")}>Explore the Industry Hub</button>
+            </div>
+            <div style={{borderTop:"1px solid #EEEAE7",paddingTop:24,display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+              <button className="btn-out" style={{fontSize:10}} onClick={restart}>New Strategy</button>
+              <button className="btn-out" style={{fontSize:10}} onClick={()=>go("plans")}>My Strategies</button>
+            </div>
+          </div>
+
+          {/* EXIT EXPERIENCE */}
+          <div style={{background:"#FAFAF8",padding:"36px 52px",borderTop:"1px solid #EEEAE7",textAlign:"center"}}>
+            <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.24em",textTransform:"uppercase",color:"#B0728A",marginBottom:10}}>Your Strategy Is Ready</p>
+            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3vw,28px)",fontWeight:600,color:"#1A1916",marginBottom:8,letterSpacing:"-0.01em"}}>What's your next move?</h3>
+            <p style={{fontSize:14,color:"#78716C",fontWeight:300,marginBottom:24,maxWidth:440,margin:"0 auto 24px",lineHeight:1.7}}>The most important thing you can do now is take one action today — not tomorrow.</p>
+            {nextMove&&(
+              <div style={{background:"#1A1916",borderRadius:8,padding:"22px 26px",maxWidth:500,margin:"0 auto 22px",textAlign:"left"}}>
+                <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.16em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:8}}>Your commitment</p>
+                <p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(14px,2.2vw,18px)",fontWeight:500,fontStyle:"italic",color:"#fff",lineHeight:1.45}}>{'"'}{nextMove.replace(/\*\*/g,"").split(".")[0]}.{'"'}</p>
+                <button style={{marginTop:12,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"6px 16px",color:"#C4A0B0",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.1em",textTransform:"uppercase"}} onClick={()=>{const txt=`"${nextMove.replace(/\*\*/g,"").split(".")[0]}." — My strategy from Your Next Move`;if(navigator.clipboard)navigator.clipboard.writeText(txt);}}>Share this →</button>
+              </div>
+            )}
+            <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginBottom:12}}>
+              <button className="btn" onClick={()=>window.print()}>Export My Strategy</button>
+              <button className="btn-out" onClick={restart}>New Strategy</button>
+            </div>
+            <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
+              <button className="btn-out" style={{fontSize:10,padding:"8px 14px"}} onClick={()=>go("advisor")}>Ask Your Advisor</button>
+              <button className="btn-out" style={{fontSize:10,padding:"8px 14px"}} onClick={()=>go("hub")}>Industry Hub</button>
+              <button className="btn-out" style={{fontSize:10,padding:"8px 14px"}} onClick={()=>go("plans")}>My Strategies</button>
+            </div>
+            <p style={{fontSize:12,color:"#C4B5AD",marginTop:16,fontStyle:"italic"}}>Come back in 7 days to check your progress.</p>
           </div>
 
           {/* FEEDBACK */}
