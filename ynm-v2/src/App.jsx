@@ -955,14 +955,23 @@ Use this structure when appropriate:
       const stepsMatch=text.match(/\*\*Step-by-Step\*\*\s*([\s\S]*?)(?=\*\*Common Mistakes\*\*|$)/i);
       const mistakesMatch=text.match(/\*\*Common Mistakes\*\*\s*([\s\S]*?)(?=\*\*Your Starting Point\*\*|$)/i);
       const startMatch=text.match(/\*\*Your Starting Point\*\*\s*([\s\S]*?)(?=$)/i);
+      // Smart format detection
+      const hasStructured = frameworkMatch||appliedMatch||stepsMatch;
+      // Parse title from response
+      const titleMatch = text.match(/^#+\s*(.+)|^\*\*(.+?)\*\*/);
+      const responseTitle = titleMatch?(titleMatch[1]||titleMatch[2]||"").replace(/\*\*/g,"").trim():"";
+      // Get first step from various formats
+      const firstStepMatch = text.match(/\*\*Your First Step\*\*\s*([\s\S]*?)(?=$)/i);
       setHubSearchResult({
         query,
-        isPlaybook: true,
+        isPlaybook: !!hasStructured,
+        rawText: !hasStructured ? text.replace(/\*\*/g,"").trim() : "",
+        responseTitle,
         framework:(frameworkMatch?.[1]||"").replace(/\*\*/g,"").trim(),
         applied:(appliedMatch?.[1]||"").replace(/\*\*/g,"").trim(),
         steps:lines((stepsMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
         mistakes:lines((mistakesMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
-        start:(startMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        start:(firstStepMatch?.[1]||startMatch?.[1]||"").replace(/\*\*/g,"").trim(),
       });
     }catch(e){setHubSearchResult({query,error:"We hit a snag on our end. Please try again in a moment."});}
     finally{setHubSearchLoading(false);}
@@ -1050,7 +1059,7 @@ Use this structure when appropriate:
               {
                 num:"01",
                 title:"Create My Strategy",
-                desc:"Answer a short series of questions about your focus area, industry, and goals. In under a minute, you receive a personalized 8-section strategy built specifically for you.",
+                desc:"Answer a few questions about your goals and situation. Receive a personalized strategic roadmap built specifically around your opportunities, challenges, and next steps.",
                 cta:"Start here →",
                 action:()=>go("welcome"),
                 accent:true
@@ -1058,7 +1067,7 @@ Use this structure when appropriate:
               {
                 num:"02",
                 title:"Ask Your Advisor",
-                desc:"Have a specific challenge you need help with right now? Ask one focused question and get a direct, personalized answer — no lengthy session required.",
+                desc:"Need help making a decision? Describe your situation and receive direct, thoughtful guidance tailored to what you're working on today.",
                 cta:"Ask a question →",
                 action:()=>go("advisor"),
                 accent:false
@@ -1066,7 +1075,7 @@ Use this structure when appropriate:
               {
                 num:"03",
                 title:"Industry Hub",
-                desc:"Browse curated questions built for your specific field. Real Estate, Creative, Healthcare, Finance and more — each with 15 questions written for that industry.",
+                desc:"Browse professionally curated prompts designed for your field. Real Estate, Finance, Healthcare, Creative, and more — each with expert prompts written specifically for that profession.",
                 cta:"Explore your field →",
                 action:()=>go("hub"),
                 accent:false
@@ -1085,7 +1094,7 @@ Use this structure when appropriate:
               onMouseEnter={e=>{e.currentTarget.style.background=c.accent?"#2A2420":"#fff";}}
               onMouseLeave={e=>{e.currentTarget.style.background=c.accent?"#1A1916":"#FAFAF8";}}
               >
-                <div style={{fontFamily:"'Cormorant',serif",fontSize:13,fontWeight:500,color:c.accent?"#5A5350":"#C4B5AD",letterSpacing:"0.06em",marginBottom:16}}>{c.num}</div>
+                <div style={{fontSize:10,fontWeight:600,letterSpacing:"0.22em",textTransform:"uppercase",color:c.accent?"#5A5350":"#C4B5AD",marginBottom:16}}>{c.num==="01"?"PLAN":c.num==="02"?"DECIDE":"LEARN"}</div>
                 <div style={{fontFamily:"'Cormorant',serif",fontSize:26,fontWeight:600,color:c.accent?"#fff":"#1C1917",marginBottom:12,lineHeight:1.2,letterSpacing:"-0.01em"}}>{c.title}</div>
                 <div style={{fontSize:13,color:c.accent?"#8A7E78":"#78716C",fontWeight:300,lineHeight:1.7,flex:1,marginBottom:24}}>{c.desc}</div>
                 <div style={{fontSize:11,fontWeight:600,letterSpacing:"0.12em",textTransform:"uppercase",color:c.accent?"#C4A0B0":"#B0728A"}}>{c.cta}</div>
@@ -1337,13 +1346,13 @@ Use this structure when appropriate:
               style={{padding:"0 20px",background:"#1A1916",color:"#fff",border:"none",borderRadius:"0 6px 6px 0",fontSize:11,fontWeight:500,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"'Plus Jakarta Sans',sans-serif"}}
             >{hubSearchLoading?"Searching…":"Ask →"}</button>
           </div>
-          <p style={{fontSize:12,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Search 164 professional prompts, or press Ask → for an AI-powered answer to any question</p>
+          <p style={{fontSize:12,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Search 164 professional prompts, or press Ask → for an intelligent answer to any question</p>
         </div>
         {hubSearchLoading&&<div style={{textAlign:"center",padding:"32px 0"}}><div className="load-ring" style={{margin:"0 auto 14px"}}/><p style={{fontSize:13,color:"#78716C"}}>Finding your answer…</p></div>}
         {hubSearchResult&&!hubSearchResult.error&&(
           <div style={{marginBottom:28,border:"1px solid #EEEAE7",borderRadius:6,overflow:"hidden"}}>
             <div style={{background:"#1A1916",padding:"16px 22px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>AI Answer</p><p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:500,color:"#fff"}}>"{hubSearchResult.query}"</p></div>
+              <div><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>Expert Response</p><p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:500,color:"#fff"}}>"{hubSearchResult.query}"</p></div>
               <button onClick={()=>{setHubSearchResult(null);setHubSearchQuery("");}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"5px 14px",color:"#A8A29E",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Clear</button>
             </div>
             {hubSearchResult.framework&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>The Framework</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.framework}</p></div>}
@@ -1361,7 +1370,7 @@ Use this structure when appropriate:
               <div style={{fontFamily:"'Cormorant',serif",fontSize:13,fontWeight:600,color:"#C4B5AD",letterSpacing:"0.06em",marginBottom:10}}>{c.icon}</div>
               <div className="hub-card-label">{c.label}</div>
               <div className="hub-card-desc">{c.description}</div>
-              <div className="hub-card-cta">{c.questions.length} prompts →</div>
+              <div className="hub-card-cta">Explore prompts →</div>
             </div>
           ))}
         </div>
@@ -1408,7 +1417,7 @@ Use this structure when appropriate:
               {hubSearchLoading?"Searching…":"Ask →"}
             </button>
           </div>
-          <p style={{fontSize:11,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Press Enter or click Ask → to get a full AI answer to any question</p>
+          <p style={{fontSize:11,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Press Enter or click Ask → to get a full expert answer to any question</p>
         </div>
 
         {/* AI SEARCH RESULT */}
@@ -1422,7 +1431,7 @@ Use this structure when appropriate:
           <div style={{marginBottom:28,border:"1px solid #EEEAE7",borderRadius:6,overflow:"hidden"}}>
             <div style={{background:"#1A1916",padding:"16px 22px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>AI Answer</p>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>Expert Response</p>
                 <p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:500,color:"#fff",lineHeight:1.3}}>"{hubSearchResult.query}"</p>
               </div>
               <button onClick={()=>{setHubSearchResult(null);setHubSearchQuery("");setHubSearch("");}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"5px 14px",color:"#A8A29E",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.08em",textTransform:"uppercase"}}>Clear</button>
@@ -1484,7 +1493,7 @@ Use this structure when appropriate:
           <span onClick={()=>setHubQuestion(null)}>{hubCat?.label}</span>
         </div>
         <h1 className="advisor-h1"><em>{hubQuestion.title}</em></h1>
-        <p className="advisor-sub">Add your personal context below — then generate your answer.</p>
+        <p className="advisor-sub">Add your personal context below — then get your guidance.</p>
         <textarea
           className="advisor-ta"
           rows={5}
@@ -1502,7 +1511,7 @@ Use this structure when appropriate:
         {advisorLoading&&(
           <div style={{textAlign:"center",padding:"32px 0"}}>
             <div className="load-ring" style={{margin:"0 auto 16px"}}/>
-            <p style={{fontSize:13,color:"#78716C"}}>Building your personalized answer…</p>
+            <p style={{fontSize:13,color:"#78716C"}}>Preparing your guidance…</p>
           </div>
         )}
         {advisorResult&&!advisorResult.error&&(
@@ -1570,13 +1579,15 @@ Use this structure when appropriate:
           <div className="advisor-suggestions">
             {[
               "How do I get my first paying clients?",
+              "How do I ask for a raise or promotion?",
               "How do I raise my prices without losing clients?",
               "How do I build a referral system that actually works?",
-              "How do I stand out in a crowded market?",
-              "How do I stay motivated when growth is slow?",
+              "How do I transition to a new career or industry?",
               "Should I niche down or stay broad?",
-              "When should I hire help?",
-              "How do I make my revenue more consistent?"
+              "How do I stand out in a crowded market?",
+              "How do I stay motivated when progress feels slow?",
+              "How do I manage a difficult conversation at work?",
+              "When should I hire help or delegate?",
             ].map(s=>(
               <button key={s} className="advisor-sugg" onClick={()=>{setAdvisorQ(s);window.scrollTo({top:0,behavior:"smooth"});}}>{s}</button>
             ))}
@@ -1591,7 +1602,7 @@ Use this structure when appropriate:
         {advisorLoading&&(
           <div style={{textAlign:"center",padding:"32px 0"}}>
             <div className="load-ring" style={{margin:"0 auto 16px"}}/>
-            <p style={{fontSize:13,color:"#78716C"}}>Building your personalized answer…</p>
+            <p style={{fontSize:13,color:"#78716C"}}>Preparing your guidance…</p>
           </div>
         )}
         {advisorResult&&!advisorResult.error&&(
