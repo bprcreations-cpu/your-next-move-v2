@@ -613,11 +613,12 @@ export default function App() {
   const stageLabel = {starting:"Just Getting Started",growing:"Growing & Building Momentum",established:"Established & Looking to Scale",optimizing:"Experienced & Optimizing"}[journeyStage]||"";
 
   const loadMsgs = [
-    `${firstName?firstName+", we":"We"}'re reviewing your answers…`,
-    "Identifying your primary challenge…",
-    "Prioritizing your best opportunity…",
-    `Building your 30-day plan for ${effectiveIndustry||"your field"}…`,
-    "Finalizing your next move…",
+    `${firstName?firstName+", we":"We"}'re reviewing everything you shared…`,
+    `Analyzing your ${effectiveIndustry||"industry"} context…`,
+    "Identifying your most important opportunity…",
+    "Building your 30-day action plan…",
+    "Writing your personalized strategy…",
+    "Almost ready — adding your final recommendations…",
   ];
 
   useEffect(()=>{
@@ -746,62 +747,67 @@ export default function App() {
     setShowPaywall(false);setLoading(true);setError(null);go("loading");
     const qa=qs.map((q,i)=>{const a=answers[i];return`Q: ${q.q}\nA: ${Array.isArray(a)?a.join(", "):(a||"Not specified")}`;}).join("\n\n");
 
-    const prompt=`You are a senior strategist writing a concise, personalized strategy report. This should feel like a focused $500 session — not a lengthy document. Every section must be specific to this person. No generic advice.
+    const prompt=`You are a senior strategist delivering a concise, premium strategy report. Think McKinsey meets a trusted mentor. Every word earns its place. No filler. No generic advice. No sentences that could apply to anyone other than this exact person.
 
-RULES:
-1. SPECIFIC: Every sentence applies only to this person. If a sentence could apply to 80% of people, rewrite it.
-2. CONCISE: Keep each section tight. Users should finish reading in 8–10 minutes total.
-3. PERSONALIZED: Reference their industry, stage, goals, and actual answers throughout.
-4. THE INSIGHT: In Primary Challenge, include: "The insight: [one sentence — the most important truth about their situation]"
-5. REFRAME: Primary Challenge must include one sentence that reframes how they see their situation.
-6. STAGE AWARE: Just Getting Started = simple first steps. Growing = what to accelerate. Established = challenge assumptions. Optimizing = leverage and efficiency.
-7. VOICE: Warm, direct, executive. Not a coach or chatbot.
-8. COMPLETE ALL 8 SECTIONS. Shorter is better than incomplete.
+STRICT RULES — violating these fails the output:
+1. CONCISE: The entire report must be readable in 6-8 minutes. If a section feels long, cut it in half.
+2. SPECIFIC: Every sentence must be specific to this person's industry, stage, and actual answers. Test: could this sentence appear in a strategy for someone in a different industry? If yes, rewrite it.
+3. NO AI VOICE: Write like a sharp human advisor. Not "It's important to..." or "Consider..." — say what to do and why.
+4. THE INSIGHT: One sentence in Primary Challenge that is so precise it makes the person think "how did they know that." This is the sentence they screenshot.
+5. COMPLETE ALL 8: A short complete report beats a long incomplete one. Finish all 8 sections even if brief.
 
-Client: ${firstName||"Not provided"} | Focus: ${cat?.label} | Industry: ${effectiveIndustry} | Stage: ${stageLabel}
+Client Profile:
+Name: ${firstName||"Not provided"}
+Focus: ${cat?.label}
+Industry: ${effectiveIndustry}
+Stage: ${stageLabel}
 
-Answers:
+What they shared:
 ${qa}
 
-Write EXACTLY these 8 sections. Be concise — quality over quantity.
+Write EXACTLY these 8 sections in this exact order. Use these headers verbatim.
 
 # Strategic Assessment
-3 sentences maximum. First sentence references a specific detail from their answers.
-**Strengths:** [1 specific strength]
-**What needs attention:** [1 core gap]
+2-3 sentences only. Open with one specific observation from their answers — name the actual detail. Then one strength, one gap.
+Format:
+[2-3 sentence observation]
+**Strengths:** [one specific thing, tied to their answers]
+**What needs attention:** [one specific gap, tied to their answers]
 
 # Primary Challenge
-Bold header naming the constraint (4–7 words).
-2 sentences: what it is, the reframe.
-The insight: [single most important truth — the sentence they will screenshot]
+Name the root issue as a bold header (4-6 words — make it sharp, not generic).
+Then 2 sentences: (1) what it specifically is for this person, (2) the reframe — a new way of seeing it.
+Then: The insight: [the one sentence that reframes everything — specific, earned, surprising]
 
 # Strategic Opportunity
-Start: "Given your position in ${effectiveIndustry} at the ${stageLabel} stage..."
-3 opportunities. Each: **[Title]** then 1–2 sentences.
+One sentence opener referencing their specific stage and industry.
+Then 3 opportunities. Each gets a **Bold Title** and 1-2 sentences. Be specific to their situation.
 
 # Recommended Actions
-"Here is where to direct your energy."
-5 actions. Each: **[Title]** / [specific action] / *Why this matters: [1 sentence]*
-After action 5: **What to set aside for now:** [one specific thing to stop or defer]
+One sentence: where to direct energy.
+5 numbered actions. Each: **Title** — [what to do specifically]. *Why this matters: [one sentence tied to their situation.]*
+End with: **Set aside for now:** [one specific thing to stop doing or defer]
 
 # 30-Day Priority Plan
-All 4 weeks required. 6 words max per task.
+All 4 weeks required. Maximum 6 words per task. Tasks must be concrete actions not vague goals.
 Week 1 — Foundation: [Task] / [Task] / [Task] / [Task]
 Week 2 — Momentum: [Task] / [Task] / [Task] / [Task]
 Week 3 — Activation: [Task] / [Task] / [Task] / [Task]
 Week 4 — Scale & Review: [Task] / [Task] / [Task] / [Task]
 
 # Looking Ahead
-"Beyond 30 days, here is what to build toward."
-3 items. Each: **[Title]** then 1–2 sentences.
+One sentence opener. Then 3 forward-looking items. Each: **Bold Title** then 1-2 sentences specific to their trajectory.
 
 # What Success Looks Like
-3 sentences. Concrete, not aspirational. One measurable result, one relationship outcome, one internal shift.
+Exactly 3 sentences. Make them concrete and measurable — not aspirational.
+Sentence 1: a specific measurable outcome (number, timeline, metric)
+Sentence 2: a relationship or reputation outcome
+Sentence 3: an internal shift — how they will feel or think differently
 
 # Your Next Move
-Sentence 1: "Based on everything you've shared, the single most important action you should take today is [specific action]."
-Sentence 2: Why this is higher leverage than anything else.
-Sentence 3: What changes in 2 weeks if they do this.`;
+Sentence 1: "Based on everything you have shared, the single most important action you should take today is [very specific action — not a category, an action]."
+Sentence 2: Why this action creates more leverage than anything else right now — specific to their situation.
+Sentence 3: What specifically changes in 2 weeks if they do this.`;
 
     const callAPI=async()=>{
       const controller=new AbortController();
@@ -816,10 +822,15 @@ Sentence 3: What changes in 2 weeks if they do this.`;
 
     const isComplete=(p)=>{
       const critical=[p.yourNextMove,p.priorityPlan,p.strategicAssessment,p.primaryConstraint];
-      const allDone=critical.every(s=>s&&s.trim().length>20);
+      const allDone=critical.every(s=>s&&s.trim().length>30);
       const fullText=Object.values(p).join(" ");
+      // Must mention industry
       const indOk=effectiveIndustry?fullText.toLowerCase().includes(effectiveIndustry.toLowerCase().split(" ")[0]):true;
-      return allDone&&indOk;
+      // Must have The Insight
+      const hasInsight=fullText.toLowerCase().includes("the insight");
+      // Must have reasonable length (not truncated)
+      const hasLength=fullText.length>600;
+      return allDone&&indOk&&hasInsight&&hasLength;
     };
 
     try{
@@ -839,31 +850,33 @@ Sentence 3: What changes in 2 weeks if they do this.`;
     if(!question.trim())return;
     setAdvisorLoading(true);setAdvisorResult(null);
     const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry, ${savedPlans[0].journeyStage} stage.`:"";
-    const prompt=`You are a trusted personal advisor — warm, direct, and deeply knowledgeable across business, career, marketing, finance, real estate, leadership, and personal development. You speak like a brilliant friend who tells the truth. You give one clear opinion, not a list of options.
+    const prompt=`You are a trusted personal advisor. You are warm, direct, and speak plainly. You have deep knowledge across business, careers, finance, real estate, marketing, leadership, and personal development. You respond like a brilliant friend who happens to know everything — not like an AI assistant.
 
-IMPORTANT: Never assume the user has only one career, business, or role. They may juggle multiple interests — a corporate job, a side business, freelancing, investing, speaking, and more. Respond to THIS conversation only. Do not carry assumptions from previous topics.
+CRITICAL RULES:
+1. NO BULLET POINTS. No numbered lists. Write in natural flowing sentences and paragraphs only.
+2. ONE CLEAR OPINION. Do not present multiple options and let them choose. Pick the best path and advocate for it.
+3. NEVER ASSUME. The person may have a corporate job, a side business, multiple income streams, or none. Respond only to what they actually said.
+4. BE DIRECT. Say what you think. "I think you should..." not "You might want to consider..."
+5. FEEL HUMAN. Read like someone who knows this person, not a chatbot completing a template.
+6. SHORT ENOUGH TO READ. The whole response should take 60-90 seconds to read. Cut anything that doesn't add value.
 
-${firstName?`The person's name is ${firstName}. Address them by name once, naturally.`:""} ${context}
+${firstName?`The person's name is ${firstName}. Use it once naturally — not at the start of every section.`:""} ${context}
 
-Their situation: ${question}
+Their question or situation: ${question}
 
-Before responding, determine: Do I have enough context to answer well? If the question is vague, briefly acknowledge and answer the most likely interpretation — then invite them to add more context if needed. Do NOT ask multiple clarifying questions. Just answer.
-
-Choose the clearest format for your response. For most situations use flowing conversational sentences. For decisions that need comparison, use a simple side-by-side. For action items, use a short numbered list. Never use bullet points for everything by default.
-
-Always include these four parts:
+Respond with exactly these four sections. Write each section as flowing prose — never as a list.
 
 **What I'm hearing**
-1–2 sentences reflecting back their situation so they feel understood.
+One to two sentences reflecting what they said back to them. Make them feel understood before you give any advice.
 
 **Here's what I think**
-2–4 sentences. One direct recommendation or opinion. Be specific. Take a position.
+Two to four sentences. Your direct recommendation. Take a position. Be specific to their exact situation — not general career advice.
 
 **What this means for you**
-1–2 sentences on why this matters for their specific situation.
+One to two sentences on why this matters right now for their specific situation. Connect it to something they mentioned.
 
 **Your single next move**
-1 sentence. The ONE action to take in the next 24 hours.`;
+One sentence. The single most important action to take in the next 24 hours. Be specific — not a category, an actual action.`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
@@ -903,47 +916,32 @@ Always include these four parts:
     if(!query.trim())return;
     setHubSearchLoading(true);setHubSearchResult(null);
     const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry.`:"";
-    const prompt=`You are a senior professional advisor and expert consultant. Your job is to deliver the highest-quality, most useful response possible for this specific topic.
+    const prompt=`You are an expert consultant delivering a professional resource. Every response should feel like it was created by a senior advisor with 20 years of experience in this exact topic — not generated by a tool.
 
 ${firstName?`This is for ${firstName}.`:""} ${context}
 
-Topic: ${query}
+Request: ${query}
 
-BEFORE RESPONDING — think carefully:
+STEP 1 — Classify this request:
+- Is this a KNOWLEDGE question (what is X, how does X work, define X)? → Write 2-3 clear explanatory paragraphs with a bold header. No lists needed unless they add clarity.
+- Is this a CHECKLIST or TEMPLATE request (create a checklist, give me a template)? → Deliver a numbered checklist or template immediately. Clean, complete, ready to use.
+- Is this a STRATEGY or PLAN request? → Deliver a structured response with clear sections: Situation Overview, Key Recommendations, Action Steps, What to Watch For.
+- Is this a COMPARISON or DECISION? → Use a clear comparison format. Give a recommendation at the end.
+- Is this a GENERAL professional question? → Answer directly and practically in 3-4 paragraphs.
 
-1. What TYPE of request is this?
-   - KNOWLEDGE (explain a concept, define a term, describe something) → Respond immediately with a clear explanation. No questions needed.
-   - FRAMEWORK / CHECKLIST (checklist, template, process, steps) → Generate immediately. No questions needed.
-   - PERSONALIZED RESOURCE (strategy, plan, roadmap) → Generate a high-quality response. If critical details are missing, note what would make it more specific.
-   - ANALYSIS (analyze something specific) → Request only the specific information needed, then generate.
+STEP 2 — Write the response:
+Use the right format for the request type above. Do not force every response into the same structure.
 
-2. What is the BEST FORMAT for this response?
-   - Explanation → Clear paragraphs with headers
-   - Checklist → Numbered or bulleted checklist
-   - Comparison → Table format
-   - Strategy/Plan → Executive report with sections
-   - Steps → Numbered step-by-step
-   - Calendar/Schedule → Grid or timeline format
-   - Budget → Structured table
-   - Q&A → Question and answer format
-   Choose the format that makes this easiest to read, save, and implement.
+Every response must be:
+- Professional in tone — like reading a consultant's memo
+- Specific — not generic advice that applies to everyone
+- Actionable — the person should know exactly what to do
+- Complete — do not cut off before finishing
 
-3. Make every output feel like it was created by an experienced consultant — never by AI.
-
-Deliver a professional, organized, actionable response. Every deliverable should be:
-- Easy to skim
-- Easy to screenshot  
-- Easy to implement
-- Specific enough to start today
-
-Use this structure when appropriate:
-
-**[Clear Title for This Response]**
-
-[Your response in the most appropriate format]
+End every response with:
 
 **Your First Step**
-1 sentence. What to do right now.`;
+One sentence. The single most concrete action to take right now.`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
@@ -1511,7 +1509,7 @@ Use this structure when appropriate:
         {advisorLoading&&(
           <div style={{textAlign:"center",padding:"32px 0"}}>
             <div className="load-ring" style={{margin:"0 auto 16px"}}/>
-            <p style={{fontSize:13,color:"#78716C"}}>Preparing your guidance…</p>
+            <p style={{fontSize:13,color:"#78716C"}}>{firstName?firstName+", your":"Your"} advisor is thinking…</p>
           </div>
         )}
         {advisorResult&&!advisorResult.error&&(
@@ -1524,19 +1522,19 @@ Use this structure when appropriate:
             </div>
             {advisorResult.hearing&&(
               <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label">What I'm Hearing</div>
+                <div className="advisor-result-label" style={{color:"#A8A29E"}}>What I'm Hearing</div>
                 <div className="advisor-result-text" style={{fontStyle:"italic",color:"#57534E"}}>{advisorResult.hearing}</div>
               </div>
             )}
             {advisorResult.think&&(
               <div className="advisor-result-section">
-                <div className="advisor-result-label">Here's What I Think</div>
+                <div className="advisor-result-label" style={{color:"#1A1916"}}>Here's What I Think</div>
                 <div className="advisor-result-text">{advisorResult.think}</div>
               </div>
             )}
             {advisorResult.means&&(
               <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label">What This Means For You</div>
+                <div className="advisor-result-label" style={{color:"#A8A29E"}}>What This Means For You</div>
                 <div className="advisor-result-text">{advisorResult.means}</div>
               </div>
             )}
@@ -1602,7 +1600,7 @@ Use this structure when appropriate:
         {advisorLoading&&(
           <div style={{textAlign:"center",padding:"32px 0"}}>
             <div className="load-ring" style={{margin:"0 auto 16px"}}/>
-            <p style={{fontSize:13,color:"#78716C"}}>Preparing your guidance…</p>
+            <p style={{fontSize:13,color:"#78716C"}}>{firstName?firstName+", your":"Your"} advisor is thinking…</p>
           </div>
         )}
         {advisorResult&&!advisorResult.error&&(
@@ -1615,19 +1613,19 @@ Use this structure when appropriate:
             </div>
             {advisorResult.hearing&&(
               <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label">What I'm Hearing</div>
+                <div className="advisor-result-label" style={{color:"#A8A29E"}}>What I'm Hearing</div>
                 <div className="advisor-result-text" style={{fontStyle:"italic",color:"#57534E"}}>{advisorResult.hearing}</div>
               </div>
             )}
             {advisorResult.think&&(
               <div className="advisor-result-section">
-                <div className="advisor-result-label">Here's What I Think</div>
+                <div className="advisor-result-label" style={{color:"#1A1916"}}>Here's What I Think</div>
                 <div className="advisor-result-text">{advisorResult.think}</div>
               </div>
             )}
             {advisorResult.means&&(
               <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label">What This Means For You</div>
+                <div className="advisor-result-label" style={{color:"#A8A29E"}}>What This Means For You</div>
                 <div className="advisor-result-text">{advisorResult.means}</div>
               </div>
             )}
