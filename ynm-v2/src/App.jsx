@@ -1938,7 +1938,7 @@ One sentence. The single most concrete action to take right now.`;
     {/* ══ RESULTS ══ */}
     {screen==="results"&&result&&(()=>{
       const {actions,deprioritize}=parseActions(result.recommendedActions||result.actionPlan||"");
-      const opps=parseOpportunities(result.strategicOpportunity||result.keyOpportunities||"");
+      const opps=parseOpps(result.strategicOpportunity||result.keyOpportunities||"");
       const weeks=parseRoadmap(result.priorityPlan||result.roadmap||"");
       const looking=parseLooking(result.longTermGrowth||result.mistakes||"");
       const nextMove=(result.yourNextMove||"").replace(/\*\*/g,"").trim();
