@@ -550,6 +550,168 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .three-way-card.featured .three-way-desc{color:#8A7E78;}
 .three-way-tag{font-size:11px;color:#A8A29E;font-style:italic;}
 .three-way-card.featured .three-way-tag{color:#5A5350;}
+
+/* ═══════════════════════════════════════════════════════════════
+   REDESIGNED STRATEGY EXPERIENCE
+   ═══════════════════════════════════════════════════════════════ */
+
+/* EXECUTIVE SUMMARY */
+.exec-sum{background:#fff;padding:52px 56px 48px;border-bottom:3px solid #1A1916;}
+.exec-sum-eye{font-size:11px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#B0728A;margin-bottom:20px;display:block;}
+.exec-sum-h{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,42px);font-weight:600;color:#1A1916;margin-bottom:8px;letter-spacing:-0.02em;line-height:1.1;}
+.exec-sum-sub{font-size:14px;color:#78716C;font-weight:300;margin-bottom:36px;line-height:1.65;}
+.exec-sum-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:28px;}
+.exec-sum-card{padding:22px 20px;background:#FAFAF8;border:1px solid #EEEAE7;}
+.exec-sum-card.dark{background:#1A1916;}
+.exec-sum-card-label{font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#C4B5AD;margin-bottom:8px;}
+.exec-sum-card.dark .exec-sum-card-label{color:#5A4A42;}
+.exec-sum-card-text{font-size:14px;color:#1A1916;font-weight:400;line-height:1.55;}
+.exec-sum-card.dark .exec-sum-card-text{color:#E8D8D0;}
+.exec-sum-card.pink{background:#FAF0F4;border-color:#E8C4D4;}
+.exec-sum-card.pink .exec-sum-card-label{color:#B0728A;}
+.exec-sum-card.pink .exec-sum-card-text{color:#1A1916;font-weight:500;}
+.exec-sum-timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+.exec-sum-tl{padding:16px 18px;background:#FAFAF8;border:1px solid #EEEAE7;position:relative;}
+.exec-sum-tl-period{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#B0728A;margin-bottom:6px;}
+.exec-sum-tl-text{font-size:13px;color:#57534E;font-weight:300;line-height:1.55;}
+
+/* SECTION HEADINGS — REDESIGNED */
+.sec-chapter{padding:52px 56px 0;}
+.sec-chapter-num{font-family:'Cormorant',serif;font-size:64px;font-weight:700;color:#F0EDEB;line-height:1;margin-bottom:-8px;letter-spacing:-0.04em;}
+.sec-chapter-title{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,40px);font-weight:600;color:#1A1916;line-height:1.1;margin-bottom:6px;letter-spacing:-0.02em;}
+.sec-chapter-title-dark{color:#fff;}
+.sec-chapter-sub{font-size:14px;color:#A8A29E;font-weight:300;line-height:1.6;margin-bottom:32px;}
+.sec-chapter-sub-dark{color:#6A6060;}
+.sec-chapter-divider{width:40px;height:3px;background:#B0728A;margin-bottom:32px;}
+.sec-chapter-divider-green{width:40px;height:3px;background:#6A9E8A;margin-bottom:32px;}
+
+/* SECTION BODY — REDESIGNED */
+.sec-content{padding:0 56px 52px;}
+.sec-content-dark{padding:0 56px 52px;}
+
+/* STRENGTH / TENSION CARDS */
+.str-ten-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;}
+.str-card{padding:20px 22px;border-radius:4px;}
+.str-card-strength{background:#EFF7F3;border-left:3px solid #6A9E8A;}
+.str-card-tension{background:#FAF0F4;border-left:3px solid #B0728A;}
+.str-card-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;}
+.str-card-label-s{color:#5A8A78;}
+.str-card-label-t{color:#B0728A;}
+.str-card-text{font-size:14px;line-height:1.65;font-weight:300;color:#3A3530;}
+
+/* OPPORTUNITY CARDS — REDESIGNED */
+.opp-cards-new{display:flex;flex-direction:column;gap:0;}
+.opp-card-new{display:flex;gap:0;border:1px solid #EEEAE7;margin-bottom:8px;border-radius:4px;overflow:hidden;transition:border-color 0.15s;}
+.opp-card-new:hover{border-color:#E8C4D4;}
+.opp-card-rank{width:56px;flex-shrink:0;background:#1A1916;display:flex;align-items:center;justify-content:center;font-family:'Cormorant',serif;font-size:28px;font-weight:700;color:#B0728A;}
+.opp-card-body{padding:20px 24px;flex:1;}
+.opp-card-title-new{font-family:'Cormorant',serif;font-size:20px;font-weight:600;color:#1A1916;margin-bottom:6px;line-height:1.25;}
+.opp-card-text-new{font-size:14px;color:#57534E;line-height:1.7;font-weight:300;}
+
+/* ACTION CARDS — REDESIGNED */
+.action-cards-new{display:flex;flex-direction:column;gap:0;}
+.action-card-new{padding:20px 24px;border:1px solid #EEEAE7;margin-bottom:8px;border-radius:4px;display:flex;gap:16px;align-items:flex-start;transition:border-color 0.15s;}
+.action-card-new:hover{border-color:#E8C4D4;}
+.action-card-new.first-action{border-color:#B0728A;background:#FAF0F4;}
+.action-card-num-new{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;font-family:'Cormorant',serif;}
+.action-card-num-1{background:#B0728A;color:#fff;}
+.action-card-num-n{background:#F5E6EC;color:#B0728A;border:1.5px solid #E8C4D4;}
+.action-card-content-new{flex:1;}
+.action-priority-badge{font-size:9px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:4px;}
+.action-title-new{font-size:15px;font-weight:600;color:#1A1916;margin-bottom:4px;line-height:1.35;}
+.action-body-new{font-size:13px;color:#57534E;line-height:1.7;font-weight:300;margin-bottom:6px;}
+.action-why-new{font-size:12px;color:#B0728A;font-style:italic;line-height:1.55;border-top:1px solid #F0EDEB;padding-top:6px;margin-top:6px;}
+.deprio-box{margin-top:16px;padding:14px 18px;background:#FAFAF8;border:1px solid #EEEAE7;border-radius:4px;}
+.deprio-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:6px;}
+.deprio-text{font-size:13px;color:#78716C;font-weight:300;line-height:1.6;}
+
+/* 30-DAY PLAN — REDESIGNED */
+.roadmap-new{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.week-card-new{background:#fff;border:1px solid #EEEAE7;border-radius:6px;overflow:hidden;}
+.week-header-new{padding:16px 18px;background:#1A1916;border-bottom:2px solid #B0728A;}
+.week-num-new{font-family:'Cormorant',serif;font-size:40px;font-weight:700;color:#2A2420;line-height:1;margin-bottom:2px;}
+.week-label-new{font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#5A5350;margin-bottom:2px;}
+.week-theme-new{font-family:'Cormorant',serif;font-size:15px;font-weight:600;color:#C4A0B0;line-height:1.2;}
+.week-body-new{padding:16px 18px;}
+.week-item-new{font-size:12px;color:#57534E;line-height:1.65;padding:6px 0;border-bottom:1px solid #F0EDEB;display:flex;gap:8px;align-items:flex-start;}
+.week-item-new:last-child{border-bottom:none;}
+.week-item-dot{width:5px;height:5px;border-radius:50%;background:#B0728A;flex-shrink:0;margin-top:5px;}
+
+/* LOOKING AHEAD — REDESIGNED */
+.ahead-cards{display:flex;flex-direction:column;gap:8px;}
+.ahead-card{padding:20px 22px;border:1px solid #EEEAE7;border-radius:4px;display:flex;gap:14px;align-items:flex-start;transition:border-color 0.15s;}
+.ahead-card:hover{border-color:#E8C4D4;}
+.ahead-arrow{width:28px;height:28px;border-radius:50%;background:rgba(176,114,138,0.1);border:1.5px solid rgba(176,114,138,0.25);color:#B0728A;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px;}
+.ahead-title{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:#1A1916;margin-bottom:4px;}
+.ahead-body{font-size:13px;color:#78716C;line-height:1.65;font-weight:300;}
+
+/* SUCCESS SECTION — REDESIGNED */
+.success-points{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+.success-point{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:rgba(106,158,138,0.08);border-radius:4px;border-left:3px solid #6A9E8A;}
+.success-point-icon{font-size:16px;flex-shrink:0;}
+.success-point-text{font-size:14px;color:#2A4A40;font-weight:300;line-height:1.65;}
+
+/* YOUR NEXT MOVE — REDESIGNED */
+.nextmove-redesign{background:#1A1916;padding:72px 56px;text-align:center;position:relative;}
+.nextmove-redesign-eye{font-size:11px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#C4A0B0;margin-bottom:16px;display:block;}
+.nextmove-redesign-label{font-size:13px;color:#5A5350;margin-bottom:32px;display:block;font-style:italic;}
+.nextmove-redesign-text{font-family:'Cormorant',serif;font-size:clamp(22px,3.5vw,38px);font-weight:500;font-style:italic;color:#fff;line-height:1.35;max-width:680px;margin:0 auto 36px;letter-spacing:-0.01em;}
+.nextmove-divider{width:48px;height:1px;background:#3A3330;margin:0 auto 24px;}
+.nextmove-footer-text{font-size:12px;color:#4A4340;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;}
+
+/* END OF STRATEGY — NATURAL CONCLUSION */
+.strategy-end{background:#fff;padding:72px 56px;text-align:center;border-top:1px solid #F0EDEB;}
+.strategy-end-rule{width:48px;height:2px;background:#B0728A;margin:0 auto 32px;}
+.strategy-end-eye{font-size:11px;font-weight:600;letter-spacing:0.32em;text-transform:uppercase;color:#B0728A;margin-bottom:16px;display:block;}
+.strategy-end-h{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,44px);font-weight:600;color:#1A1916;line-height:1.1;margin-bottom:16px;letter-spacing:-0.02em;}
+.strategy-end-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.75;max-width:440px;margin:0 auto 36px;}
+.strategy-end-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+/* STRATEGY SAVED PAGE */
+.saved-page{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;max-width:640px;margin:0 auto;}
+.saved-check{width:64px;height:64px;border-radius:50%;background:#EFF7F3;border:2px solid #6A9E8A;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:24px;}
+.saved-eye{font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#6A9E8A;margin-bottom:16px;display:block;}
+.saved-h{font-family:'Cormorant',serif;font-size:clamp(28px,5vw,44px);font-weight:600;color:#1A1916;margin-bottom:14px;line-height:1.1;letter-spacing:-0.02em;}
+.saved-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.75;margin-bottom:12px;}
+.saved-note{font-size:13px;color:#A8A29E;line-height:1.65;margin-bottom:40px;font-style:italic;}
+.saved-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;}
+
+/* FEEDBACK PAGE */
+.feedback-page{max-width:680px;margin:0 auto;padding:56px 28px 80px;}
+.feedback-page-eye{font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#B0728A;margin-bottom:16px;display:block;}
+.feedback-page-h{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,40px);font-weight:600;color:#1A1916;margin-bottom:10px;letter-spacing:-0.02em;line-height:1.1;}
+.feedback-page-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.7;margin-bottom:36px;}
+.feedback-divider{height:1px;background:#EEEAE7;margin:24px 0;}
+
+/* SUCCESS PAGE */
+.success-page{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;max-width:600px;margin:0 auto;}
+.success-star{font-size:40px;margin-bottom:24px;}
+.success-eye{font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#B0728A;margin-bottom:16px;display:block;}
+.success-h{font-family:'Cormorant',serif;font-size:clamp(32px,5vw,52px);font-weight:600;color:#1A1916;margin-bottom:14px;line-height:1.05;letter-spacing:-0.02em;}
+.success-h em{font-style:italic;color:#B0728A;}
+.success-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.75;margin-bottom:36px;}
+.success-pdf-btn{display:inline-flex;align-items:center;gap:10px;padding:18px 48px;background:#1A1916;color:#fff;font-size:13px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:20px;width:100%;max-width:320px;justify-content:center;}
+.success-pdf-btn:hover{background:#B0728A;}
+.success-next-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:360px;}
+.success-next-btn{padding:12px 16px;background:#FAFAF8;border:1px solid #EEEAE7;border-radius:4px;font-size:11px;font-weight:500;color:#57534E;cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;}
+.success-next-btn:hover{border-color:#B0728A;color:#1A1916;background:#fff;}
+
+/* RESPONSIVE ADJUSTMENTS */
+@media(max-width:860px){
+  .exec-sum,.sec-chapter,.sec-content,.sec-content-dark,.nextmove-redesign,.strategy-end{padding-left:28px;padding-right:28px;}
+  .exec-sum-cards,.exec-sum-timeline{grid-template-columns:1fr;}
+  .roadmap-new{grid-template-columns:1fr 1fr;}
+  .str-ten-grid{grid-template-columns:1fr;}
+}
+@media(max-width:640px){
+  .exec-sum,.sec-chapter,.sec-content,.sec-content-dark,.nextmove-redesign,.strategy-end{padding-left:16px;padding-right:16px;}
+  .roadmap-new{grid-template-columns:1fr;}
+  .exec-sum-cards{grid-template-columns:1fr;}
+  .exec-sum-timeline{grid-template-columns:1fr;}
+  .success-next-grid{grid-template-columns:1fr;}
+  .strategy-end-btns{flex-direction:column;align-items:center;}
+  .strategy-end-btns .btn,.strategy-end-btns .btn-out{width:100%;max-width:320px;justify-content:center;}
+}
 /* RESPONSIVE */
 @media(max-width:860px){
   .res-cover,.sec,.sec-dark,.res-footer,.fb-wrap{padding-left:28px;padding-right:28px;}
@@ -647,6 +809,7 @@ export default function App() {
   const [editDraft,    setEditDraft]    = useState("");
   const [fbDone,       setFbDone]       = useState(false);
   const [pdfUnlocked,  setPdfUnlocked]  = useState(false);
+  const [strategyStage, setStrategyStage] = useState('reading'); // reading | saved | feedback | complete
   const [welcomeEmail, setWelcomeEmail] = useState("");
   const [fbRating,     setFbRating]     = useState(null);
   const [fbAns,        setFbAns]        = useState({});
@@ -764,7 +927,7 @@ export default function App() {
     setCatId(null);setIndustry(null);setCustomInd("");setJourneyStage(null);
     setAnswers({});setQIdx(0);setResult(null);setError(null);
     setViewingPlanId(null);setShowPaywall(false);setEditSection(null);
-    setFbDone(false);setFbRating(null);setFbAns({});setShortWarn(false);
+    setFbDone(false);setFbRating(null);setFbAns({});setShortWarn(false);setStrategyStage('reading');
     go("home");
   }
   async function completeOnboarding(name){
@@ -1955,6 +2118,16 @@ One sentence. The single most concrete action to take right now.`;
       const insightText=insightMatch?insightMatch[1].replace(/\*\*/g,"").trim():null;
       const successText=(result.successLooks||"").replace(/\*\*/g,"");
       const planCat=CATEGORIES.find(c=>c.id===catId);
+      const successSentences=successText.split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>10);
+
+      // Build executive summary data
+      const execSummaryData={
+        position: mainExec?mainExec.split(".")[0]+".":"",
+        opportunity: opps[0]?opps[0].title||opps[0].body.split(".")[0]+"." :"",
+        challenge: blindTitle||cleanBlind.split(".")[0]+".",
+        firstAction: nextMove?nextMove.split(".")[0]+".":"",
+        goal: successSentences[0]||"",
+      };
 
       const EC=({sk,lbl,val})=>{
         const isEdit=editSection===sk;
@@ -1962,220 +2135,313 @@ One sentence. The single most concrete action to take right now.`;
         return <button className="edit-btn" onClick={()=>startEdit(sk,val)}>✎ Edit</button>;
       };
 
+      // ── STRATEGY SAVED PAGE ─────────────────────────────────────────────
+      if(strategyStage==="saved") return(
+        <div className="saved-page">
+          <div className="saved-check">✓</div>
+          <span className="saved-eye">Strategy Saved</span>
+          <h1 className="saved-h">Your Strategy Has Been Saved.</h1>
+          <p className="saved-sub">Your personalized strategy has been securely saved to My Strategies. You can return anytime to review, update, or continue building on it.</p>
+          <p className="saved-note">As a beta user, your feedback directly shapes how this platform evolves. It takes 2–3 minutes and makes a real difference.</p>
+          <div className="saved-btns">
+            <button className="btn" style={{width:"100%",justifyContent:"center",padding:"16px 28px"}} onClick={()=>setStrategyStage("feedback")}>Continue to Beta Feedback →</button>
+            <button className="btn-out" style={{width:"100%",justifyContent:"center"}} onClick={()=>go("plans")}>Skip to My Strategies</button>
+          </div>
+        </div>
+      );
+
+      // ── FEEDBACK PAGE ───────────────────────────────────────────────────
+      if(strategyStage==="feedback") return(
+        <div className="feedback-page">
+          <div className="bc"><span onClick={()=>setStrategyStage("saved")}>← Back</span></div>
+          <span className="feedback-page-eye">Beta Feedback</span>
+          <h1 className="feedback-page-h">Help Us Improve.</h1>
+          <p className="feedback-page-sub">You're one of our first users. Your honest feedback shapes every future strategy session on this platform. This takes 2–3 minutes.</p>
+          <div className="feedback-divider"/>
+          <div className="fb-q"><p className="fb-q-lbl">How useful was this strategy overall? (1 = not useful, 10 = extremely useful)</p><div className="fb-nums">{[1,2,3,4,5,6,7,8,9,10].map(n=><button key={n} className={`fb-num${fbRating===n?" on":""}`} onClick={()=>setFbRating(n)}>{n}</button>)}</div></div>
+          {[
+            {k:"experience",q:"How was your overall experience using the platform?",o:["Excellent","Good","Average","Needs improvement"]},
+            {k:"valuable",q:"Which feature was most valuable to you?",o:["Create My Strategy","Ask Your Advisor","Industry Hub","All three equally"]},
+            {k:"confusing",q:"Was anything confusing or unclear?",o:["Nothing — it was clear","The flow was unclear","Some features were unclear","The output was unclear"]},
+            {k:"personalized",q:"Did this strategy feel personalized to your specific situation?",o:["Yes — very much so","Somewhat","Not really — felt generic"]},
+            {k:"wouldPay",q:"Would you pay $19/month for ongoing access to this platform?",o:["Yes — absolutely","Probably yes","Not sure","Probably not"]},
+            {k:"wouldRecommend",q:"Would you recommend this to someone you know?",o:["Yes — immediately","Maybe after using it more","Not yet"]},
+          ].map(item=>(
+            <div className="fb-q" key={item.k}><p className="fb-q-lbl">{item.q}</p><div className="fb-pills">{item.o.map(o=><button key={o} className={`fb-pill${fbAns[item.k]===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,[item.k]:o}))}>{o}</button>)}</div></div>
+          ))}
+          <div className="fb-q"><p className="fb-q-lbl">What would make this better? (optional)</p><textarea className="fb-ta" placeholder="Be honest — we want real feedback." value={fbAns.suggestions||""} onChange={e=>setFbAns(p=>({...p,suggestions:e.target.value}))}/></div>
+          <div className="fb-q"><p className="fb-q-lbl">What is one action you plan to take this week based on your strategy?</p><textarea className="fb-ta" placeholder="e.g. I am going to reach out to 3 potential clients by Friday." value={fbAns.action||""} onChange={e=>setFbAns(p=>({...p,action:e.target.value}))}/></div>
+          <div className="fb-q"><p className="fb-q-lbl">May we use your feedback as a testimonial? (optional)</p><div className="fb-pills">{["Yes, with my name","Yes, anonymously","No, keep it private"].map(o=><button key={o} className={`fb-pill${fbAns.testimonial===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,testimonial:o}))}>{o}</button>)}</div></div>
+          <div className="feedback-divider"/>
+          <button className="btn" style={{padding:"14px 36px",fontSize:12}} onClick={()=>{
+            setFbDone(true);setPdfUnlocked(true);
+            try{window.storage.set(`feedback:${Date.now()}`,JSON.stringify({rating:fbRating,industry:effectiveIndustry,stage:journeyStage,...fbAns}));}catch(e){}
+            setStrategyStage("complete");
+          }}>Submit Feedback →</button>
+          <p style={{fontSize:12,color:"#A8A29E",marginTop:12}}>You can also <button style={{background:"none",border:"none",color:"#B0728A",fontSize:12,cursor:"pointer",textDecoration:"underline",fontFamily:"'Plus Jakarta Sans',sans-serif"}} onClick={()=>setStrategyStage("complete")}>skip to PDF download</button></p>
+        </div>
+      );
+
+      // ── COMPLETE / SUCCESS PAGE ─────────────────────────────────────────
+      if(strategyStage==="complete") return(
+        <div className="success-page">
+          <div className="success-star">✦</div>
+          <span className="success-eye">Thank You{firstName?`, ${firstName}`:""}</span>
+          <h1 className="success-h">Your PDF Is <em>Ready.</em></h1>
+          <p className="success-sub">{fbDone?"Your feedback has been submitted and your strategy PDF is ready to download.":"Your strategy is complete and ready to download."} Everything you need to get started is inside.</p>
+          <button className="success-pdf-btn" onClick={()=>window.print()}>⬇ Download My Strategy PDF</button>
+          <p style={{fontSize:12,color:"#A8A29E",marginBottom:16}}>What would you like to do next?</p>
+          <div className="success-next-grid">
+            <button className="success-next-btn" onClick={restart}>New Strategy</button>
+            <button className="success-next-btn" onClick={()=>go("plans")}>My Strategies</button>
+            <button className="success-next-btn" onClick={()=>go("advisor")}>Ask Your Advisor</button>
+            <button className="success-next-btn" onClick={()=>go("hub")}>Industry Hub</button>
+          </div>
+        </div>
+      );
+
+      // ── MAIN STRATEGY READING EXPERIENCE ───────────────────────────────
       return(
         <div className="res">
+
           {/* COVER */}
           <div className="res-cover">
             <span className="res-eye">Your Next Move · Strategy Report</span>
             <h1 className="res-h1">{firstName?`${firstName}'s `:""}<em>{planCat?.label}</em><br/>Strategy</h1>
-            <p className="res-meta">Built for your {effectiveIndustry||industry} business at the {stageLabel} stage</p>
+            <p className="res-meta">Built for your {effectiveIndustry||industry} work at the {stageLabel} stage · {today}</p>
             <div className="res-tags">
               <span className="res-tag">{effectiveIndustry||industry}</span>
               <span className="res-tag">{stageLabel}</span>
-              <span className="res-tag">{today}</span>
               {viewingPlanId&&<span className="res-tag res-tag-saved">✓ Saved</span>}
             </div>
-            <div className="res-btns">
-              <button className="res-btn" onClick={()=>window.print()}>Export PDF</button>
-              <button className="res-btn" onClick={()=>go("plans")}>My Strategies</button>
+          </div>
+
+          {/* EXECUTIVE SUMMARY */}
+          <div className="exec-sum">
+            <span className="exec-sum-eye">Executive Summary</span>
+            <h2 className="exec-sum-h">Your strategy at a glance.</h2>
+            <p className="exec-sum-sub">Read this first for a 60-second overview. Then explore each section in detail below.</p>
+            <div className="exec-sum-cards">
+              {execSummaryData.position&&<div className="exec-sum-card"><div className="exec-sum-card-label">Current Position</div><div className="exec-sum-card-text">{execSummaryData.position}</div></div>}
+              {execSummaryData.opportunity&&<div className="exec-sum-card pink"><div className="exec-sum-card-label">Biggest Opportunity</div><div className="exec-sum-card-text">{execSummaryData.opportunity}</div></div>}
+              {execSummaryData.challenge&&<div className="exec-sum-card"><div className="exec-sum-card-label">Primary Challenge</div><div className="exec-sum-card-text">{execSummaryData.challenge}</div></div>}
+              {execSummaryData.firstAction&&<div className="exec-sum-card dark"><div className="exec-sum-card-label">Recommended First Action</div><div className="exec-sum-card-text">{execSummaryData.firstAction}</div></div>}
+              {execSummaryData.goal&&<div className="exec-sum-card"><div className="exec-sum-card-label">Primary Goal</div><div className="exec-sum-card-text">{execSummaryData.goal}</div></div>}
+            </div>
+            <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>30-Day Timeline</p>
+            <div className="exec-sum-timeline">
+              <div className="exec-sum-tl"><div className="exec-sum-tl-period">Days 1–10</div><div className="exec-sum-tl-text">Foundation — establish your core systems and take your first actions</div></div>
+              <div className="exec-sum-tl"><div className="exec-sum-tl-period">Days 11–21</div><div className="exec-sum-tl-text">Momentum — activate your strategy and begin measuring progress</div></div>
+              <div className="exec-sum-tl"><div className="exec-sum-tl-period">Days 22–30</div><div className="exec-sum-tl-text">Scale & Review — evaluate results and set your 60-day targets</div></div>
             </div>
           </div>
 
-          {/* 01 */}
-          <div className="sec sec-light">
-            <div className="sec-kicker"><span className="sec-kicker-num">01</span>Strategic Assessment</div>
-            <p className="sec-purpose">Where you are today and what we noticed from your answers.</p>
-            {mainExec&&<p className="sec-body">{mainExec}</p>}
-            {(strength||tension)&&(
-              <div className="cards-2">
-                {strength&&<div className="card-sm"><div className="card-sm-label">Strengths</div><div className="card-sm-text">{clean(strength)}</div></div>}
-                {tension&&<div className="card-sm card-sm-gap"><div className="card-sm-label">What needs attention</div><div className="card-sm-text">{clean(tension)}</div></div>}
-              </div>
-            )}
-            <EC sk="strategicAssessment" lbl="Strategic Assessment" val={result.strategicAssessment||result.execSummary||""}/>
-          </div>
-
-          {/* 02 */}
-          <div className="sec sec-dark">
-            <div className="sec-kicker sec-kicker-dark"><span className="sec-kicker-num sec-kicker-num-dark">02</span>Primary Challenge</div>
-            <p className="sec-purpose sec-purpose-dark">The main issue making progress harder right now.</p>
-            {blindTitle?<p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(22px,4vw,38px)",fontWeight:600,fontStyle:"italic",color:"#fff",lineHeight:1.2,marginBottom:18,letterSpacing:"-0.01em"}}>"{blindTitle}"</p>:<p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3.5vw,30px)",fontWeight:600,fontStyle:"italic",color:"#fff",lineHeight:1.25,marginBottom:18}}>"{cleanBlind.split(".")[0]}."</p>}
-            <p className="sec-body-dark">{blindTitle?cleanBlind:cleanBlind.split(".").slice(1).join(".").trim()}</p>
-            {insightText&&<div className="insight-block"><div className="insight-label">The Insight</div><p className="insight-text">"{insightText}"</p></div>}
-            <button id="copy-btn" className="insight-copy" onClick={()=>{
-              const txt=insightText?`"${insightText}"`:blindTitle?`"${blindTitle}" — ${cleanBlind}`:cleanBlind;
-              if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById("copy-btn");if(b){b.textContent="✓ Copied";setTimeout(()=>{b.textContent="Share this insight";},2200);}});}
-            }}>Share this insight →</button>
-            <EC sk="primaryConstraint" lbl="Primary Challenge" val={result.primaryConstraint||result.blindSpot||""}/>
-          </div>
-
-          {/* 03 */}
-          <div className="sec">
-            <div className="sec-kicker"><span className="sec-kicker-num">03</span>Best Opportunity</div>
-            <p className="sec-purpose">The area most likely to create meaningful progress.</p>
-            <div className="opp-list">
-              {opps.map((o,i)=>(
-                <div className="opp-row" key={i}>
-                  <div className="opp-num">{i+1}</div>
-                  <div className="opp-body">{o.title&&<div className="opp-title">{o.title}</div>}<div className="opp-text">{o.body}</div></div>
+          {/* 01 — STRATEGIC ASSESSMENT */}
+          <div style={{background:"#FAFAF8",borderBottom:"1px solid #EEEAE7"}}>
+            <div className="sec-chapter">
+              <div className="sec-chapter-num">01</div>
+              <h2 className="sec-chapter-title">Strategic Assessment</h2>
+              <p className="sec-chapter-sub">Where you are today and what we noticed from your answers.</p>
+              <div className="sec-chapter-divider"/>
+            </div>
+            <div className="sec-content">
+              {mainExec&&<p style={{fontSize:15,color:"#3A3530",lineHeight:1.85,fontWeight:300,marginBottom:20}}>{mainExec}</p>}
+              {(strength||tension)&&(
+                <div className="str-ten-grid">
+                  {strength&&<div className="str-card str-card-strength"><div className="str-card-label str-card-label-s">✓ Strengths</div><div className="str-card-text">{clean(strength)}</div></div>}
+                  {tension&&<div className="str-card str-card-tension"><div className="str-card-label str-card-label-t">↗ What Needs Attention</div><div className="str-card-text">{clean(tension)}</div></div>}
                 </div>
-              ))}
+              )}
+              <EC sk="strategicAssessment" lbl="Strategic Assessment" val={result.strategicAssessment||result.execSummary||""}/>
             </div>
-            <EC sk="strategicOpportunity" lbl="Best Opportunity" val={result.strategicOpportunity||result.keyOpportunities||""}/>
           </div>
 
-          {/* 04 */}
-          <div className="sec">
-            <div className="sec-kicker"><span className="sec-kicker-num">04</span>Recommended Actions</div>
-            <p className="sec-purpose">Where to direct your energy, in order of priority.</p>
-            <div className="action-list">
-              {actions.map((a,i)=>{
-                const lbl=i===0?"Start here":i<=2?"This week":"This month";
-                const clr=i===0?"#B0728A":i<=2?"#6A9E8A":"#A8A29E";
-                return(
-                  <div className="action-row" key={i}>
-                    <div className={`action-num${i===0?" first":""}`}>{i+1}</div>
-                    <div className="action-content">
-                      <div className="action-priority" style={{color:clr}}>{lbl}</div>
-                      <div className="action-title">{a.title||clean(a.body)}</div>
-                      {a.title&&<div className="action-body">{a.body}</div>}
-                      {a.why&&<div className="action-why">{a.why}</div>}
+          {/* 02 — PRIMARY CHALLENGE */}
+          <div style={{background:"#1A1916",borderBottom:"1px solid #2A2420"}}>
+            <div className="sec-chapter" style={{background:"#1A1916"}}>
+              <div className="sec-chapter-num" style={{color:"#2A2420"}}>02</div>
+              <h2 className="sec-chapter-title sec-chapter-title-dark">Primary Challenge</h2>
+              <p className="sec-chapter-sub sec-chapter-sub-dark">The main issue making progress harder right now.</p>
+              <div className="sec-chapter-divider"/>
+            </div>
+            <div className="sec-content-dark">
+              {blindTitle&&<p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3.5vw,34px)",fontWeight:600,fontStyle:"italic",color:"#fff",lineHeight:1.2,marginBottom:20,letterSpacing:"-0.01em"}}>"{blindTitle}"</p>}
+              <p style={{fontSize:15,color:"#8A7E78",lineHeight:1.82,fontWeight:300,marginBottom:24}}>{blindTitle?cleanBlind:cleanBlind}</p>
+              {insightText&&(
+                <div style={{marginTop:8,padding:"24px 28px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:4}}>
+                  <div style={{fontSize:11,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:12}}>The Insight</div>
+                  <p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontStyle:"italic",color:"#fff",lineHeight:1.3}}>"{insightText}"</p>
+                  <button id="copy-btn" style={{marginTop:16,background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:100,padding:"7px 20px",color:"#C4A0B0",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.1em",textTransform:"uppercase",transition:"all 0.15s"}} onClick={()=>{const txt=`"${insightText}" — My strategy from Your Next Move`;if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById("copy-btn");if(b){b.textContent="✓ Copied";setTimeout(()=>{b.textContent="Share this insight →";},2200);}});}}}>Share this insight →</button>
+                </div>
+              )}
+              <EC sk="primaryConstraint" lbl="Primary Challenge" val={result.primaryConstraint||result.blindSpot||""}/>
+            </div>
+          </div>
+
+          {/* 03 — BEST OPPORTUNITY */}
+          <div style={{background:"#fff",borderBottom:"1px solid #EEEAE7"}}>
+            <div className="sec-chapter">
+              <div className="sec-chapter-num">03</div>
+              <h2 className="sec-chapter-title">Best Opportunity</h2>
+              <p className="sec-chapter-sub">The areas most likely to create meaningful progress right now.</p>
+              <div className="sec-chapter-divider"/>
+            </div>
+            <div className="sec-content">
+              <div className="opp-cards-new">
+                {opps.map((o,i)=>(
+                  <div className="opp-card-new" key={i}>
+                    <div className="opp-card-rank">{i+1}</div>
+                    <div className="opp-card-body">
+                      {o.title&&<div className="opp-card-title-new">{o.title}</div>}
+                      <div className="opp-card-text-new">{o.body}</div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-            {deprioritize&&<div className="deprioritize"><div className="dep-label">What to set aside for now</div><div className="dep-text">{deprioritize}</div></div>}
-            <EC sk="recommendedActions" lbl="Recommended Actions" val={result.recommendedActions||result.actionPlan||""}/>
-            {/* BRIDGE TO HUB */}
-            <div style={{marginTop:20,padding:"14px 18px",background:"#FAFAF8",border:"1px solid #EEEAE7",borderRadius:4,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
-              <div>
-                <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.14em",textTransform:"uppercase",color:"#B0728A",marginBottom:4}}>Go deeper</p>
-                <p style={{fontSize:13,color:"#57534E",fontWeight:300}}>Find structured playbooks for your specific challenges in the Industry Hub.</p>
+                ))}
               </div>
-              <button className="btn-out" style={{fontSize:10,padding:"8px 16px",flexShrink:0,whiteSpace:"nowrap"}} onClick={()=>go("hub")}>Explore Industry Hub →</button>
+              <EC sk="strategicOpportunity" lbl="Best Opportunity" val={result.strategicOpportunity||result.keyOpportunities||""}/>
             </div>
           </div>
 
-          {/* 05 */}
-          <div className="sec sec-dark">
-            <div className="roadmap-kicker" style={{fontSize:9,fontWeight:600,letterSpacing:"0.36em",textTransform:"uppercase",color:"#5A5350",marginBottom:20,display:"flex",alignItems:"center",gap:12}}>
-              <span style={{fontFamily:"'Cormorant',serif",fontSize:26,fontWeight:600,color:"#2E2926",letterSpacing:"-0.02em",lineHeight:1}}>05</span>30-Day Priority Plan
+          {/* 04 — RECOMMENDED ACTIONS */}
+          <div style={{background:"#FAFAF8",borderBottom:"1px solid #EEEAE7"}}>
+            <div className="sec-chapter">
+              <div className="sec-chapter-num">04</div>
+              <h2 className="sec-chapter-title">Recommended Actions</h2>
+              <p className="sec-chapter-sub">Where to direct your energy, in priority order.</p>
+              <div className="sec-chapter-divider"/>
             </div>
-            <div className="roadmap-grid">
-              {weeks.map((items,i)=>(
-                <div className="wk" key={i}>
-                  <div className="wk-head"><div className="wk-n">{i+1}</div><div className="wk-theme-lbl">Week {i+1}</div><div className="wk-theme">{WEEK_THEMES[i]}</div></div>
-                  <div className="wk-body"><ul className="wk-items">{items.length?items.map((t,j)=><li className="wk-item" key={j}>{t}</li>):<li className="wk-item">—</li>}</ul></div>
+            <div className="sec-content">
+              <div className="action-cards-new">
+                {actions.map((a,i)=>{
+                  const badge=i===0?"Start Here":i<=1?"This Week":i<=3?"This Month":"When Ready";
+                  const badgeColor=i===0?"#B0728A":i<=1?"#6A9E8A":i<=3?"#78716C":"#A8A29E";
+                  return(
+                    <div className={`action-card-new${i===0?" first-action":""}`} key={i}>
+                      <div className={`action-card-num-new action-card-num-${i===0?"1":"n"}`}>{i+1}</div>
+                      <div className="action-card-content-new">
+                        <div className="action-priority-badge" style={{color:badgeColor}}>{badge}</div>
+                        <div className="action-title-new">{a.title||clean(a.body)}</div>
+                        {a.title&&<div className="action-body-new">{a.body}</div>}
+                        {a.why&&<div className="action-why-new">{a.why}</div>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {deprioritize&&(
+                <div className="deprio-box">
+                  <div className="deprio-label">Set Aside for Now</div>
+                  <div className="deprio-text">{deprioritize}</div>
                 </div>
-              ))}
+              )}
+              <EC sk="recommendedActions" lbl="Recommended Actions" val={result.recommendedActions||result.actionPlan||""}/>
             </div>
-            <EC sk="priorityPlan" lbl="30-Day Plan" val={result.priorityPlan||result.roadmap||""}/>
           </div>
 
-          {/* 06 */}
-          <div className="sec sec-light">
-            <div className="sec-kicker"><span className="sec-kicker-num">06</span>Looking Ahead</div>
-            <p className="sec-purpose">Beyond 30 days — what to build toward next.</p>
-            <div className="look-list">
-              {looking.map((m,i)=>(
-                <div className="look-row" key={i}>
-                  <div className="look-arr">→</div>
-                  <div className="look-content">{m.title&&<div className="look-title">{m.title}</div>}<div className="look-body">{m.body}</div></div>
-                </div>
-              ))}
+          {/* 05 — 30-DAY PLAN */}
+          <div style={{background:"#1A1916",borderBottom:"1px solid #2A2420"}}>
+            <div className="sec-chapter" style={{background:"#1A1916"}}>
+              <div className="sec-chapter-num" style={{color:"#2A2420"}}>05</div>
+              <h2 className="sec-chapter-title sec-chapter-title-dark">30-Day Priority Plan</h2>
+              <p className="sec-chapter-sub sec-chapter-sub-dark">Your week-by-week action roadmap for the next 30 days.</p>
+              <div className="sec-chapter-divider"/>
             </div>
-            <EC sk="longTermGrowth" lbl="Looking Ahead" val={result.longTermGrowth||result.mistakes||""}/>
+            <div className="sec-content-dark">
+              <div className="roadmap-new">
+                {weeks.map((items,i)=>(
+                  <div className="week-card-new" key={i}>
+                    <div className="week-header-new">
+                      <div className="week-num-new">{i+1}</div>
+                      <div className="week-label-new">Week {i+1}</div>
+                      <div className="week-theme-new">{WEEK_THEMES[i]}</div>
+                    </div>
+                    <div className="week-body-new">
+                      {items.length?items.map((item,j)=>(
+                        <div className="week-item-new" key={j}>
+                          <span className="week-item-dot"/>
+                          {item}
+                        </div>
+                      )):<div className="week-item-new"><span className="week-item-dot"/>—</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <EC sk="priorityPlan" lbl="30-Day Plan" val={result.priorityPlan||result.roadmap||""}/>
+            </div>
           </div>
 
-          {/* 07 */}
+          {/* 06 — LOOKING AHEAD */}
+          <div style={{background:"#fff",borderBottom:"1px solid #EEEAE7"}}>
+            <div className="sec-chapter">
+              <div className="sec-chapter-num">06</div>
+              <h2 className="sec-chapter-title">Looking Ahead</h2>
+              <p className="sec-chapter-sub">Beyond 30 days — what to build toward next.</p>
+              <div className="sec-chapter-divider"/>
+            </div>
+            <div className="sec-content">
+              <div className="ahead-cards">
+                {looking.map((m,i)=>(
+                  <div className="ahead-card" key={i}>
+                    <div className="ahead-arrow">→</div>
+                    <div>
+                      {m.title&&<div className="ahead-title">{m.title}</div>}
+                      <div className="ahead-body">{m.body}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <EC sk="longTermGrowth" lbl="Looking Ahead" val={result.longTermGrowth||result.mistakes||""}/>
+            </div>
+          </div>
+
+          {/* 07 — WHAT SUCCESS LOOKS LIKE */}
           {successText&&(
-            <div className="sec sec-green">
-              <div className="sec-kicker" style={{color:"#5A8A78"}}><span style={{fontFamily:"'Cormorant',serif",fontSize:26,fontWeight:600,color:"#9ABFB3",lineHeight:1}}>07</span>What Success Looks Like</div>
-              <p className="sec-body" style={{color:"#2A4A40"}}>{successText}</p>
-              <EC sk="successLooks" lbl="What Success Looks Like" val={result.successLooks||""}/>
+            <div style={{background:"linear-gradient(135deg,#EFF7F3,#E6F2EC)",borderTop:"3px solid #6A9E8A",borderBottom:"1px solid #C8E6DA"}}>
+              <div className="sec-chapter" style={{background:"transparent"}}>
+                <div className="sec-chapter-num" style={{color:"rgba(106,158,138,0.25)"}}>07</div>
+                <h2 className="sec-chapter-title" style={{color:"#2A4A40"}}>What Success Looks Like</h2>
+                <p className="sec-chapter-sub" style={{color:"#5A8A78"}}>Concrete outcomes to measure your progress against.</p>
+                <div className="sec-chapter-divider-green"/>
+              </div>
+              <div className="sec-content">
+                <div className="success-points">
+                  {successSentences.slice(0,3).map((sentence,i)=>{
+                    const icons=["📊","🤝","✨"];
+                    return(
+                      <div className="success-point" key={i}>
+                        <span className="success-point-icon">{icons[i]||"→"}</span>
+                        <span className="success-point-text">{sentence.trim()}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <EC sk="successLooks" lbl="What Success Looks Like" val={result.successLooks||""}/>
+              </div>
             </div>
           )}
 
-          {/* 08 */}
-          <div className="sec sec-dark" style={{textAlign:"center",padding:"68px 52px"}}>
-            <span className="nextmove-kicker">08 · Your Next Move</span>
-            <span className="nextmove-sub">The single most important action you should take today</span>
-            <p className="nextmove-text">"{nextMove||"—"}"</p>
-            <div className="nextmove-rule"/>
-            <span className="nextmove-footer">Every section in this plan leads here.</span>
+          {/* 08 — YOUR NEXT MOVE */}
+          <div className="nextmove-redesign">
+            <span className="nextmove-redesign-eye">08 · Your Next Move</span>
+            <span className="nextmove-redesign-label">The single most important action you should take today</span>
+            <p className="nextmove-redesign-text">"{nextMove||"—"}"</p>
+            <div className="nextmove-divider"/>
+            <span className="nextmove-footer-text">Every section in this plan leads here. This is where it starts.</span>
             <EC sk="yourNextMove" lbl="Your Next Move" val={result.yourNextMove||""}/>
           </div>
 
-          {/* EXIT EXPERIENCE */}
-          <div style={{background:"#FAFAF8",borderTop:"1px solid #EEEAE7",padding:"48px 52px",textAlign:"center"}}>
-            <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#B0728A",marginBottom:12}}>You're ready.</p>
-            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(24px,3.5vw,36px)",fontWeight:600,color:"#1A1916",lineHeight:1.2,marginBottom:12,letterSpacing:"-0.01em"}}>Your strategy is saved.<br/>Now it's time to act.</h3>
-            <p style={{fontSize:15,color:"#78716C",fontWeight:300,lineHeight:1.7,maxWidth:440,margin:"0 auto 32px"}}>The most important thing you can do right now is take your single next move. Not tomorrow. Today.</p>
-            <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginBottom:32}}>
-              <button className="btn" onClick={()=>window.print()}>Export PDF</button>
-              <button className="btn-out" onClick={()=>go("advisor")}>Ask Your Advisor</button>
-              <button className="btn-out" onClick={()=>go("hub")}>Explore the Industry Hub</button>
-            </div>
-            <div style={{borderTop:"1px solid #EEEAE7",paddingTop:24,display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
-              <button className="btn-out" style={{fontSize:10}} onClick={restart}>New Strategy</button>
-              <button className="btn-out" style={{fontSize:10}} onClick={()=>go("plans")}>My Strategies</button>
+          {/* NATURAL CONCLUSION */}
+          <div className="strategy-end">
+            <div className="strategy-end-rule"/>
+            <span className="strategy-end-eye">You've reached the end of your strategy</span>
+            <h2 className="strategy-end-h">Congratulations.<br/>Your strategy is complete.</h2>
+            <p className="strategy-end-sub">Your personalized strategy has been successfully created. Take a moment to let it land. When you're ready, save it to access anytime in My Strategies.</p>
+            <div className="strategy-end-btns">
+              <button className="btn" style={{padding:"16px 48px",fontSize:12}} onClick={()=>{setStrategyStage("saved");}}>Save My Strategy →</button>
+              <button className="btn-out" style={{padding:"16px 32px"}} onClick={()=>window.scrollTo({top:0,behavior:"smooth"})}>Review My Strategy ↑</button>
             </div>
           </div>
 
-          {/* EXIT EXPERIENCE */}
-          <div style={{background:"#FAFAF8",padding:"36px 52px",borderTop:"1px solid #EEEAE7",textAlign:"center"}}>
-            <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.24em",textTransform:"uppercase",color:"#B0728A",marginBottom:10}}>Your Strategy Is Ready</p>
-            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3vw,28px)",fontWeight:600,color:"#1A1916",marginBottom:8,letterSpacing:"-0.01em"}}>What's your next move?</h3>
-            <p style={{fontSize:14,color:"#78716C",fontWeight:300,marginBottom:24,maxWidth:440,margin:"0 auto 24px",lineHeight:1.7}}>The most important thing you can do now is take one action today — not tomorrow.</p>
-            {nextMove&&(
-              <div style={{background:"#1A1916",borderRadius:8,padding:"22px 26px",maxWidth:500,margin:"0 auto 22px",textAlign:"left"}}>
-                <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.16em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:8}}>Your commitment</p>
-                <p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(14px,2.2vw,18px)",fontWeight:500,fontStyle:"italic",color:"#fff",lineHeight:1.45}}>{'"'}{(nextMove||"").split("**").join("").split(".")[0]}.{'"'}</p>
-                <button style={{marginTop:12,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"6px 16px",color:"#C4A0B0",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.1em",textTransform:"uppercase"}} onClick={()=>{const txt='"'+(nextMove||"").split("**").join("").split(".")[0]+'." — My strategy from Your Next Move';if(navigator.clipboard)navigator.clipboard.writeText(txt);}}>Share this →</button>
-              </div>
-            )}
-            <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginBottom:12}}>
-              <button className="btn" onClick={()=>{if(pdfUnlocked){window.print();}else{const el=document.querySelector(".fb-wrap");if(el)el.scrollIntoView({behavior:"smooth"});}}}>{pdfUnlocked?"Export My Strategy":"Complete Feedback to Download PDF"}</button>
-              <button className="btn-out" onClick={restart}>New Strategy</button>
-            </div>
-            <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
-              <button className="btn-out" style={{fontSize:10,padding:"8px 14px"}} onClick={()=>go("advisor")}>Ask Your Advisor</button>
-              <button className="btn-out" style={{fontSize:10,padding:"8px 14px"}} onClick={()=>go("hub")}>Industry Hub</button>
-              <button className="btn-out" style={{fontSize:10,padding:"8px 14px"}} onClick={()=>go("plans")}>My Strategies</button>
-            </div>
-            <p style={{fontSize:12,color:"#C4B5AD",marginTop:16,fontStyle:"italic"}}>Come back in 7 days to check your progress.</p>
-          </div>
-
-          {/* FEEDBACK */}
-          {!fbDone?(
-            <div className="fb-wrap">
-              <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.24em",textTransform:"uppercase",color:"#B0728A",marginBottom:12}}>Beta Feedback — Help Us Improve</p>
-              <h3 className="fb-h">Before downloading your strategy, share your experience.</h3>
-              <p className="fb-sub">Your feedback shapes every future session. Takes 2–3 minutes. Complete this to unlock your PDF download.</p>
-              <div className="fb-q"><p className="fb-q-lbl">How useful was this overall?</p><div className="fb-nums">{[1,2,3,4,5,6,7,8,9,10].map(n=><button key={n} className={`fb-num${fbRating===n?" on":""}`} onClick={()=>setFbRating(n)}>{n}</button>)}</div></div>
-              {[
-                {k:"experience",q:"How was your overall experience?",o:["Excellent","Good","Average","Needs improvement"]},
-                {k:"valuable",q:"What was most valuable?",o:["Create My Strategy","Ask Your Advisor","Industry Hub","All three equally"]},
-                {k:"confusing",q:"Was anything confusing?",o:["Nothing — it was clear","The flow was unclear","Some features were unclear","The output was unclear"]},
-                {k:"personalized",q:"Did this feel personalized to your situation?",o:["Yes — very much so","Somewhat","Not really — felt generic"]},
-                {k:"wouldPay",q:"Would you pay $19/month for this?",o:["Yes — absolutely","Probably yes","Not sure","Probably not"]},
-                {k:"wouldRecommend",q:"Would you recommend this to someone you know?",o:["Yes — immediately","Maybe after using it more","Not yet"]},
-              ].map(item=>(
-                <div className="fb-q" key={item.k}><p className="fb-q-lbl">{item.q}</p><div className="fb-pills">{item.o.map(o=><button key={o} className={`fb-pill${fbAns[item.k]===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,[item.k]:o}))}>{o}</button>)}</div></div>
-              ))}
-              <div className="fb-q"><p className="fb-q-lbl">What would make this better? (optional)</p><textarea className="fb-ta" placeholder="Be honest — we want real feedback." value={fbAns.suggestions||""} onChange={e=>setFbAns(p=>({...p,suggestions:e.target.value}))}/></div>
-              <div className="fb-q"><p className="fb-q-lbl">One action you plan to take this week based on your strategy</p><textarea className="fb-ta" placeholder="e.g. I'm going to reach out to 3 potential clients by Friday." value={fbAns.action||""} onChange={e=>setFbAns(p=>({...p,action:e.target.value}))}/></div>
-              <div className="fb-q"><p className="fb-q-lbl">May we use your feedback as a testimonial? (optional)</p><div className="fb-pills">{["Yes, with my name","Yes, anonymously","No, keep it private"].map(o=><button key={o} className={`fb-pill${fbAns.testimonial===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,testimonial:o}))}>{o}</button>)}</div></div>
-              <button className="btn" style={{padding:"11px 26px",fontSize:10}} onClick={()=>{setFbDone(true);setPdfUnlocked(true);try{window.storage.set(`feedback:${Date.now()}`,JSON.stringify({rating:fbRating,industry:effectiveIndustry,stage:journeyStage,...fbAns}));}catch(e){}}}>Submit feedback</button>
-            </div>
-          ):(
-            <div style={{background:"#FAFAF8",borderTop:"1px solid #EEEAE7",padding:"32px 52px",textAlign:"center"}}>
-              <p style={{fontFamily:"'Cormorant',serif",fontSize:22,fontWeight:600,color:"#1A1916",marginBottom:7}}>Thank you{firstName?`, ${firstName}`:""} — your PDF is ready.</p>
-              <p style={{fontSize:13,color:"#78716C",fontWeight:300,marginBottom:16}}>Your feedback helps build a better platform for every person who comes after you.</p>
-              <button className="btn" onClick={()=>window.print()}>Download My Strategy PDF →</button>
-            </div>
-          )}
         </div>
       );
     })()}
