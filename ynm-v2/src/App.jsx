@@ -470,6 +470,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .mobile-menu-link:hover{color:#B0728A;}
 .mobile-menu-cta{margin-top:20px;width:100%;padding:16px;background:#1A1916;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;transition:background 0.2s;}
 .mobile-menu-cta:hover{background:#B0728A;}
+
+/* THREE WAYS */
+.three-ways-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.three-way-card{padding:28px 24px;border:1px solid #EEEAE7;background:#FAFAF8;border-radius:6px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;gap:0;}
+.three-way-card:hover{background:#fff;border-color:#E8C4D4;box-shadow:0 4px 20px rgba(176,114,138,0.08);transform:translateY(-2px);}
+.three-way-card.featured{background:#1A1916;border-color:#1A1916;}
+.three-way-card.featured:hover{background:#2A2420;border-color:#2A2420;}
+.three-way-icon{font-size:24px;margin-bottom:14px;}
+.three-way-title{font-family:'Cormorant',serif;font-size:22px;font-weight:600;color:#1C1917;margin-bottom:4px;letter-spacing:-0.01em;}
+.three-way-card.featured .three-way-title{color:#fff;}
+.three-way-sub{font-size:12px;font-weight:500;color:#B0728A;margin-bottom:10px;letter-spacing:0.04em;}
+.three-way-card.featured .three-way-sub{color:#C4A0B0;}
+.three-way-desc{font-size:13px;color:#78716C;font-weight:300;line-height:1.7;flex:1;margin-bottom:14px;}
+.three-way-card.featured .three-way-desc{color:#8A7E78;}
+.three-way-tag{font-size:11px;color:#A8A29E;font-style:italic;}
+.three-way-card.featured .three-way-tag{color:#5A5350;}
 /* RESPONSIVE */
 @media(max-width:860px){
   .res-cover,.sec,.sec-dark,.res-footer,.fb-wrap{padding-left:28px;padding-right:28px;}
@@ -529,6 +545,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
   .checkin-banner{flex-direction:column;gap:12px;}
   .checkin-btn{width:100%;text-align:center;}
   .hub-grid{grid-template-columns:1fr;}
+  .three-ways-grid{grid-template-columns:1fr;}
   .hub-q-grid{grid-template-columns:1fr;}
   .hub-page,.hub-q-page,.advisor-page{padding:32px 16px 60px;}
 }
@@ -565,6 +582,7 @@ export default function App() {
   const [editSection,  setEditSection]  = useState(null);
   const [editDraft,    setEditDraft]    = useState("");
   const [fbDone,       setFbDone]       = useState(false);
+  const [pdfUnlocked,  setPdfUnlocked]  = useState(false);
   const [welcomeEmail, setWelcomeEmail] = useState("");
   const [fbRating,     setFbRating]     = useState(null);
   const [fbAns,        setFbAns]        = useState({});
@@ -821,25 +839,31 @@ Sentence 3: What changes in 2 weeks if they do this.`;
     if(!question.trim())return;
     setAdvisorLoading(true);setAdvisorResult(null);
     const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry, ${savedPlans[0].journeyStage} stage.`:"";
-    const prompt=`You are a trusted personal advisor — warm, direct, and honest. You speak like a brilliant friend who happens to know business and careers deeply. You give one clear opinion, not a list of options. You reference what the person actually said back to them so they feel heard.
+    const prompt=`You are a trusted personal advisor — warm, direct, and deeply knowledgeable across business, career, marketing, finance, real estate, leadership, and personal development. You speak like a brilliant friend who tells the truth. You give one clear opinion, not a list of options.
 
-${firstName?`The person's name is ${firstName}. Address them by name once.`:""} ${context}
+IMPORTANT: Never assume the user has only one career, business, or role. They may juggle multiple interests — a corporate job, a side business, freelancing, investing, speaking, and more. Respond to THIS conversation only. Do not carry assumptions from previous topics.
+
+${firstName?`The person's name is ${firstName}. Address them by name once, naturally.`:""} ${context}
 
 Their situation: ${question}
 
-Respond conversationally with these four parts. Do NOT use bullet points or numbered lists. Write in flowing sentences like a real advisor speaking.
+Before responding, determine: Do I have enough context to answer well? If the question is vague, briefly acknowledge and answer the most likely interpretation — then invite them to add more context if needed. Do NOT ask multiple clarifying questions. Just answer.
+
+Choose the clearest format for your response. For most situations use flowing conversational sentences. For decisions that need comparison, use a simple side-by-side. For action items, use a short numbered list. Never use bullet points for everything by default.
+
+Always include these four parts:
 
 **What I'm hearing**
-2 sentences that mirror back their situation so they feel understood. Start with their name if provided.
+1–2 sentences reflecting back their situation so they feel understood.
 
 **Here's what I think**
-3–4 sentences. One clear, direct opinion or recommendation. Be specific to their situation. Take a position — don't hedge.
+2–4 sentences. One direct recommendation or opinion. Be specific. Take a position.
 
 **What this means for you**
-2–3 sentences explaining why this matters specifically for their situation, not in general.
+1–2 sentences on why this matters for their specific situation.
 
 **Your single next move**
-1 sentence. Not a list — the ONE thing they should do in the next 24 hours.`;
+1 sentence. The ONE action to take in the next 24 hours.`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
@@ -879,28 +903,47 @@ Respond conversationally with these four parts. Do NOT use bullet points or numb
     if(!query.trim())return;
     setHubSearchLoading(true);setHubSearchResult(null);
     const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry.`:"";
-    const prompt=`You are a senior professional advisor creating a structured playbook for a specific professional challenge. Your output should feel like a professional reference document — authoritative, methodical, and referenceable. Not a conversation.
+    const prompt=`You are a senior professional advisor and expert consultant. Your job is to deliver the highest-quality, most useful response possible for this specific topic.
 
-${firstName?`Context: This is for ${firstName}.`:""} ${context}
+${firstName?`This is for ${firstName}.`:""} ${context}
 
 Topic: ${query}
 
-Respond with exactly these five sections. Use clear headers. Be specific and methodical.
+BEFORE RESPONDING — think carefully:
 
-**The Framework**
-2–3 sentences explaining what this is, why it works, and what it's based on. Give it professional authority.
+1. What TYPE of request is this?
+   - KNOWLEDGE (explain a concept, define a term, describe something) → Respond immediately with a clear explanation. No questions needed.
+   - FRAMEWORK / CHECKLIST (checklist, template, process, steps) → Generate immediately. No questions needed.
+   - PERSONALIZED RESOURCE (strategy, plan, roadmap) → Generate a high-quality response. If critical details are missing, note what would make it more specific.
+   - ANALYSIS (analyze something specific) → Request only the specific information needed, then generate.
 
-**Applied to Your Situation**
-2–3 sentences connecting this framework directly to the context provided. Be specific.
+2. What is the BEST FORMAT for this response?
+   - Explanation → Clear paragraphs with headers
+   - Checklist → Numbered or bulleted checklist
+   - Comparison → Table format
+   - Strategy/Plan → Executive report with sections
+   - Steps → Numbered step-by-step
+   - Calendar/Schedule → Grid or timeline format
+   - Budget → Structured table
+   - Q&A → Question and answer format
+   Choose the format that makes this easiest to read, save, and implement.
 
-**Step-by-Step**
-5 numbered steps. Each step is one concrete action. Specific enough to start today.
+3. Make every output feel like it was created by an experienced consultant — never by AI.
 
-**Common Mistakes**
-3 things people get wrong with this specific challenge. Short, direct, specific.
+Deliver a professional, organized, actionable response. Every deliverable should be:
+- Easy to skim
+- Easy to screenshot  
+- Easy to implement
+- Specific enough to start today
 
-**Your Starting Point**
-1 sentence. The single first action given their specific context.`;
+Use this structure when appropriate:
+
+**[Clear Title for This Response]**
+
+[Your response in the most appropriate format]
+
+**Your First Step**
+1 sentence. What to do right now.`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
@@ -986,13 +1029,16 @@ Respond with exactly these five sections. Use clear headers. Be specific and met
             <button className="btn-out" style={{padding:"13px 24px",fontSize:11}} onClick={()=>go("plans")}>Review My Strategies</button>
           </div>
         </>):(<>
-          <span className="hero-eye">Strategic Clarity On Demand</span>
-          <h1 className="hero-h1">Your Personal<br/><em>Strategist.</em></h1>
-          <p className="hero-sub">A guided strategy experience that helps entrepreneurs, professionals, and creatives gain clarity and move forward with confidence.</p>
-          <button className="hero-cta" onClick={()=>go("welcome")}>
-            Create My Strategy <span className="hero-arr">→</span>
-          </button>
-          <p style={{fontSize:12,color:"#A8A29E",marginTop:14}}>First strategy free · Then $19/month · Cancel anytime</p>
+          <span className="hero-eye">Your Next Move Starts Here</span>
+          <h1 className="hero-h1">Clarity.<br/><em>Confidence.</em><br/>Action.</h1>
+          <p className="hero-sub">Whether you're growing your career, building a business, changing industries, or planning what's next — Your Next Move helps you create a clear plan, get trusted guidance, and move forward with confidence.</p>
+          <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginBottom:14}}>
+            <button className="hero-cta" onClick={()=>go("welcome")}>
+              Start Your Free Strategy <span className="hero-arr">→</span>
+            </button>
+            <button className="btn-out" style={{padding:"14px 24px",fontSize:11}} onClick={()=>{const el=document.querySelector(".cats");if(el)el.scrollIntoView({behavior:"smooth"});}}>See How It Works</button>
+          </div>
+          <p style={{fontSize:12,color:"#A8A29E"}}>First strategy free · Then $19/month · Cancel anytime</p>
         </>)}
       </section>
 
@@ -1328,7 +1374,18 @@ Respond with exactly these five sections. Use clear headers. Be specific and met
         <div className="bc"><span onClick={restart}>Home</span><span className="bc-sep">›</span><span onClick={()=>setHubCatId(null)}>Industry Hub</span></div>
         <button className="btn-out" style={{marginBottom:20,fontSize:10,padding:"8px 18px"}} onClick={()=>setHubCatId(null)}>← Back to Industry Hub</button>
         <h1 className="hub-q-h1">{hubCat?.label}</h1>
-        <p className="hub-q-sub">Select a prompt to explore. Add your personal context and get a structured playbook for your specific situation.</p>
+        <p className="hub-q-sub">{
+          hubCat?.id==="entrepreneurship"?"Explore professionally curated prompts designed to help you launch, grow, and scale your business — from your first business plan to building systems, finding clients, and creating long-term value.":
+          hubCat?.id==="corporate"?"Explore professionally curated prompts designed to strengthen your leadership, accelerate your career, improve communication, manage teams, and build lasting professional influence.":
+          hubCat?.id==="creative"?"Explore professionally curated prompts designed to help you grow your brand, attract your audience, create compelling content, land partnerships, and build a sustainable creative career.":
+          hubCat?.id==="realestate"?"Explore professionally curated prompts designed to help you buy, sell, invest, negotiate, analyze properties, build your client base, and make more confident real estate decisions.":
+          hubCat?.id==="finance"?"Explore professionally curated prompts designed to help you build wealth, manage debt, budget smarter, invest wisely, and make better financial decisions for your life and business.":
+          hubCat?.id==="education"?"Explore professionally curated prompts designed to help you design better learning experiences, master new subjects, advance your teaching career, and build programs that create real impact.":
+          hubCat?.id==="nonprofit"?"Explore professionally curated prompts designed to help you grow your organization, secure funding, engage donors, measure impact, and create lasting community change.":
+          hubCat?.id==="wellness"?"Explore professionally curated prompts designed to help you build sustainable health habits, improve nutrition, manage stress, optimize energy, and create a whole-life wellness practice.":
+          hubCat?.id==="healthcare"?"Explore professionally curated prompts designed to help you advance your healthcare career, build your practice, improve patient outcomes, and make confident professional decisions.":
+          "Select a prompt below. Add your context and get a professional, actionable response tailored to your situation."
+        }</p>
         {/* AI-POWERED SEARCH BAR */}
         <div style={{marginBottom:28}}>
           <div style={{position:"relative",display:"flex",gap:0}}>
@@ -1495,7 +1552,7 @@ Respond with exactly these five sections. Use clear headers. Be specific and met
       <div className="advisor-page">
         <div className="bc"><span onClick={restart}>Home</span></div>
         <h1 className="advisor-h1">Ask Your <em>Advisor.</em></h1>
-        <p className="advisor-sub">Your personal sounding board for the decisions, challenges, and moments that don't fit neatly into a plan. Describe what's on your mind and get a direct, honest response — like talking to a trusted advisor who actually knows what they're talking about.</p>
+        <p className="advisor-sub">Need help making a decision? Working through a challenge? Not sure what to do next? Describe your situation and get a direct, honest response — like talking to a trusted advisor who actually understands your world.</p>
         <div style={{display:"flex",gap:24,marginBottom:28,flexWrap:"wrap"}}>
           {[{label:"Use this when",items:["You're weighing a specific decision","Something happened and you need to think it through","You want a second opinion before you act","You have one burning question"]},{label:"Use Industry Hub instead when",items:["You need a framework or process","You want to browse prompts for your field","You need a structured playbook, not a conversation"]}].map((col,i)=>(
             <div key={i} style={{flex:1,minWidth:200}}>
@@ -1941,7 +1998,7 @@ Respond with exactly these five sections. Use clear headers. Be specific and met
               </div>
             )}
             <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginBottom:12}}>
-              <button className="btn" onClick={()=>window.print()}>Export My Strategy</button>
+              <button className="btn" onClick={()=>{if(pdfUnlocked){window.print();}else{const el=document.querySelector(".fb-wrap");if(el)el.scrollIntoView({behavior:"smooth"});}}}>{pdfUnlocked?"Export My Strategy":"Complete Feedback to Download PDF"}</button>
               <button className="btn-out" onClick={restart}>New Strategy</button>
             </div>
             <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
@@ -1955,24 +2012,30 @@ Respond with exactly these five sections. Use clear headers. Be specific and met
           {/* FEEDBACK */}
           {!fbDone?(
             <div className="fb-wrap">
-              <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Beta Feedback</p>
-              <h3 className="fb-h">How did your strategy land?</h3>
-              <p className="fb-sub">90 seconds of feedback shapes every future session.</p>
+              <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.24em",textTransform:"uppercase",color:"#B0728A",marginBottom:12}}>Beta Feedback — Help Us Improve</p>
+              <h3 className="fb-h">Before downloading your strategy, share your experience.</h3>
+              <p className="fb-sub">Your feedback shapes every future session. Takes 2–3 minutes. Complete this to unlock your PDF download.</p>
               <div className="fb-q"><p className="fb-q-lbl">How useful was this overall?</p><div className="fb-nums">{[1,2,3,4,5,6,7,8,9,10].map(n=><button key={n} className={`fb-num${fbRating===n?" on":""}`} onClick={()=>setFbRating(n)}>{n}</button>)}</div></div>
               {[
-                {k:"personalized",q:"Did this feel personalized?",o:["Yes — very much so","Somewhat","Not really"]},
+                {k:"experience",q:"How was your overall experience?",o:["Excellent","Good","Average","Needs improvement"]},
+                {k:"valuable",q:"What was most valuable?",o:["Create My Strategy","Ask Your Advisor","Industry Hub","All three equally"]},
+                {k:"confusing",q:"Was anything confusing?",o:["Nothing — it was clear","The flow was unclear","Some features were unclear","The output was unclear"]},
+                {k:"personalized",q:"Did this feel personalized to your situation?",o:["Yes — very much so","Somewhat","Not really — felt generic"]},
                 {k:"wouldPay",q:"Would you pay $19/month for this?",o:["Yes — absolutely","Probably yes","Not sure","Probably not"]},
-                {k:"wouldRecommend",q:"Would you recommend this?",o:["Yes — immediately","Maybe","Not yet"]},
+                {k:"wouldRecommend",q:"Would you recommend this to someone you know?",o:["Yes — immediately","Maybe after using it more","Not yet"]},
               ].map(item=>(
                 <div className="fb-q" key={item.k}><p className="fb-q-lbl">{item.q}</p><div className="fb-pills">{item.o.map(o=><button key={o} className={`fb-pill${fbAns[item.k]===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,[item.k]:o}))}>{o}</button>)}</div></div>
               ))}
-              <div className="fb-q"><p className="fb-q-lbl">One thing you plan to do this week</p><textarea className="fb-ta" placeholder="Be specific." value={fbAns.action||""} onChange={e=>setFbAns(p=>({...p,action:e.target.value}))}/></div>
-              <button className="btn" style={{padding:"11px 26px",fontSize:10}} onClick={()=>{setFbDone(true);try{window.storage.set(`feedback:${Date.now()}`,JSON.stringify({rating:fbRating,industry:effectiveIndustry,stage:journeyStage,...fbAns}));}catch(e){}}}>Submit feedback</button>
+              <div className="fb-q"><p className="fb-q-lbl">What would make this better? (optional)</p><textarea className="fb-ta" placeholder="Be honest — we want real feedback." value={fbAns.suggestions||""} onChange={e=>setFbAns(p=>({...p,suggestions:e.target.value}))}/></div>
+              <div className="fb-q"><p className="fb-q-lbl">One action you plan to take this week based on your strategy</p><textarea className="fb-ta" placeholder="e.g. I'm going to reach out to 3 potential clients by Friday." value={fbAns.action||""} onChange={e=>setFbAns(p=>({...p,action:e.target.value}))}/></div>
+              <div className="fb-q"><p className="fb-q-lbl">May we use your feedback as a testimonial? (optional)</p><div className="fb-pills">{["Yes, with my name","Yes, anonymously","No, keep it private"].map(o=><button key={o} className={`fb-pill${fbAns.testimonial===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,testimonial:o}))}>{o}</button>)}</div></div>
+              <button className="btn" style={{padding:"11px 26px",fontSize:10}} onClick={()=>{setFbDone(true);setPdfUnlocked(true);try{window.storage.set(`feedback:${Date.now()}`,JSON.stringify({rating:fbRating,industry:effectiveIndustry,stage:journeyStage,...fbAns}));}catch(e){}}}>Submit feedback</button>
             </div>
           ):(
             <div style={{background:"#FAFAF8",borderTop:"1px solid #EEEAE7",padding:"32px 52px",textAlign:"center"}}>
-              <p style={{fontFamily:"'Cormorant',serif",fontSize:20,fontWeight:600,color:"#1A1916",marginBottom:7}}>Thank you{firstName?`, ${firstName}`:""} .</p>
-              <p style={{fontSize:13,color:"#78716C",fontWeight:300}}>Your feedback makes every future strategy better.</p>
+              <p style={{fontFamily:"'Cormorant',serif",fontSize:22,fontWeight:600,color:"#1A1916",marginBottom:7}}>Thank you{firstName?`, ${firstName}`:""} — your PDF is ready.</p>
+              <p style={{fontSize:13,color:"#78716C",fontWeight:300,marginBottom:16}}>Your feedback helps build a better platform for every person who comes after you.</p>
+              <button className="btn" onClick={()=>window.print()}>Download My Strategy PDF →</button>
             </div>
           )}
         </div>
