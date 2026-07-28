@@ -62,17 +62,81 @@ function parseLooking(text){
 }
 function parseResult(raw){
   const s={strategicAssessment:"",primaryConstraint:"",strategicOpportunity:"",recommendedActions:"",priorityPlan:"",longTermGrowth:"",successLooks:"",yourNextMove:""};
-  const patterns=[
-    [/(?:strategic assessment|current position)[:\s]*([\s\S]*?)(?=\n#+\s*(?:primary constraint|primary challenge|2[\.\)])|$)/i,"strategicAssessment"],
-    [/(?:primary constraint|primary challenge)[:\s]*([\s\S]*?)(?=\n#+\s*(?:strategic opportunit|best opportunit|3[\.\)])|$)/i,"primaryConstraint"],
-    [/(?:strategic opportunit|best opportunit)[^\n]*[:\s]*([\s\S]*?)(?=\n#+\s*(?:recommended action|4[\.\)])|$)/i,"strategicOpportunity"],
-    [/recommended action[^\n]*[:\s]*([\s\S]*?)(?=\n#+\s*(?:30.day|priority plan|5[\.\)])|$)/i,"recommendedActions"],
-    [/(?:30.day priority plan|priority plan|30.day plan)[:\s]*([\s\S]*?)(?=\n#+\s*(?:long.term|looking ahead|6[\.\)])|$)/i,"priorityPlan"],
-    [/(?:long.term growth|looking ahead)[^\n]*[:\s]*([\s\S]*?)(?=\n#+\s*(?:what success|7[\.\)])|$)/i,"longTermGrowth"],
-    [/what success looks like[:\s]*([\s\S]*?)(?=\n#+\s*(?:your next move|8[\.\)])|$)/i,"successLooks"],
-    [/your next move[:\s]*([\s\S]*?)(?=\n#+|$)/i,"yourNextMove"],
-  ];
-  patterns.forEach(([re,k])=>{const m=raw.match(re);if(m)s[k]=m[1].trim();});
+  if(!raw||typeof raw!=="string")return s;
+
+  // STRATEGY 1: Split by markdown headers — most reliable
+  // Handles # Header, ## Header, ### Header
+  const headerSplit=raw.split(/\n(?=#+\s)/);
+  const sectionMap={};
+  headerSplit.forEach(section=>{
+    const headerMatch=section.match(/^#+\s+(.+?)\n/);
+    if(headerMatch){
+      const header=headerMatch[1].toLowerCase().trim();
+      const content=section.replace(/^#+\s+.+?\n/,"").trim();
+      // Map header text to field names
+      if(header.match(/strategic assessment|current position|assessment/))sectionMap.strategicAssessment=content;
+      else if(header.match(/primary challenge|primary constraint|challenge|constraint/))sectionMap.primaryConstraint=content;
+      else if(header.match(/strategic opportunit|best opportunit|opportunit/))sectionMap.strategicOpportunity=content;
+      else if(header.match(/recommended action|action/))sectionMap.recommendedActions=content;
+      else if(header.match(/30.day|priority plan|roadmap|plan/))sectionMap.priorityPlan=content;
+      else if(header.match(/looking ahead|long.term|ahead/))sectionMap.longTermGrowth=content;
+      else if(header.match(/success/))sectionMap.successLooks=content;
+      else if(header.match(/your next move|next move/))sectionMap.yourNextMove=content;
+    }
+  });
+
+  // Apply header-based results
+  Object.keys(sectionMap).forEach(k=>{if(sectionMap[k])s[k]=sectionMap[k];});
+
+  // STRATEGY 2: Fallback regex for sections that weren't found by headers
+  // More permissive — doesn't require lookahead to next section
+  const tryFill=(key,patterns)=>{
+    if(s[key]&&s[key].length>10)return; // already filled
+    for(const re of patterns){
+      const m=raw.match(re);
+      if(m&&m[1]&&m[1].trim().length>5){s[key]=m[1].trim();return;}
+    }
+  };
+
+  tryFill("strategicAssessment",[
+    /(?:strategic assessment|assessment)[^\n]*\n([\s\S]{50,}?)(?=\n#|\n\*\*Primary|\n##|$)/i,
+    /^([\s\S]{30,200}?)(?=\n#+)/,
+  ]);
+  tryFill("primaryConstraint",[
+    /(?:primary challenge|primary constraint|challenge)[^\n]*\n([\s\S]{30,}?)(?=\n#|\n\*\*Strategic|\n##|$)/i,
+  ]);
+  tryFill("strategicOpportunity",[
+    /(?:strategic opportunit|opportunit)[^\n]*\n([\s\S]{30,}?)(?=\n#|\n\*\*Recommended|\n##|$)/i,
+  ]);
+  tryFill("recommendedActions",[
+    /(?:recommended action|actions)[^\n]*\n([\s\S]{30,}?)(?=\n#|\n\*\*30|\n##|$)/i,
+  ]);
+  tryFill("priorityPlan",[
+    /(?:30.day|priority plan|roadmap)[^\n]*\n([\s\S]{30,}?)(?=\n#|\n\*\*Looking|\n##|$)/i,
+  ]);
+  tryFill("longTermGrowth",[
+    /(?:looking ahead|long.term)[^\n]*\n([\s\S]{30,}?)(?=\n#|\n\*\*What Success|\n##|$)/i,
+  ]);
+  tryFill("successLooks",[
+    /(?:what success|success looks)[^\n]*\n([\s\S]{20,}?)(?=\n#|\n\*\*Your Next|\n##|$)/i,
+  ]);
+  tryFill("yourNextMove",[
+    /(?:your next move|next move)[^\n]*\n([\s\S]{20,}?)(?=\n#+|$)/i,
+    /Based on everything[^.]+\.([\s\S]{0,400}?)$/i,
+  ]);
+
+  // STRATEGY 3: If yourNextMove still empty, extract from end of document
+  if(!s.yourNextMove||s.yourNextMove.length<20){
+    const lines=raw.split("\n").reverse();
+    for(const line of lines){
+      const clean=line.replace(/\*\*/g,"").trim();
+      if(clean.length>30&&!clean.startsWith("#")){
+        s.yourNextMove=clean;
+        break;
+      }
+    }
+  }
+
   return s;
 }
 
@@ -821,27 +885,89 @@ Sentence 3: What specifically changes in 2 weeks if they do this.`;
     };
 
     const isComplete=(p)=>{
+      // A result is complete if it has meaningful content in the 4 most critical sections
       const critical=[p.yourNextMove,p.priorityPlan,p.strategicAssessment,p.primaryConstraint];
-      const allDone=critical.every(s=>s&&s.trim().length>30);
+      const allDone=critical.every(s=>s&&s.trim().length>20);
+      // Must have reasonable total length
       const fullText=Object.values(p).join(" ");
-      // Must mention industry
-      const indOk=effectiveIndustry?fullText.toLowerCase().includes(effectiveIndustry.toLowerCase().split(" ")[0]):true;
-      // Must have The Insight
-      const hasInsight=fullText.toLowerCase().includes("the insight");
-      // Must have reasonable length (not truncated)
-      const hasLength=fullText.length>600;
-      return allDone&&indOk&&hasInsight&&hasLength;
+      const hasLength=fullText.length>400;
+      // At least 5 of 8 sections must have content
+      const filledSections=Object.values(p).filter(v=>v&&v.trim().length>10).length;
+      const hasSections=filledSections>=4;
+      return allDone&&hasLength&&hasSections;
     };
 
     try{
-      let text=await callAPI();let parsed=parseResult(text);
-      if(!isComplete(parsed)){text=await callAPI();parsed=parseResult(text);}
-      setResult(parsed);setViewingPlanId(null);
-      await savePlan(parsed,{catId,industry:effectiveIndustry,journeyStage});
+      // STEP 1: Generate
+      let text="";
+      try{text=await callAPI();}catch(apiErr){
+        const msg=(apiErr.message||"").toLowerCase();
+        if(msg.includes("abort")||msg.includes("timed out")){
+          throw new Error("TIMEOUT: Strategy generation timed out. Your answers are saved — please try again.");
+        }else if(msg.includes("401")||msg.includes("403")){
+          throw new Error("AUTH: There was a connection issue with the API. Please try again in a moment.");
+        }else{
+          throw new Error("API: "+apiErr.message);
+        }
+      }
+
+      // STEP 2: Parse
+      let parsed;
+      try{parsed=parseResult(text);}catch(parseErr){
+        throw new Error("PARSE: Failed to parse strategy response. "+parseErr.message);
+      }
+
+      // STEP 3: Quality check — retry once if incomplete
+      if(!isComplete(parsed)){
+        try{
+          const text2=await callAPI();
+          const parsed2=parseResult(text2);
+          if(isComplete(parsed2))parsed=parsed2;
+          // If second attempt also fails isComplete, use whichever has more content
+          else{
+            const score1=Object.values(parsed).filter(v=>v&&v.length>10).length;
+            const score2=Object.values(parsed2).filter(v=>v&&v.length>10).length;
+            if(score2>score1)parsed=parsed2;
+          }
+        }catch(retryErr){
+          // Retry failed — continue with first result if it has any content
+          const hasAnyContent=Object.values(parsed).some(v=>v&&v.trim().length>20);
+          if(!hasAnyContent)throw new Error("GENERATION: Both generation attempts returned empty results.");
+        }
+      }
+
+      // STEP 4: Verify we have something to show
+      const hasMinContent=parsed.yourNextMove||parsed.strategicAssessment||parsed.primaryConstraint;
+      if(!hasMinContent){
+        throw new Error("EMPTY: Strategy was generated but could not be parsed into sections. Raw length: "+text.length);
+      }
+
+      // STEP 5: Set result state FIRST — so user sees it even if save fails
+      setResult(parsed);
+      setViewingPlanId(null);
+
+      // STEP 6: Save (non-blocking — if this fails, user still sees their strategy)
+      let savedId=null;
+      try{
+        savedId=await savePlan(parsed,{catId,industry:effectiveIndustry,journeyStage});
+      }catch(saveErr){
+        // Save failed — log it but don't block the user from seeing their strategy
+        console.error("Strategy save failed (non-fatal):",saveErr.message);
+      }
+
+      // STEP 7: Navigate to results — always happens if we got here
       go("results");
+
     }catch(e){
+      // Log the full technical error for debugging
+      console.error("Strategy generation failed:",e.message,e.stack);
       const msg=e.message||"";
-      setError(msg.includes("timed out")?"Your strategy took longer than expected. Your answers are saved — please try again.":msg.includes("401")||msg.includes("403")?"There was a connection issue. Please try again in a moment.":"Something went wrong generating your strategy. Your answers are saved — please try again.");
+      let userMsg="Something went wrong generating your strategy. Your answers are saved — please try again.";
+      if(msg.includes("TIMEOUT:"))userMsg="Your strategy took longer than expected. Your answers are saved — please try again.";
+      else if(msg.includes("AUTH:"))userMsg="There was a connection issue. Please check your internet and try again.";
+      else if(msg.includes("API:"))userMsg="We couldn't reach the strategy service. Your answers are saved — please try again.";
+      else if(msg.includes("EMPTY:")||msg.includes("PARSE:"))userMsg="Your strategy was generated but couldn't be displayed. Please try again — this usually resolves immediately.";
+      setError(userMsg);
       go("questions");
     }finally{setLoading(false);}
   }
@@ -1271,10 +1397,13 @@ One sentence. The single most concrete action to take right now.`;
           <span className="prog-label">Your strategy is taking shape — {qIdx+1} of {qs.length}</span>
         </div>
         {error&&(
-          <div className="err">⚠ {error}
-            <div style={{display:"flex",gap:8,marginTop:10,flexWrap:"wrap"}}>
-              <button className="btn" style={{padding:"8px 18px",fontSize:10}} onClick={generate}>Try again</button>
-              <button className="btn-out" style={{padding:"8px 18px",fontSize:10}} onClick={()=>setError(null)}>Return to my answers</button>
+          <div style={{background:"#FEF2F2",border:"1px solid #FECACA",padding:"18px 20px",borderRadius:6,marginBottom:20}}>
+            <p style={{fontSize:14,color:"#7F1D1D",lineHeight:1.6,marginBottom:12}}>⚠ {error}</p>
+            <p style={{fontSize:12,color:"#B91C1C",marginBottom:14,fontWeight:300}}>Your answers are saved. You can retry without re-entering anything.</p>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <button className="btn" style={{padding:"10px 20px",fontSize:11}} onClick={()=>{setError(null);generate();}}>Retry Strategy Generation</button>
+              <button className="btn-out" style={{padding:"10px 20px",fontSize:11}} onClick={()=>{setError(null);}}>Return to My Answers</button>
+              <button className="btn-out" style={{padding:"10px 20px",fontSize:11}} onClick={()=>go("plans")}>View My Strategies</button>
             </div>
           </div>
         )}
