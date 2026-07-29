@@ -890,98 +890,764 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 function generatePDF(result, meta) {
   try {
     const { jsPDF } = window.jspdf || {};
-    if (!jsPDF) { window.print(); return; } // Fallback to print if jsPDF not loaded
-    const doc = new jsPDF({ orientation:"portrait", unit:"mm", format:"letter" });
-    const W=216,H=279,ML=20,MR=20,CW=W-ML-MR;
-    const ACCENT=[176,114,138],DARK=[26,25,22],INK=[42,40,38],MUTED=[120,113,108],RULE=[230,226,223],SAGE=[106,158,138];
-    let y=ML+5, pageNum=1;
-    const wrap=(t,x,w)=>doc.splitTextToSize(String(t||""),w);
-    const rawLines=(t)=>(t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/));
-    const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").replace(/^[-•*✓✗\d.]+\s*/,"").trim();
-    function chk(n){if(y+n>H-18){doc.addPage();y=ML+5;pageNum++;footer();}}
-    function footer(){doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});}
-    function rule(){chk(5);doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,y,W-MR,y);y+=5;}
-    function body(t,ind){const x=ML+(ind||0);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(t,x,CW-(ind||0)).forEach(l=>{chk(5);doc.text(l,x,y);y+=5;});y+=1;}
-    function secHd(num,title,desc){chk(24);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(num,ML,y);y+=5;doc.setFontSize(18);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");wrap(title,ML,CW).forEach(l=>{chk(8);doc.text(l,ML,y);y+=7;});y+=1;if(desc){doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(desc,ML,y);y+=5;}doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.line(ML,y,ML+20,y);y+=7;}
-    // COVER
-    doc.setFillColor(...DARK);doc.rect(0,0,W,H,"F");
-    doc.setFontSize(8);doc.setTextColor(80,75,70);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT",ML,24);
-    doc.setFontSize(30);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
-    const ct=meta.catLabel||"Strategy";wrap(ct+" Strategy",ML,CW).forEach((l,i)=>{doc.text(l,ML,50+i*12);});
-    if(meta.firstName){doc.setFontSize(12);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");doc.text("Prepared for "+meta.firstName,ML,90);}
-    let tx=ML;
-    [meta.effectiveIndustry,meta.stageLabel,meta.today].filter(Boolean).forEach(tag=>{doc.setFontSize(7);doc.setTextColor(100,95,90);doc.setFont("helvetica","normal");const tw=doc.getTextWidth(tag)+8;doc.setDrawColor(55,50,47);doc.setLineWidth(0.3);doc.roundedRect(tx,100,tw,5.5,1,1);doc.text(tag,tx+4,104.2);tx+=tw+4;});
-    footer();doc.addPage();pageNum=2;y=ML+5;footer();
-    // Parse data
-    const execRaw=(result.strategicAssessment||"").replace(/\*\*/g,"");
-    const execLines=rawLines(execRaw);
-    const mainExec=execLines.filter(l=>!l.match(/^(strength|what needs)/i)).join(" ");
-    const position=mainExec?mainExec.split(".")[0]+".":"";
-    const blindRaw=(result.primaryConstraint||"").replace(/\*\*/g,"");
-    const blindTitle=(blindRaw.match(/^[^.]+/)||[""])[0];
-    const insM=blindRaw.match(/The insight:?\s*(.+?)(?:\.|$)/i);
-    const insight=insM?insM[1].trim():"";
-    const succ=(result.successLooks||"").replace(/\*\*/g,"").split(/(?<=[.!?])\s+/).filter(s=>s.length>10);
-    const nm=(result.yourNextMove||"").replace(/\*\*/g,"").trim();
-    const nms=nm.split(".")[0]+".";
-    // EXEC SUMMARY
-    secHd("00 · EXECUTIVE SUMMARY","Your strategy at a glance.","The complete picture in under sixty seconds.");
-    if(position){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("CURRENT POSITION",ML,y);y+=4;body(position);}
-    if(blindTitle){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("PRIMARY CHALLENGE",ML,y);y+=4;body(blindTitle);}
-    if(succ[0]){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("PRIMARY GOAL",ML,y);y+=4;body(succ[0]);}
-    if(nms){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("TODAY'S NEXT MOVE",ML,y);y+=4;body(nms);}
-    rule();
-    // ASSESSMENT
-    secHd("01 · STRATEGIC ASSESSMENT","Where you are today.","What we discovered from your answers.");
-    if(mainExec)body(mainExec);
-    const sl=execLines.find(l=>l.match(/^strength/i))||"";
-    const tl=execLines.find(l=>l.match(/^what needs/i))||"";
-    if(sl){chk(8);doc.setFontSize(8);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("STRENGTHS",ML,y);y+=4;body(cleanStr(sl));}
-    if(tl){chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WHAT NEEDS ATTENTION",ML,y);y+=4;body(cleanStr(tl));}
-    rule();
-    // CHALLENGE
-    secHd("02 · PRIMARY CHALLENGE","The core constraint.","The main issue making progress harder right now.");
-    if(blindTitle){doc.setFontSize(13);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");chk(8);doc.text('"'+blindTitle+'"',ML,y);y+=8;}
-    const blindBody=blindRaw.replace(insM?.[0]||"","").replace(/^[^.]+\./,"").trim();
-    if(blindBody)body(blindBody);
-    if(insight){chk(14);doc.setFillColor(240,235,232);doc.rect(ML,y,CW,12,"F");doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("THE INSIGHT",ML+3,y+4);doc.setFontSize(9);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");doc.text('"'+insight+'"',ML+3,y+9);y+=14;}
-    rule();
-    // OPPORTUNITY
-    secHd("03 · BEST OPPORTUNITY","Where to focus your energy.","The areas most likely to move the needle.");
-    let on=0;rawLines(result.strategicOpportunity||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){on++;chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+on+"  "+b[1],ML,y);y+=4;if(b[2])body(cleanStr(b[2]),6);}else if(l.trim())body(cleanStr(l),6);});
-    rule();
-    // ACTIONS
-    secHd("04 · RECOMMENDED ACTIONS","Where to direct your energy.","In priority order.");
-    const bdgs=["START HERE","THIS WEEK","THIS WEEK","THIS MONTH","THIS MONTH"];
-    let an=0;
-    rawLines(result.recommendedActions||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);const wy=l.match(/\*Why this matters:?\*?\s*(.*)/i);if(b&&an<5){chk(12);doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(bdgs[an]||"LATER",ML,y);y+=4;doc.setFontSize(11);doc.setTextColor(...DARK);doc.text(b[1],ML,y);y+=5;if(b[2])body(cleanStr(b[2]),4);an++;}else if(wy){doc.setFontSize(9);doc.setTextColor(...ACCENT);doc.setFont("helvetica","italic");wrap("→ "+wy[1],ML+4,CW-4).forEach(l=>{chk(5);doc.text(l,ML+4,y);y+=4.5;});y+=1;}});
-    rule();
-    // 30-DAY PLAN
-    secHd("05 · 30-DAY PLAN","Your week-by-week roadmap.","Concrete actions for the next 30 days.");
-    const wths=["Foundation","Momentum","Activation","Scale & Review"];
-    const wgls=["Establish your foundation","Build momentum","Execute and activate","Review and scale"];
-    const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
-    const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim();});
-    wd.forEach((w,i)=>{chk(16);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WEEK "+(i+1)+" · "+wths[i].toUpperCase(),ML,y);y+=4;doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(wgls[i],ML,y);y+=4;w.split(/[\/\n]/).map(t=>cleanStr(t)).filter(Boolean).slice(0,4).forEach(t=>{chk(5);doc.setFontSize(9);doc.setTextColor(...INK);doc.text("·  "+t,ML+4,y);y+=4.5;});y+=2;});
-    rule();
-    // LOOKING AHEAD
-    secHd("06 · LOOKING AHEAD","What becomes possible next.","What to build toward after your first 30 days.");
-    let ln=0;rawLines(result.longTermGrowth||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){ln++;chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+ln+"  "+b[1],ML,y);y+=4;if(b[2])body(cleanStr(b[2]),6);}else if(l.trim())body(cleanStr(l),6);});
-    rule();
-    // SUCCESS
-    if(succ.length){secHd("07 · WHAT SUCCESS LOOKS LIKE","Measurable milestones.","How you will know this strategy is working.");succ.slice(0,3).forEach(s=>{chk(8);doc.setFontSize(8);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("○",ML,y);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(s.trim(),ML+5,CW-5).forEach(l=>{chk(5);doc.text(l,ML+5,y);y+=4.5;});y+=2;});rule();}
-    // NEXT MOVE
-    chk(44);doc.setFillColor(...DARK);doc.rect(0,y-4,W,50,"F");doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("08 · YOUR NEXT MOVE",ML,y);y+=5;doc.setFontSize(9);doc.setTextColor(176,114,138);doc.setFont("helvetica","italic");doc.text("The single most important action you should take today",ML,y);y+=6;doc.setFontSize(14);doc.setTextColor(255,255,255);doc.setFont("helvetica","bolditalic");wrap('"'+nms+'"',ML,CW).forEach(l=>{chk(8);doc.text(l,ML,y);y+=7;});y+=4;
-    [["TIME REQUIRED","Today"],["PRIORITY","Highest"],["EXPECTED IMPACT","High"]].forEach(([lbl,val],i)=>{const mx=ML+i*(CW/3);doc.setFontSize(7);doc.setTextColor(90,85,80);doc.setFont("helvetica","bold");doc.text(lbl,mx,y);doc.setFontSize(10);doc.setTextColor(160,154,148);doc.setFont("helvetica","normal");doc.text(val,mx,y+4);});y+=14;
+    if (!jsPDF) {
+      alert("PDF library is loading. Please wait a moment and try again.");
+      return;
+    }
+
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" });
+
+    // ── Constants ──────────────────────────────────────────────
+    const PW = 216, PH = 279;       // page dimensions
+    const ML = 22, MR = 22;         // margins
+    const CW = PW - ML - MR;        // content width
+    const BOTTOM = PH - 18;         // bottom boundary
+
+    // ── Color palette ──────────────────────────────────────────
+    const C = {
+      dark:    [20, 18, 16],
+      ink:     [36, 34, 30],
+      muted:   [100, 96, 90],
+      faint:   [160, 156, 152],
+      accent:  [176, 114, 138],
+      sage:    [106, 158, 138],
+      rule:    [220, 216, 212],
+      white:   [255, 255, 255],
+      cream:   [250, 250, 248],
+    };
+
+    // ── State ──────────────────────────────────────────────────
+    let y = 0;
+    let page = 1;
+
+    // ── Helpers ────────────────────────────────────────────────
+    const setColor = (rgb, type = "text") => {
+      if (type === "text") doc.setTextColor(...rgb);
+      else if (type === "fill") doc.setFillColor(...rgb);
+      else doc.setDrawColor(...rgb);
+    };
+
+    const setFont = (size, style = "normal", family = "helvetica") => {
+      doc.setFont(family, style);
+      doc.setFontSize(size);
+    };
+
+    const wrap = (text, maxW) =>
+      doc.splitTextToSize(String(text || "").replace(/\*\*/g, ""), maxW);
+
+    const cleanText = (s) =>
+      (s || "").replace(/\*\*/g, "").replace(/^[-•*✓✗\d.]+\s*/, "").trim();
+
+    const rawLines = (t) =>
+      (t || "").split("
+").map(l => l.trim()).filter(Boolean).filter(l => !l.match(/^#+/));
+
+    // ── Page management ────────────────────────────────────────
+    const addPageNumber = () => {
+      setFont(8, "normal");
+      setColor(C.faint);
+      doc.text(String(page), PW / 2, PH - 8, { align: "center" });
+      // Footer line
+      setColor(C.rule, "draw");
+      doc.setLineWidth(0.2);
+      doc.line(ML, PH - 13, PW - MR, PH - 13);
+    };
+
+    const newPage = () => {
+      addPageNumber();
+      doc.addPage();
+      page++;
+      y = 24;
+      // Running header
+      setFont(7, "normal");
+      setColor(C.faint);
+      doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT", ML, 12);
+      if (meta.firstName) {
+        doc.text(meta.firstName + "'s " + (meta.catLabel || "Strategy"), PW - MR, 12, { align: "right" });
+      }
+      setColor(C.rule, "draw");
+      doc.setLineWidth(0.2);
+      doc.line(ML, 15, PW - MR, 15);
+      y = 26;
+    };
+
+    // ── Smart page break ───────────────────────────────────────
+    const check = (needed, keepWith = 0) => {
+      if (y + needed + keepWith > BOTTOM) {
+        newPage();
+      }
+    };
+
+    // ── Text helpers ───────────────────────────────────────────
+    const text = (str, x, opts = {}) => {
+      const lines = Array.isArray(str) ? str : [str];
+      lines.forEach(line => {
+        check(5);
+        doc.text(String(line), x, y, opts);
+        y += opts.lineH || 5;
+      });
+    };
+
+    const bodyPara = (str, indent = 0, lineH = 5) => {
+      const x = ML + indent;
+      const wrapped = wrap(str, CW - indent);
+      wrapped.forEach(line => {
+        check(lineH + 1);
+        setColor(C.ink);
+        doc.text(line, x, y);
+        y += lineH;
+      });
+      y += 2;
+    };
+
+    const label = (str) => {
+      check(6);
+      setFont(7, "bold");
+      setColor(C.accent);
+      doc.text(str.toUpperCase(), ML, y);
+      y += 5;
+    };
+
+    const hRule = (color = C.rule, w = CW) => {
+      check(4);
+      setColor(color, "draw");
+      doc.setLineWidth(0.2);
+      doc.line(ML, y, ML + w, y);
+      y += 5;
+    };
+
+    const accentRule = () => {
+      setColor(C.accent, "draw");
+      doc.setLineWidth(0.5);
+      doc.line(ML, y, ML + 18, y);
+      y += 7;
+    };
+
+    // ── Section header — consistent across all 9 sections ──────
+    const secHeader = (num, title, desc) => {
+      check(36);
+      // Section number
+      setFont(8, "bold");
+      setColor(C.accent);
+      doc.text(num, ML, y);
+      y += 6;
+      // Title
+      setFont(22, "bold");
+      setColor(C.dark);
+      const titleLines = wrap(title, CW);
+      titleLines.forEach(line => {
+        check(9);
+        doc.text(line, ML, y);
+        y += 9;
+      });
+      // Description
+      if (desc) {
+        setFont(9, "normal");
+        setColor(C.muted);
+        doc.text(desc, ML, y);
+        y += 5;
+      }
+      accentRule();
+    };
+
+    // ── Parse all data ─────────────────────────────────────────
+    const execRaw = (result.strategicAssessment || "").replace(/\*\*/g, "");
+    const execLines = rawLines(execRaw);
+    const mainExec = execLines.filter(l => !l.match(/^(strength|what needs|primary tension)/i)).join(" ");
+    const strengthLine = execLines.find(l => l.match(/^strength/i)) || "";
+    const tensionLine = execLines.find(l => l.match(/^(what needs|primary tension)/i)) || "";
+
+    const blindRaw = (result.primaryConstraint || result.blindSpot || "").replace(/\*\*/g, "");
+    const blindTitleMatch = blindRaw.match(/^(.+?)
+/) || blindRaw.match(/^(.+?)\./);
+    const blindTitle = blindTitleMatch ? blindTitleMatch[1].trim() : blindRaw.split(".")[0];
+    const insightM = blindRaw.match(/The insight:?\s*(.+?)(?:\.|$)/i);
+    const insightText = insightM ? insightM[1].trim() : "";
+    const blindBody = blindRaw.replace(blindTitle, "").replace(insightM?.[0] || "", "").replace(/^[:\s]+/, "").trim();
+
+    const oppLines = rawLines(result.strategicOpportunity || result.keyOpportunities || "");
+    const actionText = result.recommendedActions || result.actionPlan || "";
+    const actionLines = rawLines(actionText);
+
+    const planText = result.priorityPlan || result.roadmap || "";
+    const weekHits = [...planText.matchAll(/week\s*([1-4])[:\s\-–]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
+    const weekData = ["", "", "", ""];
+    weekHits.forEach(m => { const i = parseInt(m[1]) - 1; if (i >= 0 && i < 4) weekData[i] = m[2].trim(); });
+
+    const lookLines = rawLines(result.longTermGrowth || result.mistakes || "");
+
+    const successText = (result.successLooks || "").replace(/\*\*/g, "");
+    const successSentences = successText.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10);
+
+    const nextMove = (result.yourNextMove || "").replace(/\*\*/g, "").trim();
+    const nextMoveSentence = nextMove.split(".")[0] + ".";
+
+    const weekThemes = ["Foundation", "Momentum", "Activation", "Scale & Review"];
+    const weekGoals = ["Establish your foundation", "Build momentum", "Execute and activate", "Review and scale"];
+    const actionBadges = ["START HERE", "THIS WEEK", "THIS WEEK", "THIS MONTH", "THIS MONTH"];
+    const actionTimes = ["Today", "2–3 days", "3–5 days", "1–2 weeks", "1–2 weeks"];
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE 1 — COVER
+    // ══════════════════════════════════════════════════════════
+    // Dark background
+    setColor(C.dark, "fill");
+    doc.rect(0, 0, PW, PH, "F");
+
+    // Eyebrow
+    y = 30;
+    setFont(7, "bold");
+    setColor([60, 56, 50]);
+    doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT", ML, y);
+    y += 10;
+
+    // Thin accent line
+    setColor(C.accent, "draw");
+    doc.setLineWidth(0.4);
+    doc.line(ML, y, ML + 24, y);
+    y += 12;
+
+    // Main title
+    setFont(36, "bold");
+    setColor(C.white);
+    const titleStr = `Your ${meta.catLabel || "Strategy"}`;
+    const titleLines = wrap(titleStr + "
+Strategy", CW);
+    titleLines.forEach((line, i) => {
+      doc.text(line, ML, y);
+      y += i === 0 ? 14 : 14;
+    });
+    y += 4;
+
+    // Prepared for
+    if (meta.firstName) {
+      setFont(11, "normal");
+      setColor([80, 76, 70]);
+      doc.text("Prepared for " + meta.firstName, ML, y);
+      y += 8;
+    }
+
+    // Descriptor
+    setFont(10, "normal");
+    setColor([60, 56, 50]);
+    const descStr = "A personalized strategy built around your goals, challenges, and next steps.";
+    const descLines = wrap(descStr, CW - 20);
+    descLines.forEach(line => { doc.text(line, ML, y); y += 5.5; });
+    y += 12;
+
+    // Metadata tags
+    const tags = [meta.effectiveIndustry, meta.stageLabel, meta.today].filter(Boolean);
+    let tx = ML;
+    tags.forEach(tag => {
+      setFont(7, "normal");
+      setColor([80, 76, 70]);
+      const tw = doc.getTextWidth(tag) + 8;
+      setColor([45, 42, 38], "draw");
+      doc.setLineWidth(0.3);
+      doc.rect(tx, y - 3.5, tw, 6, "S");
+      doc.text(tag, tx + 4, y);
+      tx += tw + 5;
+    });
+    y = PH - 18;
+
+    // Page number on cover
+    setFont(8, "normal");
+    setColor([50, 46, 42]);
+    doc.text("1", PW / 2, y, { align: "center" });
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE 2 — EXECUTIVE SUMMARY
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    secHeader("00 · Executive Summary", "Your strategy at a glance.", "Understand the complete picture in under sixty seconds.");
+
+    // Five summary cells in a structured grid
+    const summaryItems = [
+      { label: "Current Position", value: mainExec ? mainExec.split(".")[0] + "." : "" },
+      { label: "Primary Challenge", value: blindTitle || "" },
+      { label: "Greatest Opportunity", value: (() => { for (const l of oppLines) { const b = l.match(/^\*\*(.+?)\*\*/); if (b) return b[1]; } return oppLines[0] ? cleanText(oppLines[0]) : ""; })() },
+      { label: "Primary Goal", value: successSentences[0] || "" },
+      { label: "Today's Next Move", value: nextMoveSentence },
+    ].filter(item => item.value);
+
+    summaryItems.forEach((item, i) => {
+      check(16);
+      const isLast = i === summaryItems.length - 1;
+      // Draw cell background for last item
+      if (isLast) {
+        setColor(C.dark, "fill");
+        doc.rect(ML, y - 4, CW, 16, "F");
+      }
+      setFont(7, "bold");
+      setColor(isLast ? [80, 76, 70] : C.accent);
+      doc.text(item.label.toUpperCase(), ML + (isLast ? 4 : 0), y);
+      y += 4;
+      setFont(10, isLast ? "bolditalic" : "normal");
+      setColor(isLast ? C.white : C.ink);
+      const vLines = wrap(item.value, CW - (isLast ? 8 : 0));
+      vLines.forEach(line => {
+        check(5);
+        doc.text(line, ML + (isLast ? 4 : 0), y);
+        y += 5;
+      });
+      y += isLast ? 6 : 3;
+      if (!isLast) hRule();
+    });
+
+    y += 4;
+    // Timeline
+    label("30-Day Timeline");
+    ["Days 1–10: Foundation — establish systems and take first actions",
+     "Days 11–21: Momentum — activate strategy and measure progress",
+     "Days 22–30: Scale — review results and set 60-day targets"].forEach(t => {
+      check(5);
+      setFont(9, "normal");
+      setColor(C.ink);
+      doc.text("→  " + t, ML + 3, y);
+      y += 5.5;
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE 3 — STRATEGIC ASSESSMENT
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    secHeader("01 · Strategic Assessment", "Where you are today.", "What we discovered from your answers.");
+
+    if (mainExec) {
+      setFont(10, "normal");
+      setColor(C.ink);
+      bodyPara(mainExec, 0, 5.5);
+    }
+
+    if (strengthLine || tensionLine) {
+      y += 2;
+      check(28);
+      // Two-column grid
+      const colW = (CW - 4) / 2;
+      if (strengthLine) {
+        setColor(C.sage, "fill");
+        doc.rect(ML, y, 2, 20, "F");
+        setFont(7, "bold");
+        setColor(C.sage);
+        doc.text("STRENGTHS", ML + 5, y + 4);
+        setFont(9, "normal");
+        setColor(C.ink);
+        const sLines = wrap(cleanText(strengthLine), colW - 8);
+        sLines.slice(0, 3).forEach((l, i) => { doc.text(l, ML + 5, y + 8 + i * 4.5); });
+      }
+      if (tensionLine) {
+        const x2 = ML + colW + 4;
+        setColor(C.accent, "fill");
+        doc.rect(x2, y, 2, 20, "F");
+        setFont(7, "bold");
+        setColor(C.accent);
+        doc.text("WHAT NEEDS ATTENTION", x2 + 5, y + 4);
+        setFont(9, "normal");
+        setColor(C.ink);
+        const tLines = wrap(cleanText(tensionLine), colW - 8);
+        tLines.slice(0, 3).forEach((l, i) => { doc.text(l, x2 + 5, y + 8 + i * 4.5); });
+      }
+      y += 24;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE — PRIMARY CHALLENGE (dark section)
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    // Dark background for entire content area
+    setColor(C.dark, "fill");
+    doc.rect(0, 0, PW, PH, "F");
+
+    // Re-draw running header on dark
+    setFont(7, "normal");
+    setColor([60, 56, 50]);
+    doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT", ML, 12);
+    if (meta.firstName) {
+      doc.text(meta.firstName + "'s " + (meta.catLabel || "Strategy"), PW - MR, 12, { align: "right" });
+    }
+    setColor([40, 38, 36], "draw");
+    doc.setLineWidth(0.2);
+    doc.line(ML, 15, PW - MR, 15);
+    y = 26;
+
+    // Section header on dark
+    setFont(8, "bold");
+    setColor(C.accent);
+    doc.text("02 · PRIMARY CHALLENGE", ML, y); y += 6;
+    setFont(22, "bold");
+    setColor(C.white);
+    const chalTLines = wrap("The Core Constraint.", CW);
+    chalTLines.forEach(l => { doc.text(l, ML, y); y += 9; });
+    setFont(9, "normal");
+    setColor([80, 76, 70]);
+    doc.text("The main issue making progress harder right now.", ML, y); y += 5;
+    setColor(C.accent, "draw");
+    doc.setLineWidth(0.5);
+    doc.line(ML, y, ML + 18, y);
+    y += 10;
+
+    // Challenge name
+    if (blindTitle) {
+      setFont(18, "bolditalic");
+      setColor(C.white);
+      const btLines = wrap('"' + blindTitle + '"', CW);
+      btLines.forEach(l => { check(10); doc.text(l, ML, y); y += 10; });
+      y += 2;
+    }
+
+    // Body
+    if (blindBody) {
+      setFont(10, "normal");
+      setColor([150, 144, 140]);
+      const bbLines = wrap(blindBody, CW);
+      bbLines.forEach(l => { check(5); doc.text(l, ML, y); y += 5; });
+      y += 6;
+    }
+
+    // Insight block
+    if (insightText) {
+      check(24);
+      setColor([30, 28, 26], "fill");
+      doc.rect(ML, y, CW, 22, "F");
+      setColor([35, 32, 30], "draw");
+      doc.setLineWidth(0.3);
+      doc.rect(ML, y, CW, 22, "S");
+      setFont(7, "bold");
+      setColor(C.accent);
+      doc.text("THE INSIGHT", ML + 5, y + 5);
+      setFont(12, "bolditalic");
+      setColor(C.white);
+      const iLines = wrap('"' + insightText + '"', CW - 10);
+      iLines.slice(0, 2).forEach((l, i) => { doc.text(l, ML + 5, y + 11 + i * 5.5); });
+      y += 26;
+    }
+
+    // Page number
+    addPageNumber();
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE — BEST OPPORTUNITY
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    secHeader("03 · Best Opportunity", "Where to focus your energy.", "The areas most likely to move the needle right now.");
+
+    let oppN = 0;
+    oppLines.forEach(l => {
+      const b = l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);
+      if (b && oppN < 3) {
+        check(20);
+        oppN++;
+        // Number in accent
+        setFont(14, "bold");
+        setColor(C.accent);
+        doc.text("0" + oppN, ML, y);
+        // Title
+        setFont(13, "bold");
+        setColor(C.dark);
+        doc.text(b[1], ML + 12, y);
+        y += 6;
+        // Body
+        if (b[2] && cleanText(b[2]).length > 0) {
+          setFont(9, "normal");
+          setColor(C.muted);
+          const bLines = wrap(cleanText(b[2]), CW - 12);
+          bLines.forEach(line => { check(5); doc.text(line, ML + 12, y); y += 5; });
+        }
+        y += 4;
+        if (oppN < 3) hRule();
+      } else if (!b && l.trim() && oppN === 0) {
+        check(10);
+        setFont(9, "normal");
+        setColor(C.ink);
+        bodyPara(cleanText(l));
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE — RECOMMENDED ACTIONS
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    secHeader("04 · Recommended Actions", "Where to direct your energy.", "In priority order.");
+
+    let an = 0;
+    let curAction = null;
+    const flushAction = (isFirst) => {
+      if (!curAction) return;
+      check(20, 10);
+      // First action gets dark background
+      if (isFirst) {
+        const estimatedH = 8 + (curAction.body ? Math.ceil(curAction.body.length / 60) * 5 : 0) + (curAction.why ? 8 : 0);
+        setColor(C.dark, "fill");
+        doc.rect(ML, y - 4, CW, Math.min(estimatedH + 10, 36), "F");
+      }
+      // Badge
+      setFont(7, "bold");
+      setColor(isFirst ? C.accent : C.muted);
+      doc.text(actionBadges[an - 1] || "LATER", ML + (isFirst ? 4 : 0), y);
+      const timeStr = actionTimes[an - 1] || "Ongoing";
+      doc.text(timeStr, PW - MR - (isFirst ? 4 : 0), y, { align: "right" });
+      y += 5;
+      // Title
+      setFont(11, "bold");
+      setColor(isFirst ? C.white : C.dark);
+      const titleW = wrap(curAction.title, CW - (isFirst ? 8 : 0));
+      titleW.forEach(l => { check(6); doc.text(l, ML + (isFirst ? 4 : 0), y); y += 6; });
+      // Body
+      if (curAction.body) {
+        setFont(9, "normal");
+        setColor(isFirst ? [150, 144, 140] : C.muted);
+        const bodyW = wrap(curAction.body, CW - (isFirst ? 8 : 4));
+        bodyW.forEach(l => { check(5); doc.text(l, ML + (isFirst ? 4 : 0), y); y += 5; });
+      }
+      // Why
+      if (curAction.why) {
+        y += 2;
+        setFont(9, "italic");
+        setColor(C.accent);
+        const whyW = wrap("→ " + curAction.why, CW - (isFirst ? 8 : 4));
+        whyW.forEach(l => { check(5); doc.text(l, ML + (isFirst ? 4 : 0), y); y += 5; });
+      }
+      y += isFirst ? 8 : 5;
+      if (!isFirst && an < 5) hRule();
+      curAction = null;
+    };
+
+    actionLines.forEach(l => {
+      const b = l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);
+      const why = l.match(/\*Why this matters:?\*?\s*(.*)/i);
+      const dep = l.match(/\*\*What to set aside/i);
+      if (dep) { flushAction(an === 1); return; }
+      if (b && an < 5) {
+        flushAction(an === 1);
+        an++;
+        curAction = { title: b[1], body: cleanText(b[2]), why: "" };
+      } else if (why && curAction) {
+        curAction.why = cleanText(why[1]);
+      } else if (curAction && l.trim() && !l.match(/^\d+\./)) {
+        curAction.body = (curAction.body ? curAction.body + " " : "") + cleanText(l);
+      }
+    });
+    flushAction(an === 1);
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE — 30-DAY PLAN (dark)
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    // Dark background
+    setColor(C.dark, "fill");
+    doc.rect(0, 0, PW, PH, "F");
+    setFont(7, "normal");
+    setColor([60, 56, 50]);
+    doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT", ML, 12);
+    setColor([40, 38, 36], "draw");
+    doc.setLineWidth(0.2);
+    doc.line(ML, 15, PW - MR, 15);
+    y = 26;
+
+    // Section header
+    setFont(8, "bold");
+    setColor(C.accent);
+    doc.text("05 · 30-DAY PLAN", ML, y); y += 6;
+    setFont(22, "bold");
+    setColor(C.white);
+    doc.text("Your Week-by-Week Roadmap.", ML, y); y += 9;
+    setFont(9, "normal");
+    setColor([80, 76, 70]);
+    doc.text("Concrete actions for the next 30 days.", ML, y); y += 5;
+    setColor(C.accent, "draw");
+    doc.setLineWidth(0.5);
+    doc.line(ML, y, ML + 18, y);
+    y += 10;
+
+    // Four weeks stacked
+    weekData.forEach((w, i) => {
+      check(30);
+      // Week header
+      setFont(8, "bold");
+      setColor(C.accent);
+      doc.text("WEEK " + (i + 1) + "  ·  " + weekThemes[i].toUpperCase(), ML, y); y += 5;
+      setFont(9, "normal");
+      setColor([80, 76, 70]);
+      doc.text(weekGoals[i], ML, y); y += 6;
+      // Tasks
+      const tasks = w.split(/[\/
+]/).map(t => cleanText(t)).filter(Boolean).slice(0, 4);
+      tasks.forEach(task => {
+        check(5);
+        setFont(9, "normal");
+        setColor([110, 104, 98]);
+        doc.text("·  " + task, ML + 4, y);
+        y += 5;
+      });
+      y += 4;
+      if (i < 3) {
+        setColor([36, 34, 30], "draw");
+        doc.setLineWidth(0.2);
+        doc.line(ML, y, PW - MR, y);
+        y += 5;
+      }
+    });
+
+    addPageNumber();
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE — LOOKING AHEAD
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    secHeader("06 · Looking Ahead", "What becomes possible next.", "What to build toward after your first 30 days.");
+
+    let ln = 0;
+    let curLook = null;
+    lookLines.forEach(l => {
+      const b = l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);
+      if (b) {
+        if (curLook) {
+          check(20);
+          ln++;
+          setFont(8, "bold");
+          setColor(C.accent);
+          doc.text("0" + ln, ML, y);
+          setFont(12, "bold");
+          setColor(C.dark);
+          doc.text(curLook.title, ML + 10, y);
+          y += 6;
+          if (curLook.body) {
+            setFont(9, "normal");
+            setColor(C.muted);
+            wrap(curLook.body, CW - 10).forEach(line => { check(5); doc.text(line, ML + 10, y); y += 5; });
+          }
+          y += 3;
+          if (ln < 3) hRule();
+        }
+        curLook = { title: b[1], body: cleanText(b[2]) };
+      } else if (curLook && l.trim()) {
+        curLook.body = (curLook.body ? curLook.body + " " : "") + cleanText(l);
+      }
+    });
+    if (curLook) {
+      ln++;
+      check(20);
+      setFont(8, "bold");
+      setColor(C.accent);
+      doc.text("0" + ln, ML, y);
+      setFont(12, "bold");
+      setColor(C.dark);
+      doc.text(curLook.title, ML + 10, y);
+      y += 6;
+      if (curLook.body) {
+        setFont(9, "normal");
+        setColor(C.muted);
+        wrap(curLook.body, CW - 10).forEach(line => { check(5); doc.text(line, ML + 10, y); y += 5; });
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE — WHAT SUCCESS LOOKS LIKE
+    // ══════════════════════════════════════════════════════════
+    if (successSentences.length > 0) {
+      newPage();
+      secHeader("07 · What Success Looks Like", "Measurable milestones.", "How you'll know this strategy is working.");
+      successSentences.slice(0, 3).forEach((s, i) => {
+        check(16);
+        // Circle marker
+        setColor(C.accent, "draw");
+        doc.setLineWidth(0.5);
+        doc.circle(ML + 3, y - 1, 2.5, "S");
+        setFont(10, "normal");
+        setColor(C.ink);
+        const sLines = wrap(s.trim(), CW - 12);
+        sLines.forEach(line => { check(5); doc.text(line, ML + 10, y); y += 5.5; });
+        y += 3;
+        if (i < 2) hRule();
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // PAGE — YOUR NEXT MOVE (dark, emotional climax)
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    // Full dark page
+    setColor(C.dark, "fill");
+    doc.rect(0, 0, PW, PH, "F");
+    y = 26;
+
+    // Section label
+    setFont(8, "bold");
+    setColor(C.accent);
+    doc.text("08 · YOUR NEXT MOVE", ML, y); y += 8;
+
+    setFont(10, "italic");
+    setColor([150, 144, 140]);
+    doc.text("The single most important action you should take today", ML, y); y += 10;
+
+    // Thin accent line
+    setColor(C.accent, "draw");
+    doc.setLineWidth(0.4);
+    doc.line(ML, y, ML + 24, y); y += 12;
+
+    // The recommendation — large, italic, powerful
+    setFont(20, "bolditalic");
+    setColor(C.white);
+    const nmLines = wrap('"' + nextMoveSentence + '"', CW);
+    nmLines.forEach(line => { check(12); doc.text(line, ML, y); y += 11; });
+
+    y += 8;
+    // Thin divider
+    setColor([40, 38, 36], "draw");
+    doc.setLineWidth(0.2);
+    doc.line(ML, y, PW - MR, y); y += 10;
+
+    // Meta row
+    const metas = [["TIME REQUIRED", "Today"], ["PRIORITY", "Highest"], ["EXPECTED IMPACT", "High"]];
+    const mW = CW / 3;
+    metas.forEach(([lbl, val], i) => {
+      const mx = ML + i * mW;
+      setFont(7, "bold");
+      setColor([90, 86, 82]);
+      doc.text(lbl, mx, y);
+      setFont(12, "normal");
+      setColor([176, 114, 138]);
+      doc.text(val, mx, y + 6);
+    });
+
+    addPageNumber();
+
+    // ══════════════════════════════════════════════════════════
     // FINAL PAGE
-    doc.addPage();pageNum++;y=ML+20;footer();
-    doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE",ML,y);y+=6;
-    doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");doc.text("This strategy was built specifically for you.",ML,y);y+=6;
-    doc.setFontSize(9);doc.setTextColor(...MUTED);doc.text("Return to My Strategies to review and continue building on this plan.",ML,y);y+=6;
-    doc.text("Generated "+meta.today+" · Your Next Move by Chat It Up",ML,y);
-    const safe=(meta.firstName||"My").replace(/[^a-zA-Z0-9]/g,"_");
-    doc.save("YourNextMove_"+safe+"_Strategy.pdf");
-  } catch(err) { console.error("PDF generation failed:",err); window.print(); }
+    // ══════════════════════════════════════════════════════════
+    newPage();
+    y = PH / 2 - 20;
+    setFont(8, "bold");
+    setColor(C.accent);
+    doc.text("YOUR NEXT MOVE", ML, y); y += 7;
+    setFont(14, "bold");
+    setColor(C.dark);
+    doc.text("This strategy was built specifically for you.", ML, y); y += 8;
+    setFont(9, "normal");
+    setColor(C.muted);
+    const closingLines = wrap(
+      "Return to My Strategies to review and continue building on this plan. " +
+      "Your Next Move is a strategic decision-making platform built to help you " +
+      "gain clarity, make smarter decisions, and confidently take your next step.",
+      CW
+    );
+    closingLines.forEach(line => { doc.text(line, ML, y); y += 5; });
+    y += 6;
+    setFont(8, "normal");
+    setColor(C.faint);
+    doc.text("Generated " + meta.today + "  ·  Your Next Move by Chat It Up", ML, y);
+
+    // ══════════════════════════════════════════════════════════
+    // SAVE
+    // ══════════════════════════════════════════════════════════
+    addPageNumber();
+    const safeName = (meta.firstName || "My").replace(/[^a-zA-Z0-9]/g, "_");
+    doc.save("YourNextMove_" + safeName + "_Strategy.pdf");
+
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+    alert("PDF generation encountered an error: " + err.message + ". Please try again.");
+  }
 }
 
 
@@ -2415,14 +3081,19 @@ One sentence. The single most concrete action to take right now.`;
           <div className="rpt-cover">
             <span className="rpt-cover-eyebrow">Your Next Move · Strategy Report</span>
             <h1 className="rpt-cover-title">
-              <em>{planCat?.label}</em><br/>Strategy
+              Your <em>{planCat?.label}</em><br/>Strategy
             </h1>
-            {firstName&&<p style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:14,color:"#5A5450",fontWeight:300,letterSpacing:"0.04em",marginBottom:28,marginTop:-8}}>Prepared for {firstName}</p>}
+            {firstName&&<p style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:13,color:"#4A4540",fontWeight:300,letterSpacing:"0.06em",marginBottom:32,marginTop:4}}>Prepared for {firstName}</p>}
+            <p style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,color:"#3A3530",fontWeight:300,lineHeight:1.75,marginBottom:28,maxWidth:440}}>A personalized strategy built around your goals, challenges, and next steps.</p>
             <div className="rpt-cover-tags">
               <span className="rpt-cover-tag">{effectiveIndustry||industry}</span>
               <span className="rpt-cover-tag">{stageLabel}</span>
               <span className="rpt-cover-tag">{today}</span>
-              {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A",borderColor:"#2A3A33"}}>✓ Saved</span>}
+              {viewingPlanId&&<span className="rpt-cover-tag rpt-cover-tag-saved">✓ Saved</span>}
+            </div>
+            <div className="rpt-cover-actions">
+              <button className="rpt-cover-btn" onClick={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})}>Save My Strategy</button>
+              <button className="rpt-cover-btn" onClick={()=>go("plans")}>My Strategies</button>
             </div>
           </div>
 
