@@ -940,7 +940,6 @@ function generatePDF(result, meta) {
 
     const rawLines = (t) =>
       (t || "").split("\n").map(l => l.trim()).filter(Boolean).filter(l => !l.match(/^#+/));
-
     // ── Page management ────────────────────────────────────────
     const addPageNumber = () => {
       setFont(8, "normal");
