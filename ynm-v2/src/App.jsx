@@ -939,8 +939,7 @@ function generatePDF(result, meta) {
       (s || "").replace(/\*\*/g, "").replace(/^[-•*✓✗\d.]+\s*/, "").trim();
 
     const rawLines = (t) =>
-      (t || "").split("
-").map(l => l.trim()).filter(Boolean).filter(l => !l.match(/^#+/));
+      (t || "").split("\n").map(l => l.trim()).filter(Boolean).filter(l => !l.match(/^#+/));
 
     // ── Page management ────────────────────────────────────────
     const addPageNumber = () => {
