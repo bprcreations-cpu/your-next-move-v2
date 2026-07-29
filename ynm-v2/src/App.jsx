@@ -659,12 +659,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-action-row:last-child{border-bottom:none;}
 .rpt-action-row.is-first{background:var(--r-bg-dark);}
 .rpt-action-row.is-first .rpt-action-rule{border-right-color:var(--r-rule-dark);}
-.rpt-action-rule{border-right:1px solid var(--r-rule);padding:24px 20px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
-.rpt-action-badge{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;padding:4px 10px;display:inline-block;}
+.rpt-action-rule{border-right:1px solid var(--r-rule);padding:24px 20px 24px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;justify-content:flex-start;}
+.rpt-action-badge{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;padding:5px 12px;display:inline-block;white-space:nowrap;}
 .rpt-action-badge-1{background:var(--r-accent);color:#fff;}
 .rpt-action-badge-2{color:var(--r-sage);background:rgba(106,158,138,0.1);}
 .rpt-action-badge-n{color:var(--r-ink-3);background:var(--r-bg);}
-.rpt-action-time{font-size:11px;color:var(--r-ink-3);}
+.rpt-action-time{font-size:11px;color:var(--r-ink-3);margin-top:auto;}
 .rpt-action-row.is-first .rpt-action-time{color:#5A5450;}
 .rpt-action-body{padding:24px 28px;}
 .rpt-action-title{font-size:15px;font-weight:600;color:var(--r-ink);line-height:1.35;margin-bottom:6px;letter-spacing:-0.01em;}
@@ -709,15 +709,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 
 /* ── YOUR NEXT MOVE ─────────────────────────────────────────── */
 .rpt-nm{background:var(--r-bg-dark);padding:96px var(--r-pad);text-align:center;}
-.rpt-nm-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.38em;text-transform:uppercase;color:#3A3530;margin-bottom:20px;display:block;}
-.rpt-nm-label{font-size:13px;color:#5A5450;font-style:italic;margin-bottom:48px;display:block;}
+.rpt-nm-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.38em;text-transform:uppercase;color:#6A6460;margin-bottom:20px;display:block;}
+.rpt-nm-label{font-size:13px;color:var(--r-accent);font-style:italic;margin-bottom:48px;display:block;letter-spacing:0.02em;}
 .rpt-nm-text{font-family:'Cormorant',serif;font-size:clamp(26px,4vw,46px);font-weight:500;font-style:italic;color:#fff;line-height:1.25;max-width:620px;margin:0 auto;letter-spacing:-0.02em;}
 .rpt-nm-meta{display:flex;gap:0;justify-content:center;margin-top:48px;padding-top:36px;border-top:1px solid var(--r-rule-dark);}
 .rpt-nm-meta-col{padding:0 40px;text-align:center;border-right:1px solid var(--r-rule-dark);}
 .rpt-nm-meta-col:first-child{padding-left:0;}
 .rpt-nm-meta-col:last-child{border-right:none;padding-right:0;}
-.rpt-nm-meta-lbl{font-size:9px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#3A3530;margin-bottom:5px;}
-.rpt-nm-meta-val{font-size:14px;color:#7A7470;font-weight:300;}
+.rpt-nm-meta-lbl{font-size:9px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#7A7470;margin-bottom:5px;}
+.rpt-nm-meta-val{font-size:14px;color:#C4B5AD;font-weight:400;}
 
 /* ── CONCLUSION ─────────────────────────────────────────────── */
 .rpt-end{padding:88px var(--r-pad);text-align:center;}
@@ -885,6 +885,105 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
   .roadmap-grid{grid-template-columns:repeat(4,1fr)!important;}
 }
 `;
+
+// ─── PDF GENERATOR ───────────────────────────────────────────────────────────
+function generatePDF(result, meta) {
+  try {
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) { window.print(); return; } // Fallback to print if jsPDF not loaded
+    const doc = new jsPDF({ orientation:"portrait", unit:"mm", format:"letter" });
+    const W=216,H=279,ML=20,MR=20,CW=W-ML-MR;
+    const ACCENT=[176,114,138],DARK=[26,25,22],INK=[42,40,38],MUTED=[120,113,108],RULE=[230,226,223],SAGE=[106,158,138];
+    let y=ML+5, pageNum=1;
+    const wrap=(t,x,w)=>doc.splitTextToSize(String(t||""),w);
+    const rawLines=(t)=>(t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/));
+    const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").replace(/^[-•*✓✗\d.]+\s*/,"").trim();
+    function chk(n){if(y+n>H-18){doc.addPage();y=ML+5;pageNum++;footer();}}
+    function footer(){doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});}
+    function rule(){chk(5);doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,y,W-MR,y);y+=5;}
+    function body(t,ind){const x=ML+(ind||0);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(t,x,CW-(ind||0)).forEach(l=>{chk(5);doc.text(l,x,y);y+=5;});y+=1;}
+    function secHd(num,title,desc){chk(24);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(num,ML,y);y+=5;doc.setFontSize(18);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");wrap(title,ML,CW).forEach(l=>{chk(8);doc.text(l,ML,y);y+=7;});y+=1;if(desc){doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(desc,ML,y);y+=5;}doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.line(ML,y,ML+20,y);y+=7;}
+    // COVER
+    doc.setFillColor(...DARK);doc.rect(0,0,W,H,"F");
+    doc.setFontSize(8);doc.setTextColor(80,75,70);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT",ML,24);
+    doc.setFontSize(30);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
+    const ct=meta.catLabel||"Strategy";wrap(ct+" Strategy",ML,CW).forEach((l,i)=>{doc.text(l,ML,50+i*12);});
+    if(meta.firstName){doc.setFontSize(12);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");doc.text("Prepared for "+meta.firstName,ML,90);}
+    let tx=ML;
+    [meta.effectiveIndustry,meta.stageLabel,meta.today].filter(Boolean).forEach(tag=>{doc.setFontSize(7);doc.setTextColor(100,95,90);doc.setFont("helvetica","normal");const tw=doc.getTextWidth(tag)+8;doc.setDrawColor(55,50,47);doc.setLineWidth(0.3);doc.roundedRect(tx,100,tw,5.5,1,1);doc.text(tag,tx+4,104.2);tx+=tw+4;});
+    footer();doc.addPage();pageNum=2;y=ML+5;footer();
+    // Parse data
+    const execRaw=(result.strategicAssessment||"").replace(/\*\*/g,"");
+    const execLines=rawLines(execRaw);
+    const mainExec=execLines.filter(l=>!l.match(/^(strength|what needs)/i)).join(" ");
+    const position=mainExec?mainExec.split(".")[0]+".":"";
+    const blindRaw=(result.primaryConstraint||"").replace(/\*\*/g,"");
+    const blindTitle=(blindRaw.match(/^[^.]+/)||[""])[0];
+    const insM=blindRaw.match(/The insight:?\s*(.+?)(?:\.|$)/i);
+    const insight=insM?insM[1].trim():"";
+    const succ=(result.successLooks||"").replace(/\*\*/g,"").split(/(?<=[.!?])\s+/).filter(s=>s.length>10);
+    const nm=(result.yourNextMove||"").replace(/\*\*/g,"").trim();
+    const nms=nm.split(".")[0]+".";
+    // EXEC SUMMARY
+    secHd("00 · EXECUTIVE SUMMARY","Your strategy at a glance.","The complete picture in under sixty seconds.");
+    if(position){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("CURRENT POSITION",ML,y);y+=4;body(position);}
+    if(blindTitle){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("PRIMARY CHALLENGE",ML,y);y+=4;body(blindTitle);}
+    if(succ[0]){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("PRIMARY GOAL",ML,y);y+=4;body(succ[0]);}
+    if(nms){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("TODAY'S NEXT MOVE",ML,y);y+=4;body(nms);}
+    rule();
+    // ASSESSMENT
+    secHd("01 · STRATEGIC ASSESSMENT","Where you are today.","What we discovered from your answers.");
+    if(mainExec)body(mainExec);
+    const sl=execLines.find(l=>l.match(/^strength/i))||"";
+    const tl=execLines.find(l=>l.match(/^what needs/i))||"";
+    if(sl){chk(8);doc.setFontSize(8);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("STRENGTHS",ML,y);y+=4;body(cleanStr(sl));}
+    if(tl){chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WHAT NEEDS ATTENTION",ML,y);y+=4;body(cleanStr(tl));}
+    rule();
+    // CHALLENGE
+    secHd("02 · PRIMARY CHALLENGE","The core constraint.","The main issue making progress harder right now.");
+    if(blindTitle){doc.setFontSize(13);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");chk(8);doc.text('"'+blindTitle+'"',ML,y);y+=8;}
+    const blindBody=blindRaw.replace(insM?.[0]||"","").replace(/^[^.]+\./,"").trim();
+    if(blindBody)body(blindBody);
+    if(insight){chk(14);doc.setFillColor(240,235,232);doc.rect(ML,y,CW,12,"F");doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("THE INSIGHT",ML+3,y+4);doc.setFontSize(9);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");doc.text('"'+insight+'"',ML+3,y+9);y+=14;}
+    rule();
+    // OPPORTUNITY
+    secHd("03 · BEST OPPORTUNITY","Where to focus your energy.","The areas most likely to move the needle.");
+    let on=0;rawLines(result.strategicOpportunity||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){on++;chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+on+"  "+b[1],ML,y);y+=4;if(b[2])body(cleanStr(b[2]),6);}else if(l.trim())body(cleanStr(l),6);});
+    rule();
+    // ACTIONS
+    secHd("04 · RECOMMENDED ACTIONS","Where to direct your energy.","In priority order.");
+    const bdgs=["START HERE","THIS WEEK","THIS WEEK","THIS MONTH","THIS MONTH"];
+    let an=0;
+    rawLines(result.recommendedActions||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);const wy=l.match(/\*Why this matters:?\*?\s*(.*)/i);if(b&&an<5){chk(12);doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(bdgs[an]||"LATER",ML,y);y+=4;doc.setFontSize(11);doc.setTextColor(...DARK);doc.text(b[1],ML,y);y+=5;if(b[2])body(cleanStr(b[2]),4);an++;}else if(wy){doc.setFontSize(9);doc.setTextColor(...ACCENT);doc.setFont("helvetica","italic");wrap("→ "+wy[1],ML+4,CW-4).forEach(l=>{chk(5);doc.text(l,ML+4,y);y+=4.5;});y+=1;}});
+    rule();
+    // 30-DAY PLAN
+    secHd("05 · 30-DAY PLAN","Your week-by-week roadmap.","Concrete actions for the next 30 days.");
+    const wths=["Foundation","Momentum","Activation","Scale & Review"];
+    const wgls=["Establish your foundation","Build momentum","Execute and activate","Review and scale"];
+    const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
+    const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim();});
+    wd.forEach((w,i)=>{chk(16);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WEEK "+(i+1)+" · "+wths[i].toUpperCase(),ML,y);y+=4;doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(wgls[i],ML,y);y+=4;w.split(/[\/\n]/).map(t=>cleanStr(t)).filter(Boolean).slice(0,4).forEach(t=>{chk(5);doc.setFontSize(9);doc.setTextColor(...INK);doc.text("·  "+t,ML+4,y);y+=4.5;});y+=2;});
+    rule();
+    // LOOKING AHEAD
+    secHd("06 · LOOKING AHEAD","What becomes possible next.","What to build toward after your first 30 days.");
+    let ln=0;rawLines(result.longTermGrowth||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){ln++;chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+ln+"  "+b[1],ML,y);y+=4;if(b[2])body(cleanStr(b[2]),6);}else if(l.trim())body(cleanStr(l),6);});
+    rule();
+    // SUCCESS
+    if(succ.length){secHd("07 · WHAT SUCCESS LOOKS LIKE","Measurable milestones.","How you will know this strategy is working.");succ.slice(0,3).forEach(s=>{chk(8);doc.setFontSize(8);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("○",ML,y);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(s.trim(),ML+5,CW-5).forEach(l=>{chk(5);doc.text(l,ML+5,y);y+=4.5;});y+=2;});rule();}
+    // NEXT MOVE
+    chk(44);doc.setFillColor(...DARK);doc.rect(0,y-4,W,50,"F");doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("08 · YOUR NEXT MOVE",ML,y);y+=5;doc.setFontSize(9);doc.setTextColor(176,114,138);doc.setFont("helvetica","italic");doc.text("The single most important action you should take today",ML,y);y+=6;doc.setFontSize(14);doc.setTextColor(255,255,255);doc.setFont("helvetica","bolditalic");wrap('"'+nms+'"',ML,CW).forEach(l=>{chk(8);doc.text(l,ML,y);y+=7;});y+=4;
+    [["TIME REQUIRED","Today"],["PRIORITY","Highest"],["EXPECTED IMPACT","High"]].forEach(([lbl,val],i)=>{const mx=ML+i*(CW/3);doc.setFontSize(7);doc.setTextColor(90,85,80);doc.setFont("helvetica","bold");doc.text(lbl,mx,y);doc.setFontSize(10);doc.setTextColor(160,154,148);doc.setFont("helvetica","normal");doc.text(val,mx,y+4);});y+=14;
+    // FINAL PAGE
+    doc.addPage();pageNum++;y=ML+20;footer();
+    doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE",ML,y);y+=6;
+    doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");doc.text("This strategy was built specifically for you.",ML,y);y+=6;
+    doc.setFontSize(9);doc.setTextColor(...MUTED);doc.text("Return to My Strategies to review and continue building on this plan.",ML,y);y+=6;
+    doc.text("Generated "+meta.today+" · Your Next Move by Chat It Up",ML,y);
+    const safe=(meta.firstName||"My").replace(/[^a-zA-Z0-9]/g,"_");
+    doc.save("YourNextMove_"+safe+"_Strategy.pdf");
+  } catch(err) { console.error("PDF generation failed:",err); window.print(); }
+}
+
 
 // ─── APP ─────────────────────────────────────────────────────────────────────
 export default function App() {
@@ -1062,7 +1161,7 @@ export default function App() {
     setShortWarn(false);
     if(qIdx<qs.length-1){setQIdx(q=>q+1);window.scrollTo(0,0);}else generate();
   }
-  function openSavedPlan(plan){setCatId(plan.catId);setIndustry(plan.industry);setJourneyStage(plan.journeyStage||null);setResult(plan.result);setViewingPlanId(plan.id);go("results");}
+  function openSavedPlan(plan){setCatId(plan.catId);setIndustry(plan.industry);setJourneyStage(plan.journeyStage||null);setResult(plan.result);setViewingPlanId(plan.id);setStrategyStage('reading');setFbDone(false);setPdfUnlocked(false);go("results");}
   function startEdit(key,val){setEditSection(key);setEditDraft(val||"");}
   function cancelEdit(){setEditSection(null);setEditDraft("");}
   function saveEdit(key){
@@ -2285,15 +2384,21 @@ One sentence. The single most concrete action to take right now.`;
       /* ── COMPLETE ── */
       if(strategyStage==="complete") return(
         <div className="rpt-flow">
-          <div className="rpt-flow-mark" style={{fontFamily:"'Cormorant',serif",fontSize:24}}>✦</div>
+          <div className="rpt-flow-mark" style={{fontFamily:"'Cormorant',serif",fontSize:24,color:"var(--r-accent)",borderColor:"rgba(176,114,138,0.3)"}}>✦</div>
           <span className="rpt-flow-eyebrow">Thank you{firstName?`, ${firstName}`:""}</span>
           <h1 className="rpt-flow-h">Your PDF is ready.</h1>
-          <p className="rpt-flow-sub">Your strategy is complete and formatted for download.</p>
-          <p className="rpt-flow-note">{fbDone?"Your feedback has been received.":"Your strategy has been saved to My Strategies."}</p>
+          <p className="rpt-flow-sub">Your strategy is complete and ready to download as a professionally formatted PDF.</p>
+          <p className="rpt-flow-note">{fbDone?"Your feedback has been received and will shape every future strategy.":"Your strategy has been saved to My Strategies."}</p>
           <div className="rpt-flow-btns">
-            <button className="rpt-flow-primary" onClick={()=>window.print()}>Download Strategy PDF</button>
+            <button className="rpt-flow-primary" onClick={()=>generatePDF(result,{
+              firstName,
+              effectiveIndustry: effectiveIndustry||industry,
+              stageLabel,
+              today,
+              catLabel:planCat?.label||""
+            })}>Download Strategy PDF</button>
           </div>
-          <div className="rpt-pdf-grid" style={{marginTop:16}}>
+          <div className="rpt-pdf-grid" style={{marginTop:20}}>
             <button className="rpt-pdf-link" onClick={()=>go("plans")}>My Strategies</button>
             <button className="rpt-pdf-link" onClick={restart}>New Strategy</button>
             <button className="rpt-pdf-link" onClick={()=>go("advisor")}>Ask Your Advisor</button>
@@ -2310,14 +2415,15 @@ One sentence. The single most concrete action to take right now.`;
           <div className="rpt-cover">
             <span className="rpt-cover-eyebrow">Your Next Move · Strategy Report</span>
             <h1 className="rpt-cover-title">
-              {firstName?`${firstName}'s `:""}<em>{planCat?.label}</em><br/>Strategy
+              <em>{planCat?.label}</em><br/>Strategy
             </h1>
-            <p className="rpt-cover-meta">
-              <span>{effectiveIndustry||industry}</span>
-              <span>{stageLabel}</span>
-              <span>{today}</span>
-            </p>
-            {viewingPlanId&&<span className="rpt-cover-saved">✓ Saved to My Strategies</span>}
+            {firstName&&<p style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:14,color:"#5A5450",fontWeight:300,letterSpacing:"0.04em",marginBottom:28,marginTop:-8}}>Prepared for {firstName}</p>}
+            <div className="rpt-cover-tags">
+              <span className="rpt-cover-tag">{effectiveIndustry||industry}</span>
+              <span className="rpt-cover-tag">{stageLabel}</span>
+              <span className="rpt-cover-tag">{today}</span>
+              {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A",borderColor:"#2A3A33"}}>✓ Saved</span>}
+            </div>
           </div>
 
           {/* 00 — EXECUTIVE SUMMARY */}
