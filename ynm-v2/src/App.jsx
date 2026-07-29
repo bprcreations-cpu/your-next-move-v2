@@ -552,166 +552,261 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .three-way-card.featured .three-way-tag{color:#5A5350;}
 
 /* ═══════════════════════════════════════════════════════════════
-   REDESIGNED STRATEGY EXPERIENCE
+   STRATEGY REPORT — ONE UNIFIED DESIGN SYSTEM
+   Design language: Apple × Stripe × Consulting Report
    ═══════════════════════════════════════════════════════════════ */
 
+/* DESIGN TOKENS */
+:root{
+  --r-bg: #FAFAF8;
+  --r-bg-dark: #141210;
+  --r-ink: #1A1916;
+  --r-ink-muted: #6A6560;
+  --r-ink-faint: #A8A29E;
+  --r-rule: #EEEAE7;
+  --r-rule-dark: #252220;
+  --r-accent: #B0728A;
+  --r-accent-faint: rgba(176,114,138,0.12);
+  --r-sage: #6A9E8A;
+  --r-col-pad: 64px;
+  --r-section-pad: 72px 0;
+}
+
+/* REPORT SHELL */
+.rpt{max-width:860px;margin:0 auto;width:100%;background:#fff;}
+
+/* COVER — dark, editorial, confident */
+.rpt-cover{background:var(--r-bg-dark);padding:72px var(--r-col-pad) 64px;border-bottom:1px solid var(--r-rule-dark);}
+.rpt-cover-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.42em;text-transform:uppercase;color:#4A4540;margin-bottom:32px;display:block;}
+.rpt-cover-title{font-family:'Cormorant',serif;font-size:clamp(38px,6vw,68px);font-weight:600;color:#fff;line-height:1.0;letter-spacing:-0.03em;margin-bottom:16px;}
+.rpt-cover-title em{font-style:italic;color:var(--r-accent);}
+.rpt-cover-meta{font-size:12px;color:#4A4540;letter-spacing:0.04em;margin-bottom:32px;line-height:1.8;}
+.rpt-cover-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;}
+.rpt-cover-tag{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#5A5350;border:1px solid #252220;padding:5px 14px;border-radius:2px;}
+.rpt-cover-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.rpt-cover-btn{padding:9px 20px;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;border-radius:2px;cursor:pointer;background:rgba(255,255,255,0.06);color:#7A7470;border:1px solid #252220;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.15s;}
+.rpt-cover-btn:hover{background:rgba(255,255,255,0.1);color:#C4B5AD;border-color:#3A3530;}
+
+/* SECTION ANATOMY — one system, every section */
+.rpt-sec{padding:var(--r-section-pad);border-bottom:1px solid var(--r-rule);}
+.rpt-sec:last-child{border-bottom:none;}
+.rpt-sec-inner{padding:0 var(--r-col-pad);}
+
+/* SECTION HEADER — identical every time */
+.rpt-sec-header{display:grid;grid-template-columns:48px 1fr;gap:0 24px;align-items:start;margin-bottom:48px;}
+.rpt-sec-num{font-family:'Cormorant',serif;font-size:13px;font-weight:500;color:var(--r-accent);letter-spacing:0.1em;padding-top:4px;line-height:1;}
+.rpt-sec-heading{display:flex;flex-direction:column;gap:0;}
+.rpt-sec-title{font-family:'Cormorant',serif;font-size:clamp(24px,3.5vw,34px);font-weight:600;color:var(--r-ink);line-height:1.1;letter-spacing:-0.02em;margin-bottom:6px;}
+.rpt-sec-desc{font-size:13px;color:var(--r-ink-faint);font-weight:300;line-height:1.6;}
+.rpt-sec-rule{height:1px;background:var(--r-rule);margin:0 var(--r-col-pad) 0;margin-bottom:0;}
+
+/* DARK SECTION VARIANT */
+.rpt-sec-dark{background:var(--r-bg-dark);border-bottom:1px solid var(--r-rule-dark);}
+.rpt-sec-dark .rpt-sec-num{color:#5A4840;}
+.rpt-sec-dark .rpt-sec-title{color:#fff;}
+.rpt-sec-dark .rpt-sec-desc{color:#4A4540;}
+
+/* ALT SECTION VARIANT — cream */
+.rpt-sec-alt{background:var(--r-bg);}
+
 /* EXECUTIVE SUMMARY */
-.exec-sum{background:#fff;padding:52px 56px 48px;border-bottom:3px solid #1A1916;}
-.exec-sum-eye{font-size:11px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#B0728A;margin-bottom:20px;display:block;}
-.exec-sum-h{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,42px);font-weight:600;color:#1A1916;margin-bottom:8px;letter-spacing:-0.02em;line-height:1.1;}
-.exec-sum-sub{font-size:14px;color:#78716C;font-weight:300;margin-bottom:36px;line-height:1.65;}
-.exec-sum-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:28px;}
-.exec-sum-card{padding:22px 20px;background:#FAFAF8;border:1px solid #EEEAE7;}
-.exec-sum-card.dark{background:#1A1916;}
-.exec-sum-card-label{font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#C4B5AD;margin-bottom:8px;}
-.exec-sum-card.dark .exec-sum-card-label{color:#5A4A42;}
-.exec-sum-card-text{font-size:14px;color:#1A1916;font-weight:400;line-height:1.55;}
-.exec-sum-card.dark .exec-sum-card-text{color:#E8D8D0;}
-.exec-sum-card.pink{background:#FAF0F4;border-color:#E8C4D4;}
-.exec-sum-card.pink .exec-sum-card-label{color:#B0728A;}
-.exec-sum-card.pink .exec-sum-card-text{color:#1A1916;font-weight:500;}
-.exec-sum-timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
-.exec-sum-tl{padding:16px 18px;background:#FAFAF8;border:1px solid #EEEAE7;position:relative;}
-.exec-sum-tl-period{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#B0728A;margin-bottom:6px;}
-.exec-sum-tl-text{font-size:13px;color:#57534E;font-weight:300;line-height:1.55;}
+.rpt-exec{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--r-rule);border:1px solid var(--r-rule);margin-bottom:28px;}
+.rpt-exec-item{padding:24px 26px;background:#fff;}
+.rpt-exec-item.span2{grid-column:span 2;}
+.rpt-exec-item.dark{background:var(--r-bg-dark);}
+.rpt-exec-item.accent{background:var(--r-accent-faint);}
+.rpt-exec-label{font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--r-ink-faint);margin-bottom:8px;}
+.rpt-exec-item.dark .rpt-exec-label{color:#4A4540;}
+.rpt-exec-value{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:var(--r-ink);line-height:1.4;letter-spacing:-0.01em;}
+.rpt-exec-item.dark .rpt-exec-value{color:#E8E4E0;}
+.rpt-exec-item.accent .rpt-exec-value{color:var(--r-ink);}
+.rpt-exec-tl{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--r-rule);border:1px solid var(--r-rule);}
+.rpt-exec-tl-item{padding:18px 20px;background:#fff;}
+.rpt-exec-tl-period{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--r-accent);margin-bottom:6px;}
+.rpt-exec-tl-text{font-size:13px;color:var(--r-ink-muted);font-weight:300;line-height:1.55;}
 
-/* SECTION HEADINGS — REDESIGNED */
-.sec-chapter{padding:52px 56px 0;}
-.sec-chapter-num{font-family:'Cormorant',serif;font-size:64px;font-weight:700;color:#F0EDEB;line-height:1;margin-bottom:-8px;letter-spacing:-0.04em;}
-.sec-chapter-title{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,40px);font-weight:600;color:#1A1916;line-height:1.1;margin-bottom:6px;letter-spacing:-0.02em;}
-.sec-chapter-title-dark{color:#fff;}
-.sec-chapter-sub{font-size:14px;color:#A8A29E;font-weight:300;line-height:1.6;margin-bottom:32px;}
-.sec-chapter-sub-dark{color:#6A6060;}
-.sec-chapter-divider{width:40px;height:3px;background:#B0728A;margin-bottom:32px;}
-.sec-chapter-divider-green{width:40px;height:3px;background:#6A9E8A;margin-bottom:32px;}
+/* ASSESSMENT — two column */
+.rpt-assessment-body{font-size:15px;color:var(--r-ink);line-height:1.88;font-weight:300;margin-bottom:28px;}
+.rpt-str-ten{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--r-rule);}
+.rpt-str-item{padding:22px 24px;background:#fff;}
+.rpt-str-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;}
+.rpt-str-label-s{color:var(--r-sage);}
+.rpt-str-label-t{color:var(--r-accent);}
+.rpt-str-text{font-size:14px;color:var(--r-ink);line-height:1.65;font-weight:300;}
 
-/* SECTION BODY — REDESIGNED */
-.sec-content{padding:0 56px 52px;}
-.sec-content-dark{padding:0 56px 52px;}
+/* CHALLENGE — dark section interior */
+.rpt-challenge-name{font-family:'Cormorant',serif;font-size:clamp(22px,3.5vw,38px);font-weight:600;font-style:italic;color:#fff;line-height:1.15;letter-spacing:-0.02em;margin-bottom:20px;}
+.rpt-challenge-body{font-size:15px;color:#7A7470;line-height:1.85;font-weight:300;margin-bottom:32px;}
+.rpt-insight{border:1px solid #252220;padding:28px 32px;}
+.rpt-insight-label{font-size:10px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:#5A4840;margin-bottom:12px;}
+.rpt-insight-text{font-family:'Cormorant',serif;font-size:clamp(18px,2.8vw,26px);font-weight:600;font-style:italic;color:#fff;line-height:1.3;letter-spacing:-0.01em;}
+.rpt-share-btn{margin-top:20px;padding:8px 20px;background:transparent;border:1px solid #2A2520;color:#7A7470;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.rpt-share-btn:hover{border-color:#5A4840;color:#C4B5AD;}
 
-/* STRENGTH / TENSION CARDS */
-.str-ten-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;}
-.str-card{padding:20px 22px;border-radius:4px;}
-.str-card-strength{background:#EFF7F3;border-left:3px solid #6A9E8A;}
-.str-card-tension{background:#FAF0F4;border-left:3px solid #B0728A;}
-.str-card-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;}
-.str-card-label-s{color:#5A8A78;}
-.str-card-label-t{color:#B0728A;}
-.str-card-text{font-size:14px;line-height:1.65;font-weight:300;color:#3A3530;}
+/* OPPORTUNITY — numbered stack */
+.rpt-opps{display:flex;flex-direction:column;gap:1px;background:var(--r-rule);}
+.rpt-opp{display:grid;grid-template-columns:48px 1fr;background:#fff;border:none;}
+.rpt-opp-num{padding:22px 0 22px 0;display:flex;align-items:flex-start;justify-content:center;padding-top:26px;}
+.rpt-opp-num-inner{font-family:'Cormorant',serif;font-size:20px;font-weight:600;color:var(--r-accent);}
+.rpt-opp-body{padding:22px 24px 22px 16px;border-left:1px solid var(--r-rule);}
+.rpt-opp-title{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:var(--r-ink);margin-bottom:6px;line-height:1.25;letter-spacing:-0.01em;}
+.rpt-opp-text{font-size:13px;color:var(--r-ink-muted);line-height:1.7;font-weight:300;}
 
-/* OPPORTUNITY CARDS — REDESIGNED */
-.opp-cards-new{display:flex;flex-direction:column;gap:0;}
-.opp-card-new{display:flex;gap:0;border:1px solid #EEEAE7;margin-bottom:8px;border-radius:4px;overflow:hidden;transition:border-color 0.15s;}
-.opp-card-new:hover{border-color:#E8C4D4;}
-.opp-card-rank{width:56px;flex-shrink:0;background:#1A1916;display:flex;align-items:center;justify-content:center;font-family:'Cormorant',serif;font-size:28px;font-weight:700;color:#B0728A;}
-.opp-card-body{padding:20px 24px;flex:1;}
-.opp-card-title-new{font-family:'Cormorant',serif;font-size:20px;font-weight:600;color:#1A1916;margin-bottom:6px;line-height:1.25;}
-.opp-card-text-new{font-size:14px;color:#57534E;line-height:1.7;font-weight:300;}
+/* ACTIONS — priority stack */
+.rpt-actions{display:flex;flex-direction:column;gap:1px;background:var(--r-rule);}
+.rpt-action{display:grid;grid-template-columns:140px 1fr;background:#fff;}
+.rpt-action.priority-1{background:var(--r-bg-dark);}
+.rpt-action-meta{padding:24px 20px;border-right:1px solid var(--r-rule);display:flex;flex-direction:column;gap:6px;}
+.rpt-action.priority-1 .rpt-action-meta{border-right-color:var(--r-rule-dark);}
+.rpt-action-badge{font-size:9px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;padding:4px 10px;border-radius:1px;display:inline-block;align-self:flex-start;}
+.rpt-action-badge-1{background:var(--r-accent);color:#fff;}
+.rpt-action-badge-2{background:#EFF7F3;color:var(--r-sage);}
+.rpt-action-badge-n{background:#F5F4F2;color:var(--r-ink-faint);}
+.rpt-action-num{font-family:'Cormorant',serif;font-size:36px;font-weight:600;color:#2A2420;line-height:1;}
+.rpt-action.priority-1 .rpt-action-num{color:#3A3330;}
+.rpt-action-time{font-size:11px;color:var(--r-ink-faint);}
+.rpt-action.priority-1 .rpt-action-time{color:#4A4540;}
+.rpt-action-body{padding:24px 28px;}
+.rpt-action-title{font-size:15px;font-weight:600;color:var(--r-ink);margin-bottom:6px;line-height:1.35;letter-spacing:-0.01em;}
+.rpt-action.priority-1 .rpt-action-title{color:#fff;}
+.rpt-action-desc{font-size:13px;color:var(--r-ink-muted);line-height:1.7;font-weight:300;margin-bottom:8px;}
+.rpt-action.priority-1 .rpt-action-desc{color:#7A7470;}
+.rpt-action-why{font-size:12px;color:var(--r-accent);font-style:italic;line-height:1.55;border-top:1px solid var(--r-rule);padding-top:8px;margin-top:8px;}
+.rpt-action.priority-1 .rpt-action-why{border-top-color:var(--r-rule-dark);color:#8A6878;}
+.rpt-deprio{padding:18px 24px;background:var(--r-bg);border-top:1px solid var(--r-rule);display:grid;grid-template-columns:140px 1fr;}
+.rpt-deprio-label{font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--r-ink-faint);padding-top:2px;}
+.rpt-deprio-text{font-size:13px;color:var(--r-ink-muted);line-height:1.6;font-weight:300;}
 
-/* ACTION CARDS — REDESIGNED */
-.action-cards-new{display:flex;flex-direction:column;gap:0;}
-.action-card-new{padding:20px 24px;border:1px solid #EEEAE7;margin-bottom:8px;border-radius:4px;display:flex;gap:16px;align-items:flex-start;transition:border-color 0.15s;}
-.action-card-new:hover{border-color:#E8C4D4;}
-.action-card-new.first-action{border-color:#B0728A;background:#FAF0F4;}
-.action-card-num-new{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;font-family:'Cormorant',serif;}
-.action-card-num-1{background:#B0728A;color:#fff;}
-.action-card-num-n{background:#F5E6EC;color:#B0728A;border:1.5px solid #E8C4D4;}
-.action-card-content-new{flex:1;}
-.action-priority-badge{font-size:9px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:4px;}
-.action-title-new{font-size:15px;font-weight:600;color:#1A1916;margin-bottom:4px;line-height:1.35;}
-.action-body-new{font-size:13px;color:#57534E;line-height:1.7;font-weight:300;margin-bottom:6px;}
-.action-why-new{font-size:12px;color:#B0728A;font-style:italic;line-height:1.55;border-top:1px solid #F0EDEB;padding-top:6px;margin-top:6px;}
-.deprio-box{margin-top:16px;padding:14px 18px;background:#FAFAF8;border:1px solid #EEEAE7;border-radius:4px;}
-.deprio-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:6px;}
-.deprio-text{font-size:13px;color:#78716C;font-weight:300;line-height:1.6;}
+/* 30-DAY PLAN — four column grid */
+.rpt-roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--r-rule);}
+.rpt-week{background:#fff;display:flex;flex-direction:column;}
+.rpt-week-header{padding:20px 20px 16px;border-bottom:1px solid var(--r-rule);}
+.rpt-week-num{font-family:'Cormorant',serif;font-size:11px;font-weight:500;color:var(--r-accent);letter-spacing:0.1em;margin-bottom:4px;}
+.rpt-week-name{font-family:'Cormorant',serif;font-size:22px;font-weight:600;color:var(--r-ink);line-height:1;margin-bottom:4px;letter-spacing:-0.01em;}
+.rpt-week-theme{font-size:11px;color:var(--r-ink-faint);font-weight:300;}
+.rpt-week-body{padding:16px 20px;flex:1;}
+.rpt-week-item{font-size:12px;color:var(--r-ink-muted);line-height:1.65;padding:6px 0;border-bottom:1px solid var(--r-rule);display:flex;gap:10px;align-items:flex-start;}
+.rpt-week-item:last-child{border-bottom:none;}
+.rpt-week-dot{width:4px;height:4px;border-radius:50%;background:var(--r-accent);flex-shrink:0;margin-top:6px;}
+/* Dark roadmap variant */
+.rpt-roadmap-dark .rpt-week{background:var(--r-bg-dark);}
+.rpt-roadmap-dark{background:var(--r-rule-dark);}
+.rpt-roadmap-dark .rpt-week-header{border-bottom-color:var(--r-rule-dark);}
+.rpt-roadmap-dark .rpt-week-num{color:#5A4840;}
+.rpt-roadmap-dark .rpt-week-name{color:#fff;}
+.rpt-roadmap-dark .rpt-week-theme{color:#3A3330;}
+.rpt-roadmap-dark .rpt-week-item{color:#5A5350;border-bottom-color:var(--r-rule-dark);}
+.rpt-roadmap-dark .rpt-week-dot{background:#3A3330;}
 
-/* 30-DAY PLAN — REDESIGNED */
-.roadmap-new{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.week-card-new{background:#fff;border:1px solid #EEEAE7;border-radius:6px;overflow:hidden;}
-.week-header-new{padding:16px 18px;background:#1A1916;border-bottom:2px solid #B0728A;}
-.week-num-new{font-family:'Cormorant',serif;font-size:40px;font-weight:700;color:#2A2420;line-height:1;margin-bottom:2px;}
-.week-label-new{font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#5A5350;margin-bottom:2px;}
-.week-theme-new{font-family:'Cormorant',serif;font-size:15px;font-weight:600;color:#C4A0B0;line-height:1.2;}
-.week-body-new{padding:16px 18px;}
-.week-item-new{font-size:12px;color:#57534E;line-height:1.65;padding:6px 0;border-bottom:1px solid #F0EDEB;display:flex;gap:8px;align-items:flex-start;}
-.week-item-new:last-child{border-bottom:none;}
-.week-item-dot{width:5px;height:5px;border-radius:50%;background:#B0728A;flex-shrink:0;margin-top:5px;}
+/* LOOKING AHEAD — editorial list */
+.rpt-ahead{display:flex;flex-direction:column;gap:0;}
+.rpt-ahead-item{display:grid;grid-template-columns:48px 1fr;gap:0;padding:24px 0;border-bottom:1px solid var(--r-rule);}
+.rpt-ahead-item:last-child{border-bottom:none;}
+.rpt-ahead-n{font-family:'Cormorant',serif;font-size:20px;font-weight:600;color:var(--r-accent);padding-top:2px;}
+.rpt-ahead-content{}
+.rpt-ahead-title{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:var(--r-ink);margin-bottom:4px;line-height:1.25;letter-spacing:-0.01em;}
+.rpt-ahead-body{font-size:13px;color:var(--r-ink-muted);line-height:1.7;font-weight:300;}
 
-/* LOOKING AHEAD — REDESIGNED */
-.ahead-cards{display:flex;flex-direction:column;gap:8px;}
-.ahead-card{padding:20px 22px;border:1px solid #EEEAE7;border-radius:4px;display:flex;gap:14px;align-items:flex-start;transition:border-color 0.15s;}
-.ahead-card:hover{border-color:#E8C4D4;}
-.ahead-arrow{width:28px;height:28px;border-radius:50%;background:rgba(176,114,138,0.1);border:1.5px solid rgba(176,114,138,0.25);color:#B0728A;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px;}
-.ahead-title{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:#1A1916;margin-bottom:4px;}
-.ahead-body{font-size:13px;color:#78716C;line-height:1.65;font-weight:300;}
+/* SUCCESS — milestone grid */
+.rpt-success{display:flex;flex-direction:column;gap:1px;background:var(--r-rule);}
+.rpt-success-item{padding:22px 26px;background:#fff;display:grid;grid-template-columns:24px 1fr;gap:16px;align-items:flex-start;}
+.rpt-success-check{width:24px;height:24px;border:1.5px solid var(--r-sage);border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.rpt-success-check-inner{width:8px;height:8px;background:var(--r-sage);border-radius:1px;}
+.rpt-success-text{font-size:14px;color:var(--r-ink);line-height:1.65;font-weight:300;}
 
-/* SUCCESS SECTION — REDESIGNED */
-.success-points{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
-.success-point{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:rgba(106,158,138,0.08);border-radius:4px;border-left:3px solid #6A9E8A;}
-.success-point-icon{font-size:16px;flex-shrink:0;}
-.success-point-text{font-size:14px;color:#2A4A40;font-weight:300;line-height:1.65;}
+/* YOUR NEXT MOVE — emotional climax */
+.rpt-nextmove{background:var(--r-bg-dark);padding:88px var(--r-col-pad);text-align:center;}
+.rpt-nextmove-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.42em;text-transform:uppercase;color:#3A3330;margin-bottom:20px;display:block;}
+.rpt-nextmove-label{font-size:13px;color:#4A4540;font-style:italic;margin-bottom:40px;display:block;}
+.rpt-nextmove-text{font-family:'Cormorant',serif;font-size:clamp(24px,4vw,44px);font-weight:500;font-style:italic;color:#fff;line-height:1.3;max-width:660px;margin:0 auto;letter-spacing:-0.02em;}
+.rpt-nextmove-meta{display:flex;gap:0;justify-content:center;margin-top:40px;border-top:1px solid var(--r-rule-dark);padding-top:32px;}
+.rpt-nextmove-meta-item{padding:0 32px;text-align:center;border-right:1px solid var(--r-rule-dark);}
+.rpt-nextmove-meta-item:first-child{padding-left:0;}
+.rpt-nextmove-meta-item:last-child{border-right:none;padding-right:0;}
+.rpt-nextmove-meta-label{font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#3A3330;margin-bottom:4px;}
+.rpt-nextmove-meta-value{font-size:13px;color:#6A6560;font-weight:300;}
 
-/* YOUR NEXT MOVE — REDESIGNED */
-.nextmove-redesign{background:#1A1916;padding:72px 56px;text-align:center;position:relative;}
-.nextmove-redesign-eye{font-size:11px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:#C4A0B0;margin-bottom:16px;display:block;}
-.nextmove-redesign-label{font-size:13px;color:#5A5350;margin-bottom:32px;display:block;font-style:italic;}
-.nextmove-redesign-text{font-family:'Cormorant',serif;font-size:clamp(22px,3.5vw,38px);font-weight:500;font-style:italic;color:#fff;line-height:1.35;max-width:680px;margin:0 auto 36px;letter-spacing:-0.01em;}
-.nextmove-divider{width:48px;height:1px;background:#3A3330;margin:0 auto 24px;}
-.nextmove-footer-text{font-size:12px;color:#4A4340;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;}
+/* CONCLUSION — natural end */
+.rpt-conclusion{padding:80px var(--r-col-pad);text-align:center;border-top:1px solid var(--r-rule);}
+.rpt-conclusion-rule{width:32px;height:1px;background:var(--r-accent);margin:0 auto 32px;}
+.rpt-conclusion-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:var(--r-accent);margin-bottom:14px;display:block;}
+.rpt-conclusion-h{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,44px);font-weight:600;color:var(--r-ink);line-height:1.1;margin-bottom:14px;letter-spacing:-0.02em;}
+.rpt-conclusion-sub{font-size:14px;color:var(--r-ink-muted);font-weight:300;line-height:1.75;max-width:400px;margin:0 auto 36px;}
+.rpt-conclusion-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 
-/* END OF STRATEGY — NATURAL CONCLUSION */
-.strategy-end{background:#fff;padding:72px 56px;text-align:center;border-top:1px solid #F0EDEB;}
-.strategy-end-rule{width:48px;height:2px;background:#B0728A;margin:0 auto 32px;}
-.strategy-end-eye{font-size:11px;font-weight:600;letter-spacing:0.32em;text-transform:uppercase;color:#B0728A;margin-bottom:16px;display:block;}
-.strategy-end-h{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,44px);font-weight:600;color:#1A1916;line-height:1.1;margin-bottom:16px;letter-spacing:-0.02em;}
-.strategy-end-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.75;max-width:440px;margin:0 auto 36px;}
-.strategy-end-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+/* EDIT CONTROLS */
+.rpt-edit-btn{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--r-ink-faint);background:none;border:1px solid var(--r-rule);padding:5px 12px;cursor:pointer;transition:all 0.15s;margin-top:20px;font-family:'Plus Jakarta Sans',sans-serif;}
+.rpt-edit-btn:hover{border-color:var(--r-accent);color:var(--r-accent);}
+.rpt-edit-ta{width:100%;min-height:120px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:300;color:var(--r-ink);line-height:1.75;border:1.5px solid var(--r-accent);background:#fff;resize:vertical;outline:none;margin-top:12px;}
+.rpt-edit-acts{display:flex;gap:7px;margin-top:8px;}
+.rpt-edit-save{padding:7px 18px;background:var(--r-ink);color:#fff;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+.rpt-edit-save:hover{background:var(--r-accent);}
+.rpt-edit-cancel{padding:7px 18px;background:transparent;color:var(--r-ink-faint);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--r-rule);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
 
-/* STRATEGY SAVED PAGE */
-.saved-page{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;max-width:640px;margin:0 auto;}
-.saved-check{width:64px;height:64px;border-radius:50%;background:#EFF7F3;border:2px solid #6A9E8A;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-size:24px;}
-.saved-eye{font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#6A9E8A;margin-bottom:16px;display:block;}
-.saved-h{font-family:'Cormorant',serif;font-size:clamp(28px,5vw,44px);font-weight:600;color:#1A1916;margin-bottom:14px;line-height:1.1;letter-spacing:-0.02em;}
-.saved-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.75;margin-bottom:12px;}
-.saved-note{font-size:13px;color:#A8A29E;line-height:1.65;margin-bottom:40px;font-style:italic;}
-.saved-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;}
+/* SAVED / FEEDBACK / SUCCESS PAGES */
+.rpt-page{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;max-width:560px;margin:0 auto;}
+.rpt-page-icon{width:56px;height:56px;border:1px solid var(--r-rule);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;font-family:'Cormorant',serif;font-size:24px;color:var(--r-accent);}
+.rpt-page-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.36em;text-transform:uppercase;color:var(--r-accent);margin-bottom:14px;display:block;}
+.rpt-page-h{font-family:'Cormorant',serif;font-size:clamp(26px,4vw,40px);font-weight:600;color:var(--r-ink);margin-bottom:12px;letter-spacing:-0.02em;line-height:1.1;}
+.rpt-page-sub{font-size:14px;color:var(--r-ink-muted);font-weight:300;line-height:1.75;margin-bottom:10px;}
+.rpt-page-note{font-size:12px;color:var(--r-ink-faint);line-height:1.65;margin-bottom:36px;}
+.rpt-page-btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:300px;}
+.rpt-page-btn-primary{width:100%;padding:15px 28px;background:var(--r-ink);color:#fff;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.2s;font-family:'Plus Jakarta Sans',sans-serif;}
+.rpt-page-btn-primary:hover{background:var(--r-accent);}
+.rpt-page-btn-secondary{width:100%;padding:13px 28px;background:transparent;color:var(--r-ink-muted);font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--r-rule);cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.rpt-page-btn-secondary:hover{border-color:var(--r-accent);color:var(--r-ink);}
+.rpt-next-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;max-width:320px;margin-top:8px;}
+.rpt-next-btn{padding:13px 16px;background:var(--r-bg);border:1px solid var(--r-rule);font-size:11px;font-weight:500;color:var(--r-ink-muted);cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:0.04em;}
+.rpt-next-btn:hover{border-color:var(--r-accent);color:var(--r-ink);background:#fff;}
 
 /* FEEDBACK PAGE */
-.feedback-page{max-width:680px;margin:0 auto;padding:56px 28px 80px;}
-.feedback-page-eye{font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#B0728A;margin-bottom:16px;display:block;}
-.feedback-page-h{font-family:'Cormorant',serif;font-size:clamp(28px,4vw,40px);font-weight:600;color:#1A1916;margin-bottom:10px;letter-spacing:-0.02em;line-height:1.1;}
-.feedback-page-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.7;margin-bottom:36px;}
-.feedback-divider{height:1px;background:#EEEAE7;margin:24px 0;}
+.rpt-fb-page{max-width:640px;margin:0 auto;padding:56px 28px 80px;}
+.rpt-fb-eyebrow{font-size:10px;font-weight:600;letter-spacing:0.32em;text-transform:uppercase;color:var(--r-accent);margin-bottom:14px;display:block;}
+.rpt-fb-h{font-family:'Cormorant',serif;font-size:clamp(26px,4vw,38px);font-weight:600;color:var(--r-ink);margin-bottom:10px;letter-spacing:-0.02em;line-height:1.1;}
+.rpt-fb-sub{font-size:14px;color:var(--r-ink-muted);font-weight:300;line-height:1.7;margin-bottom:36px;}
+.rpt-fb-divider{height:1px;background:var(--r-rule);margin:24px 0;}
+.rpt-skip{font-size:11px;color:var(--r-ink-faint);margin-top:12px;}
+.rpt-skip button{background:none;border:none;color:var(--r-accent);font-size:11px;cursor:pointer;text-decoration:underline;font-family:'Plus Jakarta Sans',sans-serif;}
 
-/* SUCCESS PAGE */
-.success-page{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px;text-align:center;max-width:600px;margin:0 auto;}
-.success-star{font-size:40px;margin-bottom:24px;}
-.success-eye{font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#B0728A;margin-bottom:16px;display:block;}
-.success-h{font-family:'Cormorant',serif;font-size:clamp(32px,5vw,52px);font-weight:600;color:#1A1916;margin-bottom:14px;line-height:1.05;letter-spacing:-0.02em;}
-.success-h em{font-style:italic;color:#B0728A;}
-.success-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.75;margin-bottom:36px;}
-.success-pdf-btn{display:inline-flex;align-items:center;gap:10px;padding:18px 48px;background:#1A1916;color:#fff;font-size:13px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:20px;width:100%;max-width:320px;justify-content:center;}
-.success-pdf-btn:hover{background:#B0728A;}
-.success-next-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:360px;}
-.success-next-btn{padding:12px 16px;background:#FAFAF8;border:1px solid #EEEAE7;border-radius:4px;font-size:11px;font-weight:500;color:#57534E;cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:0.06em;}
-.success-next-btn:hover{border-color:#B0728A;color:#1A1916;background:#fff;}
-
-/* RESPONSIVE ADJUSTMENTS */
+/* RESPONSIVE */
 @media(max-width:860px){
-  .exec-sum,.sec-chapter,.sec-content,.sec-content-dark,.nextmove-redesign,.strategy-end{padding-left:28px;padding-right:28px;}
-  .exec-sum-cards,.exec-sum-timeline{grid-template-columns:1fr;}
-  .roadmap-new{grid-template-columns:1fr 1fr;}
-  .str-ten-grid{grid-template-columns:1fr;}
+  :root{--r-col-pad:32px;--r-section-pad:56px 0;}
+  .rpt-action{grid-template-columns:110px 1fr;}
+  .rpt-deprio{grid-template-columns:110px 1fr;}
+  .rpt-roadmap{grid-template-columns:1fr 1fr;}
+  .rpt-exec{grid-template-columns:1fr;}
+  .rpt-exec-item.span2{grid-column:span 1;}
+  .rpt-exec-tl{grid-template-columns:1fr;}
+  .rpt-str-ten{grid-template-columns:1fr;}
+  .rpt-sec-header{grid-template-columns:36px 1fr;gap:0 16px;}
+  .rpt-nextmove-meta{flex-direction:column;gap:20px;align-items:center;}
+  .rpt-nextmove-meta-item{border-right:none;padding:0;}
 }
 @media(max-width:640px){
-  .exec-sum,.sec-chapter,.sec-content,.sec-content-dark,.nextmove-redesign,.strategy-end{padding-left:16px;padding-right:16px;}
-  .roadmap-new{grid-template-columns:1fr;}
-  .exec-sum-cards{grid-template-columns:1fr;}
-  .exec-sum-timeline{grid-template-columns:1fr;}
-  .success-next-grid{grid-template-columns:1fr;}
-  .strategy-end-btns{flex-direction:column;align-items:center;}
-  .strategy-end-btns .btn,.strategy-end-btns .btn-out{width:100%;max-width:320px;justify-content:center;}
+  :root{--r-col-pad:16px;--r-section-pad:44px 0;}
+  .rpt-cover{padding:48px 16px 40px;}
+  .rpt-action{grid-template-columns:1fr;}
+  .rpt-action-meta{border-right:none;border-bottom:1px solid var(--r-rule);flex-direction:row;align-items:center;gap:12px;}
+  .rpt-action.priority-1 .rpt-action-meta{border-bottom-color:var(--r-rule-dark);}
+  .rpt-action-num{display:none;}
+  .rpt-deprio{grid-template-columns:1fr;}
+  .rpt-roadmap{grid-template-columns:1fr;}
+  .rpt-nextmove{padding:56px 16px;}
+  .rpt-nextmove-text{font-size:clamp(20px,5.5vw,28px);}
+  .rpt-conclusion{padding:56px 16px;}
+  .rpt-conclusion-btns{flex-direction:column;align-items:center;}
+  .rpt-conclusion-btns .btn,.rpt-conclusion-btns .btn-out{width:100%;max-width:300px;justify-content:center;}
+  .rpt-next-grid{grid-template-columns:1fr;}
 }
+@media print{
+  @page{margin:0.5in 0.6in;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .nav,.rpt-cover-actions,.rpt-conclusion,.rpt-edit-btn{display:none!important;}
+  .rpt-cover{background:var(--r-bg-dark)!important;}
+  .rpt-sec-dark,.rpt-nextmove{background:var(--r-bg-dark)!important;}
+  .rpt-roadmap{grid-template-columns:repeat(4,1fr)!important;}
+}
+
 /* RESPONSIVE */
 @media(max-width:860px){
   .res-cover,.sec,.sec-dark,.res-footer,.fb-wrap{padding-left:28px;padding-right:28px;}
@@ -2119,326 +2214,403 @@ One sentence. The single most concrete action to take right now.`;
       const successText=(result.successLooks||"").replace(/\*\*/g,"");
       const planCat=CATEGORIES.find(c=>c.id===catId);
       const successSentences=successText.split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>10);
-
-      // Build executive summary data
       const execSummaryData={
-        position: mainExec?mainExec.split(".")[0]+".":"",
-        opportunity: opps[0]?opps[0].title||opps[0].body.split(".")[0]+"." :"",
-        challenge: blindTitle||cleanBlind.split(".")[0]+".",
-        firstAction: nextMove?nextMove.split(".")[0]+".":"",
-        goal: successSentences[0]||"",
+        position:mainExec?mainExec.split(".")[0]+".":"",
+        opportunity:opps[0]?opps[0].title||opps[0].body.split(".")[0]+".":"",
+        challenge:blindTitle||cleanBlind.split(".")[0]+".",
+        firstAction:nextMove?nextMove.split(".")[0]+".":"",
+        goal:successSentences[0]||"",
+      };
+      // Next move metadata extraction
+      const nmWords=nextMove.split(" ").length;
+      const nmDifficulty=nmWords<20?"Low":nmWords<40?"Medium":"High";
+
+      // Unified edit control — same everywhere
+      const EC=({sk,val})=>{
+        if(editSection===sk)return(
+          <div style={{marginTop:20}}>
+            <textarea className="rpt-edit-ta" value={editDraft} onChange={e=>setEditDraft(e.target.value)} autoFocus rows={6}/>
+            <div className="rpt-edit-acts">
+              <button className="rpt-edit-save" onClick={()=>saveEdit(sk)}>Save</button>
+              <button className="rpt-edit-cancel" onClick={cancelEdit}>Cancel</button>
+            </div>
+          </div>
+        );
+        return <button className="rpt-edit-btn" onClick={()=>startEdit(sk,val)}>✎ Edit</button>;
       };
 
-      const EC=({sk,lbl,val})=>{
-        const isEdit=editSection===sk;
-        if(isEdit)return(<div><textarea className="edit-ta" value={editDraft} onChange={e=>setEditDraft(e.target.value)} autoFocus/><div className="edit-acts"><button className="edit-save" onClick={()=>saveEdit(sk)}>Save</button><button className="edit-cancel" onClick={cancelEdit}>Cancel</button></div></div>);
-        return <button className="edit-btn" onClick={()=>startEdit(sk,val)}>✎ Edit</button>;
-      };
-
-      // ── STRATEGY SAVED PAGE ─────────────────────────────────────────────
+      // ── SAVED PAGE ──────────────────────────────────────────────────────
       if(strategyStage==="saved") return(
-        <div className="saved-page">
-          <div className="saved-check">✓</div>
-          <span className="saved-eye">Strategy Saved</span>
-          <h1 className="saved-h">Your Strategy Has Been Saved.</h1>
-          <p className="saved-sub">Your personalized strategy has been securely saved to My Strategies. You can return anytime to review, update, or continue building on it.</p>
-          <p className="saved-note">As a beta user, your feedback directly shapes how this platform evolves. It takes 2–3 minutes and makes a real difference.</p>
-          <div className="saved-btns">
-            <button className="btn" style={{width:"100%",justifyContent:"center",padding:"16px 28px"}} onClick={()=>setStrategyStage("feedback")}>Continue to Beta Feedback →</button>
-            <button className="btn-out" style={{width:"100%",justifyContent:"center"}} onClick={()=>go("plans")}>Skip to My Strategies</button>
+        <div className="rpt-page">
+          <div className="rpt-page-icon">✓</div>
+          <span className="rpt-page-eyebrow">Strategy Saved</span>
+          <h1 className="rpt-page-h">Your strategy has been saved.</h1>
+          <p className="rpt-page-sub">It lives in My Strategies — available to revisit, review, and build on anytime.</p>
+          <p className="rpt-page-note">As a beta user, your feedback shapes what this product becomes. It takes 2 minutes.</p>
+          <div className="rpt-page-btns">
+            <button className="rpt-page-btn-primary" onClick={()=>setStrategyStage("feedback")}>Continue to Beta Feedback</button>
+            <button className="rpt-page-btn-secondary" onClick={()=>go("plans")}>Go to My Strategies</button>
           </div>
         </div>
       );
 
-      // ── FEEDBACK PAGE ───────────────────────────────────────────────────
+      // ── FEEDBACK PAGE ────────────────────────────────────────────────────
       if(strategyStage==="feedback") return(
-        <div className="feedback-page">
-          <div className="bc"><span onClick={()=>setStrategyStage("saved")}>← Back</span></div>
-          <span className="feedback-page-eye">Beta Feedback</span>
-          <h1 className="feedback-page-h">Help Us Improve.</h1>
-          <p className="feedback-page-sub">You're one of our first users. Your honest feedback shapes every future strategy session on this platform. This takes 2–3 minutes.</p>
-          <div className="feedback-divider"/>
-          <div className="fb-q"><p className="fb-q-lbl">How useful was this strategy overall? (1 = not useful, 10 = extremely useful)</p><div className="fb-nums">{[1,2,3,4,5,6,7,8,9,10].map(n=><button key={n} className={`fb-num${fbRating===n?" on":""}`} onClick={()=>setFbRating(n)}>{n}</button>)}</div></div>
+        <div className="rpt-fb-page">
+          <span className="rpt-fb-eyebrow">Beta Feedback</span>
+          <h1 className="rpt-fb-h">Help us improve.</h1>
+          <p className="rpt-fb-sub">You are one of our first users. Your honest input shapes every future strategy on this platform.</p>
+          <div className="rpt-fb-divider"/>
+          <div className="fb-q"><p className="fb-q-lbl">How useful was this strategy overall?</p><div className="fb-nums">{[1,2,3,4,5,6,7,8,9,10].map(n=><button key={n} className={`fb-num${fbRating===n?" on":""}`} onClick={()=>setFbRating(n)}>{n}</button>)}</div></div>
           {[
-            {k:"experience",q:"How was your overall experience using the platform?",o:["Excellent","Good","Average","Needs improvement"]},
-            {k:"valuable",q:"Which feature was most valuable to you?",o:["Create My Strategy","Ask Your Advisor","Industry Hub","All three equally"]},
-            {k:"confusing",q:"Was anything confusing or unclear?",o:["Nothing — it was clear","The flow was unclear","Some features were unclear","The output was unclear"]},
-            {k:"personalized",q:"Did this strategy feel personalized to your specific situation?",o:["Yes — very much so","Somewhat","Not really — felt generic"]},
-            {k:"wouldPay",q:"Would you pay $19/month for ongoing access to this platform?",o:["Yes — absolutely","Probably yes","Not sure","Probably not"]},
-            {k:"wouldRecommend",q:"Would you recommend this to someone you know?",o:["Yes — immediately","Maybe after using it more","Not yet"]},
+            {k:"personalized",q:"Did this feel personalized to your situation?",o:["Yes — very much so","Somewhat","Not really"]},
+            {k:"valuable",q:"What was most valuable?",o:["Create My Strategy","Ask Your Advisor","Industry Hub","All three equally"]},
+            {k:"confusing",q:"Was anything confusing?",o:["Nothing — all clear","The flow was unclear","Features were unclear","The output was unclear"]},
+            {k:"wouldPay",q:"Would you pay $19/month for this?",o:["Yes — absolutely","Probably","Not sure","Probably not"]},
+            {k:"wouldRecommend",q:"Would you recommend this?",o:["Yes — immediately","Maybe","Not yet"]},
           ].map(item=>(
             <div className="fb-q" key={item.k}><p className="fb-q-lbl">{item.q}</p><div className="fb-pills">{item.o.map(o=><button key={o} className={`fb-pill${fbAns[item.k]===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,[item.k]:o}))}>{o}</button>)}</div></div>
           ))}
-          <div className="fb-q"><p className="fb-q-lbl">What would make this better? (optional)</p><textarea className="fb-ta" placeholder="Be honest — we want real feedback." value={fbAns.suggestions||""} onChange={e=>setFbAns(p=>({...p,suggestions:e.target.value}))}/></div>
-          <div className="fb-q"><p className="fb-q-lbl">What is one action you plan to take this week based on your strategy?</p><textarea className="fb-ta" placeholder="e.g. I am going to reach out to 3 potential clients by Friday." value={fbAns.action||""} onChange={e=>setFbAns(p=>({...p,action:e.target.value}))}/></div>
-          <div className="fb-q"><p className="fb-q-lbl">May we use your feedback as a testimonial? (optional)</p><div className="fb-pills">{["Yes, with my name","Yes, anonymously","No, keep it private"].map(o=><button key={o} className={`fb-pill${fbAns.testimonial===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,testimonial:o}))}>{o}</button>)}</div></div>
-          <div className="feedback-divider"/>
-          <button className="btn" style={{padding:"14px 36px",fontSize:12}} onClick={()=>{
-            setFbDone(true);setPdfUnlocked(true);
-            try{window.storage.set(`feedback:${Date.now()}`,JSON.stringify({rating:fbRating,industry:effectiveIndustry,stage:journeyStage,...fbAns}));}catch(e){}
-            setStrategyStage("complete");
-          }}>Submit Feedback →</button>
-          <p style={{fontSize:12,color:"#A8A29E",marginTop:12}}>You can also <button style={{background:"none",border:"none",color:"#B0728A",fontSize:12,cursor:"pointer",textDecoration:"underline",fontFamily:"'Plus Jakarta Sans',sans-serif"}} onClick={()=>setStrategyStage("complete")}>skip to PDF download</button></p>
+          <div className="fb-q"><p className="fb-q-lbl">What would make this better?</p><textarea className="fb-ta" placeholder="Be direct." value={fbAns.suggestions||""} onChange={e=>setFbAns(p=>({...p,suggestions:e.target.value}))}/></div>
+          <div className="fb-q"><p className="fb-q-lbl">One action you are taking this week</p><textarea className="fb-ta" placeholder="Be specific." value={fbAns.action||""} onChange={e=>setFbAns(p=>({...p,action:e.target.value}))}/></div>
+          <div className="fb-q"><p className="fb-q-lbl">May we use this as a testimonial?</p><div className="fb-pills">{["Yes, with my name","Yes, anonymously","No"].map(o=><button key={o} className={`fb-pill${fbAns.testimonial===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,testimonial:o}))}>{o}</button>)}</div></div>
+          <div className="rpt-fb-divider"/>
+          <button className="btn" style={{padding:"14px 36px"}} onClick={()=>{setFbDone(true);setPdfUnlocked(true);try{window.storage.set(`feedback:${Date.now()}`,JSON.stringify({rating:fbRating,...fbAns}));}catch(e){}setStrategyStage("complete");}}>Submit Feedback</button>
+          <p className="rpt-skip">Prefer to skip? <button onClick={()=>{setPdfUnlocked(true);setStrategyStage("complete");}}>Go to PDF download</button></p>
         </div>
       );
 
-      // ── COMPLETE / SUCCESS PAGE ─────────────────────────────────────────
+      // ── COMPLETE PAGE ─────────────────────────────────────────────────────
       if(strategyStage==="complete") return(
-        <div className="success-page">
-          <div className="success-star">✦</div>
-          <span className="success-eye">Thank You{firstName?`, ${firstName}`:""}</span>
-          <h1 className="success-h">Your PDF Is <em>Ready.</em></h1>
-          <p className="success-sub">{fbDone?"Your feedback has been submitted and your strategy PDF is ready to download.":"Your strategy is complete and ready to download."} Everything you need to get started is inside.</p>
-          <button className="success-pdf-btn" onClick={()=>window.print()}>⬇ Download My Strategy PDF</button>
-          <p style={{fontSize:12,color:"#A8A29E",marginBottom:16}}>What would you like to do next?</p>
-          <div className="success-next-grid">
-            <button className="success-next-btn" onClick={restart}>New Strategy</button>
-            <button className="success-next-btn" onClick={()=>go("plans")}>My Strategies</button>
-            <button className="success-next-btn" onClick={()=>go("advisor")}>Ask Your Advisor</button>
-            <button className="success-next-btn" onClick={()=>go("hub")}>Industry Hub</button>
+        <div className="rpt-page">
+          <div className="rpt-page-icon" style={{fontFamily:"'Cormorant',serif",fontSize:28,color:"#B0728A",borderColor:"#E8C4D4"}}>✦</div>
+          <span className="rpt-page-eyebrow">Your PDF is ready</span>
+          <h1 className="rpt-page-h">{firstName?`Thank you, ${firstName}.`:"Thank you."}</h1>
+          <p className="rpt-page-sub">Your strategy is complete. Your PDF is ready to download.</p>
+          <p className="rpt-page-note">{fbDone?"Your feedback has been received and will shape every future session.":"Your strategy has been saved to My Strategies."}</p>
+          <div className="rpt-page-btns">
+            <button className="rpt-page-btn-primary" onClick={()=>window.print()}>Download PDF</button>
+            <button className="rpt-page-btn-secondary" onClick={()=>setStrategyStage("reading")}>Review Strategy</button>
+          </div>
+          <div className="rpt-next-grid" style={{marginTop:16}}>
+            <button className="rpt-next-btn" onClick={restart}>New Strategy</button>
+            <button className="rpt-next-btn" onClick={()=>go("plans")}>My Strategies</button>
+            <button className="rpt-next-btn" onClick={()=>go("advisor")}>Ask Your Advisor</button>
+            <button className="rpt-next-btn" onClick={()=>go("hub")}>Industry Hub</button>
           </div>
         </div>
       );
 
-      // ── MAIN STRATEGY READING EXPERIENCE ───────────────────────────────
+      // ── MAIN STRATEGY DOCUMENT ────────────────────────────────────────────
       return(
-        <div className="res">
+        <div className="rpt">
 
-          {/* COVER */}
-          <div className="res-cover">
-            <span className="res-eye">Your Next Move · Strategy Report</span>
-            <h1 className="res-h1">{firstName?`${firstName}'s `:""}<em>{planCat?.label}</em><br/>Strategy</h1>
-            <p className="res-meta">Built for your {effectiveIndustry||industry} work at the {stageLabel} stage · {today}</p>
-            <div className="res-tags">
-              <span className="res-tag">{effectiveIndustry||industry}</span>
-              <span className="res-tag">{stageLabel}</span>
-              {viewingPlanId&&<span className="res-tag res-tag-saved">✓ Saved</span>}
+          {/* ─── COVER ─────────────────────────────────────────────────── */}
+          <div className="rpt-cover">
+            <span className="rpt-cover-eyebrow">Your Next Move · Strategy Report</span>
+            <h1 className="rpt-cover-title">
+              {firstName?`${firstName}'s `:""}<em>{planCat?.label}</em><br/>Strategy
+            </h1>
+            <p className="rpt-cover-meta">
+              {effectiveIndustry||industry} · {stageLabel} · {today}
+            </p>
+            <div className="rpt-cover-tags">
+              <span className="rpt-cover-tag">{effectiveIndustry||industry}</span>
+              <span className="rpt-cover-tag">{stageLabel}</span>
+              {viewingPlanId&&<span className="rpt-cover-tag">Saved</span>}
+            </div>
+            <div className="rpt-cover-actions">
+              <button className="rpt-cover-btn" onClick={()=>window.print()}>Export PDF</button>
+              <button className="rpt-cover-btn" onClick={()=>go("plans")}>My Strategies</button>
             </div>
           </div>
 
-          {/* EXECUTIVE SUMMARY */}
-          <div className="exec-sum">
-            <span className="exec-sum-eye">Executive Summary</span>
-            <h2 className="exec-sum-h">Your strategy at a glance.</h2>
-            <p className="exec-sum-sub">Read this first for a 60-second overview. Then explore each section in detail below.</p>
-            <div className="exec-sum-cards">
-              {execSummaryData.position&&<div className="exec-sum-card"><div className="exec-sum-card-label">Current Position</div><div className="exec-sum-card-text">{execSummaryData.position}</div></div>}
-              {execSummaryData.opportunity&&<div className="exec-sum-card pink"><div className="exec-sum-card-label">Biggest Opportunity</div><div className="exec-sum-card-text">{execSummaryData.opportunity}</div></div>}
-              {execSummaryData.challenge&&<div className="exec-sum-card"><div className="exec-sum-card-label">Primary Challenge</div><div className="exec-sum-card-text">{execSummaryData.challenge}</div></div>}
-              {execSummaryData.firstAction&&<div className="exec-sum-card dark"><div className="exec-sum-card-label">Recommended First Action</div><div className="exec-sum-card-text">{execSummaryData.firstAction}</div></div>}
-              {execSummaryData.goal&&<div className="exec-sum-card"><div className="exec-sum-card-label">Primary Goal</div><div className="exec-sum-card-text">{execSummaryData.goal}</div></div>}
-            </div>
-            <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>30-Day Timeline</p>
-            <div className="exec-sum-timeline">
-              <div className="exec-sum-tl"><div className="exec-sum-tl-period">Days 1–10</div><div className="exec-sum-tl-text">Foundation — establish your core systems and take your first actions</div></div>
-              <div className="exec-sum-tl"><div className="exec-sum-tl-period">Days 11–21</div><div className="exec-sum-tl-text">Momentum — activate your strategy and begin measuring progress</div></div>
-              <div className="exec-sum-tl"><div className="exec-sum-tl-period">Days 22–30</div><div className="exec-sum-tl-text">Scale & Review — evaluate results and set your 60-day targets</div></div>
+          {/* ─── EXECUTIVE SUMMARY ──────────────────────────────────────── */}
+          <div className="rpt-sec rpt-sec-alt">
+            <div className="rpt-sec-inner">
+              <div className="rpt-sec-header">
+                <span className="rpt-sec-num">00</span>
+                <div className="rpt-sec-heading">
+                  <h2 className="rpt-sec-title">Executive Summary</h2>
+                  <p className="rpt-sec-desc">Your complete strategy in under sixty seconds.</p>
+                </div>
+              </div>
+              <div className="rpt-exec">
+                {execSummaryData.position&&(
+                  <div className="rpt-exec-item">
+                    <div className="rpt-exec-label">Current Position</div>
+                    <div className="rpt-exec-value">{execSummaryData.position}</div>
+                  </div>
+                )}
+                {execSummaryData.challenge&&(
+                  <div className="rpt-exec-item dark">
+                    <div className="rpt-exec-label">Primary Challenge</div>
+                    <div className="rpt-exec-value">{execSummaryData.challenge}</div>
+                  </div>
+                )}
+                {execSummaryData.opportunity&&(
+                  <div className="rpt-exec-item accent">
+                    <div className="rpt-exec-label">Greatest Opportunity</div>
+                    <div className="rpt-exec-value">{execSummaryData.opportunity}</div>
+                  </div>
+                )}
+                {execSummaryData.goal&&(
+                  <div className="rpt-exec-item">
+                    <div className="rpt-exec-label">Primary Goal</div>
+                    <div className="rpt-exec-value">{execSummaryData.goal}</div>
+                  </div>
+                )}
+                {execSummaryData.firstAction&&(
+                  <div className="rpt-exec-item dark span2">
+                    <div className="rpt-exec-label">Today's Next Move</div>
+                    <div className="rpt-exec-value">{execSummaryData.firstAction}</div>
+                  </div>
+                )}
+              </div>
+              <div className="rpt-exec-tl">
+                <div className="rpt-exec-tl-item"><div className="rpt-exec-tl-period">Days 1–10</div><div className="rpt-exec-tl-text">Foundation — establish systems and take first actions</div></div>
+                <div className="rpt-exec-tl-item"><div className="rpt-exec-tl-period">Days 11–21</div><div className="rpt-exec-tl-text">Momentum — activate strategy and measure progress</div></div>
+                <div className="rpt-exec-tl-item"><div className="rpt-exec-tl-period">Days 22–30</div><div className="rpt-exec-tl-text">Scale — review results and set 60-day targets</div></div>
+              </div>
             </div>
           </div>
 
-          {/* 01 — STRATEGIC ASSESSMENT */}
-          <div style={{background:"#FAFAF8",borderBottom:"1px solid #EEEAE7"}}>
-            <div className="sec-chapter">
-              <div className="sec-chapter-num">01</div>
-              <h2 className="sec-chapter-title">Strategic Assessment</h2>
-              <p className="sec-chapter-sub">Where you are today and what we noticed from your answers.</p>
-              <div className="sec-chapter-divider"/>
-            </div>
-            <div className="sec-content">
-              {mainExec&&<p style={{fontSize:15,color:"#3A3530",lineHeight:1.85,fontWeight:300,marginBottom:20}}>{mainExec}</p>}
+          {/* ─── 01 STRATEGIC ASSESSMENT ────────────────────────────────── */}
+          <div className="rpt-sec">
+            <div className="rpt-sec-inner">
+              <div className="rpt-sec-header">
+                <span className="rpt-sec-num">01</span>
+                <div className="rpt-sec-heading">
+                  <h2 className="rpt-sec-title">Strategic Assessment</h2>
+                  <p className="rpt-sec-desc">Where you are today and what we discovered from your answers.</p>
+                </div>
+              </div>
+              {mainExec&&<p className="rpt-assessment-body">{mainExec}</p>}
               {(strength||tension)&&(
-                <div className="str-ten-grid">
-                  {strength&&<div className="str-card str-card-strength"><div className="str-card-label str-card-label-s">✓ Strengths</div><div className="str-card-text">{clean(strength)}</div></div>}
-                  {tension&&<div className="str-card str-card-tension"><div className="str-card-label str-card-label-t">↗ What Needs Attention</div><div className="str-card-text">{clean(tension)}</div></div>}
+                <div className="rpt-str-ten">
+                  {strength&&(
+                    <div className="rpt-str-item">
+                      <div className="rpt-str-label rpt-str-label-s">Strengths</div>
+                      <div className="rpt-str-text">{clean(strength)}</div>
+                    </div>
+                  )}
+                  {tension&&(
+                    <div className="rpt-str-item">
+                      <div className="rpt-str-label rpt-str-label-t">What Needs Attention</div>
+                      <div className="rpt-str-text">{clean(tension)}</div>
+                    </div>
+                  )}
                 </div>
               )}
-              <EC sk="strategicAssessment" lbl="Strategic Assessment" val={result.strategicAssessment||result.execSummary||""}/>
+              <EC sk="strategicAssessment" val={result.strategicAssessment||result.execSummary||""}/>
             </div>
           </div>
 
-          {/* 02 — PRIMARY CHALLENGE */}
-          <div style={{background:"#1A1916",borderBottom:"1px solid #2A2420"}}>
-            <div className="sec-chapter" style={{background:"#1A1916"}}>
-              <div className="sec-chapter-num" style={{color:"#2A2420"}}>02</div>
-              <h2 className="sec-chapter-title sec-chapter-title-dark">Primary Challenge</h2>
-              <p className="sec-chapter-sub sec-chapter-sub-dark">The main issue making progress harder right now.</p>
-              <div className="sec-chapter-divider"/>
-            </div>
-            <div className="sec-content-dark">
-              {blindTitle&&<p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3.5vw,34px)",fontWeight:600,fontStyle:"italic",color:"#fff",lineHeight:1.2,marginBottom:20,letterSpacing:"-0.01em"}}>"{blindTitle}"</p>}
-              <p style={{fontSize:15,color:"#8A7E78",lineHeight:1.82,fontWeight:300,marginBottom:24}}>{blindTitle?cleanBlind:cleanBlind}</p>
+          {/* ─── 02 PRIMARY CHALLENGE ───────────────────────────────────── */}
+          <div className="rpt-sec rpt-sec-dark">
+            <div className="rpt-sec-inner">
+              <div className="rpt-sec-header">
+                <span className="rpt-sec-num">02</span>
+                <div className="rpt-sec-heading">
+                  <h2 className="rpt-sec-title">Primary Challenge</h2>
+                  <p className="rpt-sec-desc">The core constraint holding you back right now.</p>
+                </div>
+              </div>
+              {blindTitle&&<p className="rpt-challenge-name">"{blindTitle}"</p>}
+              {cleanBlind&&<p className="rpt-challenge-body">{blindTitle?cleanBlind:cleanBlind}</p>}
               {insightText&&(
-                <div style={{marginTop:8,padding:"24px 28px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:4}}>
-                  <div style={{fontSize:11,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:12}}>The Insight</div>
-                  <p style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(18px,3vw,26px)",fontWeight:600,fontStyle:"italic",color:"#fff",lineHeight:1.3}}>"{insightText}"</p>
-                  <button id="copy-btn" style={{marginTop:16,background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:100,padding:"7px 20px",color:"#C4A0B0",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.1em",textTransform:"uppercase",transition:"all 0.15s"}} onClick={()=>{const txt=`"${insightText}" — My strategy from Your Next Move`;if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById("copy-btn");if(b){b.textContent="✓ Copied";setTimeout(()=>{b.textContent="Share this insight →";},2200);}});}}}>Share this insight →</button>
+                <div className="rpt-insight">
+                  <div className="rpt-insight-label">The Insight</div>
+                  <p className="rpt-insight-text">"{insightText}"</p>
+                  <button id="rpt-share-btn" className="rpt-share-btn" onClick={()=>{
+                    const txt=`"${insightText}" — from my strategy with Your Next Move`;
+                    if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{const b=document.getElementById("rpt-share-btn");if(b){b.textContent="Copied";setTimeout(()=>{b.textContent="Copy insight";},2000);}});}
+                  }}>Copy insight</button>
                 </div>
               )}
-              <EC sk="primaryConstraint" lbl="Primary Challenge" val={result.primaryConstraint||result.blindSpot||""}/>
+              <EC sk="primaryConstraint" val={result.primaryConstraint||result.blindSpot||""}/>
             </div>
           </div>
 
-          {/* 03 — BEST OPPORTUNITY */}
-          <div style={{background:"#fff",borderBottom:"1px solid #EEEAE7"}}>
-            <div className="sec-chapter">
-              <div className="sec-chapter-num">03</div>
-              <h2 className="sec-chapter-title">Best Opportunity</h2>
-              <p className="sec-chapter-sub">The areas most likely to create meaningful progress right now.</p>
-              <div className="sec-chapter-divider"/>
-            </div>
-            <div className="sec-content">
-              <div className="opp-cards-new">
+          {/* ─── 03 BEST OPPORTUNITY ────────────────────────────────────── */}
+          <div className="rpt-sec">
+            <div className="rpt-sec-inner">
+              <div className="rpt-sec-header">
+                <span className="rpt-sec-num">03</span>
+                <div className="rpt-sec-heading">
+                  <h2 className="rpt-sec-title">Best Opportunity</h2>
+                  <p className="rpt-sec-desc">The areas most likely to move the needle right now.</p>
+                </div>
+              </div>
+              <div className="rpt-opps">
                 {opps.map((o,i)=>(
-                  <div className="opp-card-new" key={i}>
-                    <div className="opp-card-rank">{i+1}</div>
-                    <div className="opp-card-body">
-                      {o.title&&<div className="opp-card-title-new">{o.title}</div>}
-                      <div className="opp-card-text-new">{o.body}</div>
+                  <div className="rpt-opp" key={i}>
+                    <div className="rpt-opp-num"><span className="rpt-opp-num-inner">0{i+1}</span></div>
+                    <div className="rpt-opp-body">
+                      {o.title&&<div className="rpt-opp-title">{o.title}</div>}
+                      <div className="rpt-opp-text">{o.body}</div>
                     </div>
                   </div>
                 ))}
               </div>
-              <EC sk="strategicOpportunity" lbl="Best Opportunity" val={result.strategicOpportunity||result.keyOpportunities||""}/>
+              <EC sk="strategicOpportunity" val={result.strategicOpportunity||result.keyOpportunities||""}/>
             </div>
           </div>
 
-          {/* 04 — RECOMMENDED ACTIONS */}
-          <div style={{background:"#FAFAF8",borderBottom:"1px solid #EEEAE7"}}>
-            <div className="sec-chapter">
-              <div className="sec-chapter-num">04</div>
-              <h2 className="sec-chapter-title">Recommended Actions</h2>
-              <p className="sec-chapter-sub">Where to direct your energy, in priority order.</p>
-              <div className="sec-chapter-divider"/>
-            </div>
-            <div className="sec-content">
-              <div className="action-cards-new">
+          {/* ─── 04 RECOMMENDED ACTIONS ─────────────────────────────────── */}
+          <div className="rpt-sec rpt-sec-alt">
+            <div className="rpt-sec-inner">
+              <div className="rpt-sec-header">
+                <span className="rpt-sec-num">04</span>
+                <div className="rpt-sec-heading">
+                  <h2 className="rpt-sec-title">Recommended Actions</h2>
+                  <p className="rpt-sec-desc">Where to direct your energy, in priority order.</p>
+                </div>
+              </div>
+              <div className="rpt-actions">
                 {actions.map((a,i)=>{
-                  const badge=i===0?"Start Here":i<=1?"This Week":i<=3?"This Month":"When Ready";
-                  const badgeColor=i===0?"#B0728A":i<=1?"#6A9E8A":i<=3?"#78716C":"#A8A29E";
+                  const badges=["Start Here","This Week","This Week","This Month","This Month"];
+                  const badgeCls=["rpt-action-badge-1","rpt-action-badge-2","rpt-action-badge-2","rpt-action-badge-n","rpt-action-badge-n"];
+                  const times=["Today","2–3 days","3–5 days","1–2 weeks","1–2 weeks"];
                   return(
-                    <div className={`action-card-new${i===0?" first-action":""}`} key={i}>
-                      <div className={`action-card-num-new action-card-num-${i===0?"1":"n"}`}>{i+1}</div>
-                      <div className="action-card-content-new">
-                        <div className="action-priority-badge" style={{color:badgeColor}}>{badge}</div>
-                        <div className="action-title-new">{a.title||clean(a.body)}</div>
-                        {a.title&&<div className="action-body-new">{a.body}</div>}
-                        {a.why&&<div className="action-why-new">{a.why}</div>}
+                    <div className={`rpt-action${i===0?" priority-1":""}`} key={i}>
+                      <div className="rpt-action-meta">
+                        <span className={`rpt-action-badge ${badgeCls[i]||"rpt-action-badge-n"}`}>{badges[i]||"Later"}</span>
+                        <div className="rpt-action-num">{String(i+1).padStart(2,"0")}</div>
+                        <div className="rpt-action-time">{times[i]||"Ongoing"}</div>
+                      </div>
+                      <div className="rpt-action-body">
+                        <div className="rpt-action-title">{a.title||clean(a.body)}</div>
+                        {a.title&&a.body&&<div className="rpt-action-desc">{a.body}</div>}
+                        {a.why&&<div className="rpt-action-why">{a.why}</div>}
                       </div>
                     </div>
                   );
                 })}
+                {deprioritize&&(
+                  <div className="rpt-deprio">
+                    <div className="rpt-deprio-label">Set Aside</div>
+                    <div className="rpt-deprio-text">{deprioritize}</div>
+                  </div>
+                )}
               </div>
-              {deprioritize&&(
-                <div className="deprio-box">
-                  <div className="deprio-label">Set Aside for Now</div>
-                  <div className="deprio-text">{deprioritize}</div>
-                </div>
-              )}
-              <EC sk="recommendedActions" lbl="Recommended Actions" val={result.recommendedActions||result.actionPlan||""}/>
+              <EC sk="recommendedActions" val={result.recommendedActions||result.actionPlan||""}/>
             </div>
           </div>
 
-          {/* 05 — 30-DAY PLAN */}
-          <div style={{background:"#1A1916",borderBottom:"1px solid #2A2420"}}>
-            <div className="sec-chapter" style={{background:"#1A1916"}}>
-              <div className="sec-chapter-num" style={{color:"#2A2420"}}>05</div>
-              <h2 className="sec-chapter-title sec-chapter-title-dark">30-Day Priority Plan</h2>
-              <p className="sec-chapter-sub sec-chapter-sub-dark">Your week-by-week action roadmap for the next 30 days.</p>
-              <div className="sec-chapter-divider"/>
-            </div>
-            <div className="sec-content-dark">
-              <div className="roadmap-new">
+          {/* ─── 05 30-DAY PLAN ─────────────────────────────────────────── */}
+          <div className="rpt-sec rpt-sec-dark">
+            <div className="rpt-sec-inner">
+              <div className="rpt-sec-header">
+                <span className="rpt-sec-num">05</span>
+                <div className="rpt-sec-heading">
+                  <h2 className="rpt-sec-title">30-Day Plan</h2>
+                  <p className="rpt-sec-desc">Your week-by-week action roadmap.</p>
+                </div>
+              </div>
+              <div className="rpt-roadmap rpt-roadmap-dark">
                 {weeks.map((items,i)=>(
-                  <div className="week-card-new" key={i}>
-                    <div className="week-header-new">
-                      <div className="week-num-new">{i+1}</div>
-                      <div className="week-label-new">Week {i+1}</div>
-                      <div className="week-theme-new">{WEEK_THEMES[i]}</div>
+                  <div className="rpt-week" key={i}>
+                    <div className="rpt-week-header">
+                      <div className="rpt-week-num">Week {i+1}</div>
+                      <div className="rpt-week-name">{WEEK_THEMES[i]}</div>
+                      <div className="rpt-week-theme">{["Establish your foundation","Build momentum","Execute and activate","Review and scale"][i]}</div>
                     </div>
-                    <div className="week-body-new">
+                    <div className="rpt-week-body">
                       {items.length?items.map((item,j)=>(
-                        <div className="week-item-new" key={j}>
-                          <span className="week-item-dot"/>
-                          {item}
+                        <div className="rpt-week-item" key={j}>
+                          <span className="rpt-week-dot"/>
+                          <span>{item}</span>
                         </div>
-                      )):<div className="week-item-new"><span className="week-item-dot"/>—</div>}
+                      )):<div className="rpt-week-item"><span className="rpt-week-dot"/><span>—</span></div>}
                     </div>
                   </div>
                 ))}
               </div>
-              <EC sk="priorityPlan" lbl="30-Day Plan" val={result.priorityPlan||result.roadmap||""}/>
+              <EC sk="priorityPlan" val={result.priorityPlan||result.roadmap||""}/>
             </div>
           </div>
 
-          {/* 06 — LOOKING AHEAD */}
-          <div style={{background:"#fff",borderBottom:"1px solid #EEEAE7"}}>
-            <div className="sec-chapter">
-              <div className="sec-chapter-num">06</div>
-              <h2 className="sec-chapter-title">Looking Ahead</h2>
-              <p className="sec-chapter-sub">Beyond 30 days — what to build toward next.</p>
-              <div className="sec-chapter-divider"/>
-            </div>
-            <div className="sec-content">
-              <div className="ahead-cards">
-                {looking.map((m,i)=>(
-                  <div className="ahead-card" key={i}>
-                    <div className="ahead-arrow">→</div>
-                    <div>
-                      {m.title&&<div className="ahead-title">{m.title}</div>}
-                      <div className="ahead-body">{m.body}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <EC sk="longTermGrowth" lbl="Looking Ahead" val={result.longTermGrowth||result.mistakes||""}/>
-            </div>
-          </div>
-
-          {/* 07 — WHAT SUCCESS LOOKS LIKE */}
-          {successText&&(
-            <div style={{background:"linear-gradient(135deg,#EFF7F3,#E6F2EC)",borderTop:"3px solid #6A9E8A",borderBottom:"1px solid #C8E6DA"}}>
-              <div className="sec-chapter" style={{background:"transparent"}}>
-                <div className="sec-chapter-num" style={{color:"rgba(106,158,138,0.25)"}}>07</div>
-                <h2 className="sec-chapter-title" style={{color:"#2A4A40"}}>What Success Looks Like</h2>
-                <p className="sec-chapter-sub" style={{color:"#5A8A78"}}>Concrete outcomes to measure your progress against.</p>
-                <div className="sec-chapter-divider-green"/>
-              </div>
-              <div className="sec-content">
-                <div className="success-points">
-                  {successSentences.slice(0,3).map((sentence,i)=>{
-                    const icons=["📊","🤝","✨"];
-                    return(
-                      <div className="success-point" key={i}>
-                        <span className="success-point-icon">{icons[i]||"→"}</span>
-                        <span className="success-point-text">{sentence.trim()}</span>
-                      </div>
-                    );
-                  })}
+          {/* ─── 06 LOOKING AHEAD ───────────────────────────────────────── */}
+          <div className="rpt-sec">
+            <div className="rpt-sec-inner">
+              <div className="rpt-sec-header">
+                <span className="rpt-sec-num">06</span>
+                <div className="rpt-sec-heading">
+                  <h2 className="rpt-sec-title">Looking Ahead</h2>
+                  <p className="rpt-sec-desc">What to build toward after your first 30 days.</p>
                 </div>
-                <EC sk="successLooks" lbl="What Success Looks Like" val={result.successLooks||""}/>
+              </div>
+              <div className="rpt-ahead">
+                {looking.map((m,i)=>(
+                  <div className="rpt-ahead-item" key={i}>
+                    <span className="rpt-ahead-n">0{i+1}</span>
+                    <div>
+                      {m.title&&<div className="rpt-ahead-title">{m.title}</div>}
+                      <div className="rpt-ahead-body">{m.body}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <EC sk="longTermGrowth" val={result.longTermGrowth||result.mistakes||""}/>
+            </div>
+          </div>
+
+          {/* ─── 07 WHAT SUCCESS LOOKS LIKE ─────────────────────────────── */}
+          {successText&&(
+            <div className="rpt-sec rpt-sec-alt">
+              <div className="rpt-sec-inner">
+                <div className="rpt-sec-header">
+                  <span className="rpt-sec-num">07</span>
+                  <div className="rpt-sec-heading">
+                    <h2 className="rpt-sec-title">What Success Looks Like</h2>
+                    <p className="rpt-sec-desc">Measurable outcomes to work toward.</p>
+                  </div>
+                </div>
+                <div className="rpt-success">
+                  {successSentences.slice(0,3).map((sentence,i)=>(
+                    <div className="rpt-success-item" key={i}>
+                      <div className="rpt-success-check"><div className="rpt-success-check-inner"/></div>
+                      <span className="rpt-success-text">{sentence.trim()}</span>
+                    </div>
+                  ))}
+                </div>
+                <EC sk="successLooks" val={result.successLooks||""}/>
               </div>
             </div>
           )}
 
-          {/* 08 — YOUR NEXT MOVE */}
-          <div className="nextmove-redesign">
-            <span className="nextmove-redesign-eye">08 · Your Next Move</span>
-            <span className="nextmove-redesign-label">The single most important action you should take today</span>
-            <p className="nextmove-redesign-text">"{nextMove||"—"}"</p>
-            <div className="nextmove-divider"/>
-            <span className="nextmove-footer-text">Every section in this plan leads here. This is where it starts.</span>
-            <EC sk="yourNextMove" lbl="Your Next Move" val={result.yourNextMove||""}/>
+          {/* ─── 08 YOUR NEXT MOVE ──────────────────────────────────────── */}
+          <div className="rpt-nextmove">
+            <span className="rpt-nextmove-eyebrow">08 · Your Next Move</span>
+            <span className="rpt-nextmove-label">The single most important action you should take today</span>
+            <p className="rpt-nextmove-text">"{nextMove.split(".")[0]}."</p>
+            <div className="rpt-nextmove-meta">
+              <div className="rpt-nextmove-meta-item">
+                <div className="rpt-nextmove-meta-label">Time Required</div>
+                <div className="rpt-nextmove-meta-value">Today</div>
+              </div>
+              <div className="rpt-nextmove-meta-item">
+                <div className="rpt-nextmove-meta-label">Difficulty</div>
+                <div className="rpt-nextmove-meta-value">{nmDifficulty}</div>
+              </div>
+              <div className="rpt-nextmove-meta-item">
+                <div className="rpt-nextmove-meta-label">Expected Impact</div>
+                <div className="rpt-nextmove-meta-value">High</div>
+              </div>
+            </div>
+            <EC sk="yourNextMove" val={result.yourNextMove||""}/>
           </div>
 
-          {/* NATURAL CONCLUSION */}
-          <div className="strategy-end">
-            <div className="strategy-end-rule"/>
-            <span className="strategy-end-eye">You've reached the end of your strategy</span>
-            <h2 className="strategy-end-h">Congratulations.<br/>Your strategy is complete.</h2>
-            <p className="strategy-end-sub">Your personalized strategy has been successfully created. Take a moment to let it land. When you're ready, save it to access anytime in My Strategies.</p>
-            <div className="strategy-end-btns">
-              <button className="btn" style={{padding:"16px 48px",fontSize:12}} onClick={()=>{setStrategyStage("saved");}}>Save My Strategy →</button>
-              <button className="btn-out" style={{padding:"16px 32px"}} onClick={()=>window.scrollTo({top:0,behavior:"smooth"})}>Review My Strategy ↑</button>
+          {/* ─── CONCLUSION ─────────────────────────────────────────────── */}
+          <div className="rpt-conclusion">
+            <div className="rpt-conclusion-rule"/>
+            <span className="rpt-conclusion-eyebrow">Strategy Complete</span>
+            <h2 className="rpt-conclusion-h">Your strategy is ready.</h2>
+            <p className="rpt-conclusion-sub">Save it now to access anytime in My Strategies. Then take your next move.</p>
+            <div className="rpt-conclusion-btns">
+              <button className="btn" style={{padding:"16px 44px",fontSize:12}} onClick={()=>setStrategyStage("saved")}>Save My Strategy</button>
+              <button className="btn-out" style={{padding:"16px 28px"}} onClick={()=>window.scrollTo({top:0,behavior:"smooth"})}>Review from Top</button>
             </div>
           </div>
 
