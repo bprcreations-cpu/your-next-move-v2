@@ -886,7 +886,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 }
 `;
 
-// ─── PDF GENERATOR ───────────────────────────────────────────────────────────
+// ─-- PDF GENERATOR ----------------------------------------------------------─
 function generatePDF(result, meta) {
   try {
     const { jsPDF } = window.jspdf || {};
@@ -897,13 +897,13 @@ function generatePDF(result, meta) {
 
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "letter" });
 
-    // ── Constants ──────────────────────────────────────────────
+    // -- Constants ----------------------------------------------
     const PW = 216, PH = 279;       // page dimensions
     const ML = 22, MR = 22;         // margins
     const CW = PW - ML - MR;        // content width
     const BOTTOM = PH - 18;         // bottom boundary
 
-    // ── Color palette ──────────────────────────────────────────
+    // -- Color palette ------------------------------------------
     const C = {
       dark:    [20, 18, 16],
       ink:     [36, 34, 30],
@@ -916,11 +916,11 @@ function generatePDF(result, meta) {
       cream:   [250, 250, 248],
     };
 
-    // ── State ──────────────────────────────────────────────────
+    // -- State --------------------------------------------------
     let y = 0;
     let page = 1;
 
-    // ── Helpers ────────────────────────────────────────────────
+    // -- Helpers ------------------------------------------------
     const setColor = (rgb, type = "text") => {
       if (type === "text") doc.setTextColor(...rgb);
       else if (type === "fill") doc.setFillColor(...rgb);
@@ -940,7 +940,8 @@ function generatePDF(result, meta) {
 
     const rawLines = (t) =>
       (t || "").split("\n").map(l => l.trim()).filter(Boolean).filter(l => !l.match(/^#+/));
-    // ── Page management ────────────────────────────────────────
+
+    // -- Page management ----------------------------------------
     const addPageNumber = () => {
       setFont(8, "normal");
       setColor(C.faint);
@@ -969,14 +970,14 @@ function generatePDF(result, meta) {
       y = 26;
     };
 
-    // ── Smart page break ───────────────────────────────────────
+    // -- Smart page break --------------------------------------─
     const check = (needed, keepWith = 0) => {
       if (y + needed + keepWith > BOTTOM) {
         newPage();
       }
     };
 
-    // ── Text helpers ───────────────────────────────────────────
+    // -- Text helpers ------------------------------------------─
     const text = (str, x, opts = {}) => {
       const lines = Array.isArray(str) ? str : [str];
       lines.forEach(line => {
@@ -1021,7 +1022,7 @@ function generatePDF(result, meta) {
       y += 7;
     };
 
-    // ── Section header — consistent across all 9 sections ──────
+    // -- Section header — consistent across all 9 sections ------
     const secHeader = (num, title, desc) => {
       check(36);
       // Section number
@@ -1048,7 +1049,7 @@ function generatePDF(result, meta) {
       accentRule();
     };
 
-    // ── Parse all data ─────────────────────────────────────────
+    // -- Parse all data ----------------------------------------─
     const execRaw = (result.strategicAssessment || "").replace(/\*\*/g, "");
     const execLines = rawLines(execRaw);
     const mainExec = execLines.filter(l => !l.match(/^(strength|what needs|primary tension)/i)).join(" ");
@@ -1109,8 +1110,7 @@ function generatePDF(result, meta) {
     setFont(36, "bold");
     setColor(C.white);
     const titleStr = `Your ${meta.catLabel || "Strategy"}`;
-    const titleLines = wrap(titleStr + "
-Strategy", CW);
+    const titleLines = wrap(titleStr + " Strategy", CW);
     titleLines.forEach((line, i) => {
       doc.text(line, ML, y);
       y += i === 0 ? 14 : 14;
