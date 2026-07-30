@@ -626,9 +626,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-cover-meta{font-size:12px;color:#4A4540;letter-spacing:0.06em;line-height:2;margin-bottom:36px;}
 .rpt-cover-meta span{margin:0 12px 0 0;}
 .rpt-cover-meta span:not(:last-child)::after{content:'·';margin-left:12px;color:#2A2520;}
-.rpt-cover-tags{display:flex;flex-wrap:wrap;align-items:center;gap:0;padding-top:28px;border-top:1px solid var(--r-rule-dark);}
-.rpt-cover-tag{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--r-dark-meta);}
-.rpt-cover-tag:not(:last-child)::after{content:'·';margin:0 14px;color:#3A3430;}
+.rpt-cover-tags{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-top:28px;border-top:1px solid var(--r-rule-dark);}
+.rpt-cover-tag{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--r-dark-meta);border:1px solid rgba(176,114,138,0.32);border-radius:100px;padding:7px 16px;background:rgba(255,255,255,0.02);}
 .rpt-cover-saved{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--r-sage);margin-top:16px;}
 
 /* ── SECTION ANATOMY — identical every time ────────────────── */
@@ -2521,7 +2520,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
               <span className="rpt-cover-tag">{effectiveIndustry||industry}</span>
               <span className="rpt-cover-tag">{stageLabel}</span>
               <span className="rpt-cover-tag">{today}</span>
-              {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A"}}>✓ Saved</span>}
+              {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A",borderColor:"rgba(106,158,138,0.35)"}}>✓ Saved</span>}
             </div>
           </div>
 
