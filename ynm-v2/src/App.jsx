@@ -960,11 +960,18 @@ function generatePDF(result, meta) {
     // COVER
     doc.setFillColor(...DARK);doc.rect(0,0,W,H,"F");
     doc.setFontSize(8);doc.setTextColor(80,75,70);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT",ML,24);
-    doc.setFontSize(30);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
-    const ct=meta.catLabel||"Strategy";wrap(ct+" Strategy",0,CW).forEach((l,i)=>{doc.text(l,ML,50+i*12);});
-    if(meta.firstName){doc.setFontSize(12);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");doc.text("Prepared exclusively for "+meta.firstName,ML,90);}
+    doc.setFontSize(38);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
+    const ct=meta.catLabel||"Strategy";const coverTitleLines=wrap(ct+" Strategy",0,CW-10);
+    coverTitleLines.forEach((l,i)=>{doc.text(l,ML,52+i*15);});
+    const afterTitleY=52+coverTitleLines.length*15+18;
+    if(meta.firstName){doc.setFontSize(12);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");doc.text("Prepared exclusively for "+meta.firstName,ML,afterTitleY);}
     let tx=ML;
-    [meta.effectiveIndustry,meta.stageLabel,meta.today].filter(Boolean).forEach(tag=>{doc.setFontSize(7);doc.setTextColor(100,95,90);doc.setFont("helvetica","normal");const tw=doc.getTextWidth(tag)+8;doc.setDrawColor(55,50,47);doc.setLineWidth(0.3);doc.roundedRect(tx,100,tw,5.5,1,1);doc.text(tag,tx+4,104.2);tx+=tw+4;});
+    [meta.effectiveIndustry,meta.stageLabel,meta.today].filter(Boolean).forEach(tag=>{doc.setFontSize(7);doc.setTextColor(100,95,90);doc.setFont("helvetica","normal");const tw=doc.getTextWidth(tag)+8;doc.setDrawColor(55,50,47);doc.setLineWidth(0.3);doc.roundedRect(tx,afterTitleY+10,tw,5.5,1,1);doc.text(tag,tx+4,afterTitleY+14.2);tx+=tw+4;});
+    // Quiet colophon anchor — gives the lower half of the cover an intentional resting point instead of dead space
+    doc.setDrawColor(45,42,38);doc.setLineWidth(0.3);doc.line(ML,H-42,ML+28,H-42);
+    doc.setFontSize(7);doc.setTextColor(90,85,80);doc.setFont("helvetica","normal");
+    doc.text("A PERSONALIZED STRATEGY REPORT",ML,H-35);
+    doc.text("PREPARED BY YOUR NEXT MOVE",ML,H-30);
     footer();
     // Parse data (unchanged business logic)
     const execRaw=(result.strategicAssessment||"").replace(/\*\*/g,"");
@@ -989,15 +996,16 @@ function generatePDF(result, meta) {
     if(heroSub){doc.setFontSize(10.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","italic");wrap(heroSub,0,CW-20).forEach(l=>{chk(5.5);doc.text(l,ML,y);y+=5.5;});}
     y+=14;
     // One unified container — thin mauve outline, no internal card borders
-    const colVals=[["Current Position",position||"—"],["Greatest Opportunity",oppList[0]?(oppList[0].title||oppList[0].body):"—"],["Primary Goal",goalFirst||"—"]];
+    const oppValue=oppList[0]?(oppList[0].title+(oppList[0].body?(" — "+oppList[0].body.split(".")[0]+"."):"")):"—";
+    const colVals=[["Current Position",position||"—"],["Greatest Opportunity",oppValue],["Primary Goal",goalFirst||"—"]];
     const colW3=(CW-32-16)/3;
     doc.setFontSize(9.5);
     const colHeights=colVals.map(([,v])=>16+wrap(v,0,colW3).length*4.6);
     const rowH=Math.max(...colHeights,26);
-    doc.setFontSize(13);doc.setFont("helvetica","bolditalic");
+    doc.setFontSize(15.5);doc.setFont("helvetica","bolditalic");
     const nmLines=wrap(nms||"—",0,CW-32);
-    const nmSectionH=18+nmLines.length*6.2;
-    const boxH=24+rowH+18+nmSectionH+16;
+    const nmSectionH=20+nmLines.length*7.2;
+    const boxH=24+rowH+20+nmSectionH+16;
     chk(boxH+6);
     doc.setDrawColor(...ACCENT);doc.setLineWidth(0.4);doc.roundedRect(ML,y,CW,boxH,3,3,"S");
     let iy=y+22;
@@ -1008,11 +1016,11 @@ function generatePDF(result, meta) {
       doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
       wrap(val,0,colW3).forEach((l,li)=>doc.text(l,cx,iy+8+li*4.6));
     });
-    iy+=rowH+14;
-    doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML+16,iy-8,W-MR-16,iy-8);
-    doc.setFontSize(8.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("TODAY'S FIRST MOVE",ML+16,iy);
-    doc.setFontSize(13);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");
-    nmLines.forEach((l,li)=>doc.text(l,ML+16,iy+9+li*6.2));
+    iy+=rowH+16;
+    doc.setDrawColor(...ACCENT);doc.setLineWidth(0.6);doc.line(ML+16,iy-9,ML+50,iy-9);
+    doc.setFontSize(9);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("TODAY'S FIRST MOVE",ML+16,iy);
+    doc.setFontSize(15.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");
+    nmLines.forEach((l,li)=>doc.text(l,ML+16,iy+11+li*7.2));
     y+=boxH+10;
 
     // ══ PAGE — STRATEGIC ASSESSMENT + PRIMARY CHALLENGE: "the diagnosis" ══
@@ -1076,11 +1084,14 @@ function generatePDF(result, meta) {
       chk(cardHt+5);
       doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.roundedRect(ML,y,CW,cardHt,1.5,1.5,"S");
       if(i===0){doc.setFillColor(...ACCENT);doc.rect(ML,y,3,cardHt,"F");}
-      doc.setFontSize(15);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML+7,y+11);
+      doc.setFontSize(12);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML+7,y+11);
+      if(i===0){doc.setFontSize(6.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("START",ML+7,y+16);doc.text("HERE",ML+7,y+19.5);}
       doc.setFontSize(11.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");titleLines.forEach((l,li)=>doc.text(l,ML+22,y+9+li*5.5));
       let ry=y+9+titleLines.length*5.5+1;
-      doc.setFontSize(7);doc.setTextColor(...MUTED);doc.setFont("helvetica","bold");
-      doc.text(`PRIORITY: ${tier.p.toUpperCase()}   ·   IMPACT: ${tier.im.toUpperCase()}   ·   TIMING: ${tier.t.toUpperCase()}`,ML+22,ry);
+      doc.setFontSize(7.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(`${tier.p.toUpperCase()} PRIORITY`,ML+22,ry);
+      const priW=doc.getTextWidth(`${tier.p.toUpperCase()} PRIORITY`);
+      doc.setFontSize(7.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");
+      doc.text(`   ·  ${tier.im} impact  ·  ${tier.t}`,ML+22+priW,ry);
       ry+=5.5;
       doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
       bodyLines.forEach(l=>{doc.text(l,ML+22,ry);ry+=4.6;});
@@ -1097,40 +1108,56 @@ function generatePDF(result, meta) {
       y+=4;
     }
 
-    // ══ PAGE — 30-DAY ROADMAP: "the execution page" — checklist visual, given room to breathe ══
+    // ══ PAGE — 30-DAY ROADMAP: "the execution page" — owns the full canvas ══
     newPage("30-Day Roadmap");
     secHd("05 · 30-DAY ROADMAP","Your week-by-week execution plan.","Print it. Check it off.");
     y+=6;
     const wths=["Foundation","Momentum","Activation","Scale & Review"];
     const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–—]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
     const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim().replace(/^(Foundation|Momentum|Activation|Scale\s*&?\s*Review)\s*:?\s*[-–—]?\s*/i,"");});
-    const colGap=6,colW=(CW-colGap*3)/4,startY=y;
+    const colGap=8,colW=(CW-colGap*3)/4,startY=y;
+    const gridBottom=H-38;
     let maxColH=0;
     wd.forEach((w,i)=>{
       const cx=ML+i*(colW+colGap);let cy=startY;
-      doc.setFillColor(...ACCENT);doc.rect(cx,cy,colW,9,"F");
-      doc.setFontSize(8.5);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
-      doc.text("WEEK "+(i+1),cx+4,cy+6);
-      cy+=14;
-      doc.setFontSize(10);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");
-      wrap(wths[i],0,colW-6).forEach(l=>{doc.text(l,cx+4,cy);cy+=5;});
-      cy+=5;
+      doc.setFillColor(...ACCENT);doc.rect(cx,cy,colW,12,"F");
+      doc.setFontSize(10);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
+      doc.text("WEEK "+(i+1),cx+5,cy+8);
+      cy+=19;
+      doc.setFontSize(12.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");
+      wrap(wths[i],0,colW-6).forEach(l=>{doc.text(l,cx+5,cy);cy+=6;});
+      cy+=8;
       const tasks=w.split(/[\/\n]/).map(t=>cleanStr(t)).filter(Boolean).slice(0,5);
       tasks.forEach(t=>{
-        doc.setDrawColor(...MUTED);doc.setLineWidth(0.35);doc.rect(cx+4,cy-3.2,3.4,3.4,"S");
-        doc.setFontSize(9);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
-        const tLines=wrap(t,0,colW-13);
-        tLines.forEach((l,li)=>{doc.text(l,cx+10.5,cy+li*4.6);});
-        cy+=Math.max(tLines.length*4.6,6.5)+3;
+        doc.setDrawColor(...MUTED);doc.setLineWidth(0.4);doc.rect(cx+5,cy-4,5,5,"S");
+        doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
+        const tLines=wrap(t,0,colW-16);
+        tLines.forEach((l,li)=>{doc.text(l,cx+13,cy+li*5.2);});
+        cy+=Math.max(tLines.length*5.2,8)+7;
       });
       maxColH=Math.max(maxColH,cy-startY);
+      // Full-height column rule — the grid claims the whole page, not just where tasks end
+      doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.line(cx,startY+19,cx,gridBottom);
+      if(i===3){doc.line(cx+colW,startY+19,cx+colW,gridBottom);}
     });
-    y=startY+maxColH+10;
+    doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.line(ML,gridBottom,W-MR,gridBottom);
+    doc.setFontSize(9.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","italic");
+    doc.text("Revisit this page every Friday. Consistency compounds faster than intensity.",ML,gridBottom+10);
+    y=gridBottom+20;
 
     // ══ PAGE — LOOKING AHEAD + MEASURABLE MILESTONES: "the reflective page" ══
     newPage("Looking Ahead");
     secHd("06 · LOOKING AHEAD","What becomes possible next.","What to build toward after your first 30 days.");
-    let ln=0;rawLines(result.longTermGrowth||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){ln++;chk(15);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+ln+"  "+b[1],ML,y);y+=4;if(b[2])body(cleanStr(b[2]),6);}else if(l.trim())body(cleanStr(l),6);});
+    let ln=0;rawLines(result.longTermGrowth||"").forEach(l=>{
+      const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);
+      if(b){
+        ln++;chk(16);
+        doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.circle(ML+3.5,y-1.3,3.5,"S");
+        doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(String(ln),ML+3.5,y-0.1,{align:"center"});
+        doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");doc.text(b[1],ML+11,y);y+=5;
+        if(b[2])body(cleanStr(b[2]),11);
+      }else if(l.trim())body(cleanStr(l),11);
+    });
     if(succ.length){
       rule();y+=6;
       secHd("07 · MEASURABLE MILESTONES","How you will know this is working.","Concrete signals of progress.");
@@ -1158,10 +1185,12 @@ function generatePDF(result, meta) {
     doc.setDrawColor(60,55,50);doc.setLineWidth(0.3);doc.line(ML,cy,W-MR,cy);cy+=12;
     [["TIME REQUIRED","Today"],["PRIORITY","Highest"],["EXPECTED IMPACT","High"]].forEach(([lbl,val],i)=>{const mx=ML+i*(CW/3);doc.setFontSize(7.5);doc.setTextColor(120,113,108);doc.setFont("helvetica","bold");doc.text(lbl,mx,cy);doc.setFontSize(11);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");doc.text(val,mx,cy+6);});
     cy+=30;
-    doc.setDrawColor(60,55,50);doc.setLineWidth(0.3);doc.line(ML,cy,W-MR,cy);cy+=16;
-    doc.setFontSize(16);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.text("This strategy was built specifically for you.",ML,cy);cy+=10;
+    doc.setDrawColor(60,55,50);doc.setLineWidth(0.3);doc.line(ML,cy,W-MR,cy);cy+=20;
+    doc.setFontSize(17);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.text("This strategy was built specifically for you.",ML,cy);cy+=12;
     doc.setFontSize(10);doc.setTextColor(160,154,148);doc.setFont("helvetica","normal");
-    doc.text("Return to My Strategies to review and continue building on this plan.",ML,cy);cy+=7;
+    doc.text("Return to My Strategies to review and continue building on this plan.",ML,cy);cy+=16;
+    doc.setDrawColor(45,42,38);doc.setLineWidth(0.3);doc.line(ML,cy,ML+28,cy);cy+=8;
+    doc.setFontSize(8.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");
     doc.text("Generated "+meta.today+" · Your Next Move by Chat It Up",ML,cy);
     doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});
 
