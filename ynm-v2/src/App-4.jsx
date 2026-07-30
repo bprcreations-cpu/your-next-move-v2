@@ -886,7 +886,104 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 }
 `;
 
-// ─-- PDF GENERATOR ----------------------------------------------------------─
+// ─── PDF GENERATOR ───────────────────────────────────────────────────────────
+function generatePDF(result, meta) {
+  try {
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) { window.print(); return; } // Fallback to print if jsPDF not loaded
+    const doc = new jsPDF({ orientation:"portrait", unit:"mm", format:"letter" });
+    const W=216,H=279,ML=20,MR=20,CW=W-ML-MR;
+    const ACCENT=[176,114,138],DARK=[26,25,22],INK=[42,40,38],MUTED=[120,113,108],RULE=[230,226,223],SAGE=[106,158,138];
+    let y=ML+5, pageNum=1;
+    const wrap=(t,x,w)=>doc.splitTextToSize(String(t||""),w);
+    const rawLines=(t)=>(t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/));
+    const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").replace(/^[-•*✓✗\d.]+\s*/,"").trim();
+    function chk(n){if(y+n>H-18){doc.addPage();y=ML+5;pageNum++;footer();}}
+    function footer(){doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});}
+    function rule(){chk(5);doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,y,W-MR,y);y+=5;}
+    function body(t,ind){const x=ML+(ind||0);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(t,x,CW-(ind||0)).forEach(l=>{chk(5);doc.text(l,x,y);y+=5;});y+=1;}
+    function secHd(num,title,desc){chk(24);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(num,ML,y);y+=5;doc.setFontSize(18);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");wrap(title,ML,CW).forEach(l=>{chk(8);doc.text(l,ML,y);y+=7;});y+=1;if(desc){doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(desc,ML,y);y+=5;}doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.line(ML,y,ML+20,y);y+=7;}
+    // COVER
+    doc.setFillColor(...DARK);doc.rect(0,0,W,H,"F");
+    doc.setFontSize(8);doc.setTextColor(80,75,70);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT",ML,24);
+    doc.setFontSize(30);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
+    const ct=meta.catLabel||"Strategy";wrap(ct+" Strategy",ML,CW).forEach((l,i)=>{doc.text(l,ML,50+i*12);});
+    if(meta.firstName){doc.setFontSize(12);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");doc.text("Prepared for "+meta.firstName,ML,90);}
+    let tx=ML;
+    [meta.effectiveIndustry,meta.stageLabel,meta.today].filter(Boolean).forEach(tag=>{doc.setFontSize(7);doc.setTextColor(100,95,90);doc.setFont("helvetica","normal");const tw=doc.getTextWidth(tag)+8;doc.setDrawColor(55,50,47);doc.setLineWidth(0.3);doc.roundedRect(tx,100,tw,5.5,1,1);doc.text(tag,tx+4,104.2);tx+=tw+4;});
+    footer();doc.addPage();pageNum=2;y=ML+5;footer();
+    // Parse data
+    const execRaw=(result.strategicAssessment||"").replace(/\*\*/g,"");
+    const execLines=rawLines(execRaw);
+    const mainExec=execLines.filter(l=>!l.match(/^(strength|what needs)/i)).join(" ");
+    const position=mainExec?mainExec.split(".")[0]+".":"";
+    const blindRaw=(result.primaryConstraint||"").replace(/\*\*/g,"");
+    const blindTitle=(blindRaw.match(/^[^.]+/)||[""])[0];
+    const insM=blindRaw.match(/The insight:?\s*(.+?)(?:\.|$)/i);
+    const insight=insM?insM[1].trim():"";
+    const succ=(result.successLooks||"").replace(/\*\*/g,"").split(/(?<=[.!?])\s+/).filter(s=>s.length>10);
+    const nm=(result.yourNextMove||"").replace(/\*\*/g,"").trim();
+    const nms=nm.split(".")[0]+".";
+    // EXEC SUMMARY
+    secHd("00 · EXECUTIVE SUMMARY","Your strategy at a glance.","The complete picture in under sixty seconds.");
+    if(position){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("CURRENT POSITION",ML,y);y+=4;body(position);}
+    if(blindTitle){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("PRIMARY CHALLENGE",ML,y);y+=4;body(blindTitle);}
+    if(succ[0]){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("PRIMARY GOAL",ML,y);y+=4;body(succ[0]);}
+    if(nms){doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");chk(4);doc.text("TODAY'S NEXT MOVE",ML,y);y+=4;body(nms);}
+    rule();
+    // ASSESSMENT
+    secHd("01 · STRATEGIC ASSESSMENT","Where you are today.","What we discovered from your answers.");
+    if(mainExec)body(mainExec);
+    const sl=execLines.find(l=>l.match(/^strength/i))||"";
+    const tl=execLines.find(l=>l.match(/^what needs/i))||"";
+    if(sl){chk(8);doc.setFontSize(8);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("STRENGTHS",ML,y);y+=4;body(cleanStr(sl));}
+    if(tl){chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WHAT NEEDS ATTENTION",ML,y);y+=4;body(cleanStr(tl));}
+    rule();
+    // CHALLENGE
+    secHd("02 · PRIMARY CHALLENGE","The core constraint.","The main issue making progress harder right now.");
+    if(blindTitle){doc.setFontSize(13);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");chk(8);doc.text('"'+blindTitle+'"',ML,y);y+=8;}
+    const blindBody=blindRaw.replace(insM?.[0]||"","").replace(/^[^.]+\./,"").trim();
+    if(blindBody)body(blindBody);
+    if(insight){chk(14);doc.setFillColor(240,235,232);doc.rect(ML,y,CW,12,"F");doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("THE INSIGHT",ML+3,y+4);doc.setFontSize(9);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");doc.text('"'+insight+'"',ML+3,y+9);y+=14;}
+    rule();
+    // OPPORTUNITY
+    secHd("03 · BEST OPPORTUNITY","Where to focus your energy.","The areas most likely to move the needle.");
+    let on=0;rawLines(result.strategicOpportunity||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){on++;chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+on+"  "+b[1],ML,y);y+=4;if(b[2])body(cleanStr(b[2]),6);}else if(l.trim())body(cleanStr(l),6);});
+    rule();
+    // ACTIONS
+    secHd("04 · RECOMMENDED ACTIONS","Where to direct your energy.","In priority order.");
+    const bdgs=["START HERE","THIS WEEK","THIS WEEK","THIS MONTH","THIS MONTH"];
+    let an=0;
+    rawLines(result.recommendedActions||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);const wy=l.match(/\*Why this matters:?\*?\s*(.*)/i);if(b&&an<5){chk(12);doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(bdgs[an]||"LATER",ML,y);y+=4;doc.setFontSize(11);doc.setTextColor(...DARK);doc.text(b[1],ML,y);y+=5;if(b[2])body(cleanStr(b[2]),4);an++;}else if(wy){doc.setFontSize(9);doc.setTextColor(...ACCENT);doc.setFont("helvetica","italic");wrap("→ "+wy[1],ML+4,CW-4).forEach(l=>{chk(5);doc.text(l,ML+4,y);y+=4.5;});y+=1;}});
+    rule();
+    // 30-DAY PLAN
+    secHd("05 · 30-DAY PLAN","Your week-by-week roadmap.","Concrete actions for the next 30 days.");
+    const wths=["Foundation","Momentum","Activation","Scale & Review"];
+    const wgls=["Establish your foundation","Build momentum","Execute and activate","Review and scale"];
+    const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
+    const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim();});
+    wd.forEach((w,i)=>{chk(16);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WEEK "+(i+1)+" · "+wths[i].toUpperCase(),ML,y);y+=4;doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(wgls[i],ML,y);y+=4;w.split(/[\/\n]/).map(t=>cleanStr(t)).filter(Boolean).slice(0,4).forEach(t=>{chk(5);doc.setFontSize(9);doc.setTextColor(...INK);doc.text("·  "+t,ML+4,y);y+=4.5;});y+=2;});
+    rule();
+    // LOOKING AHEAD
+    secHd("06 · LOOKING AHEAD","What becomes possible next.","What to build toward after your first 30 days.");
+    let ln=0;rawLines(result.longTermGrowth||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){ln++;chk(8);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+ln+"  "+b[1],ML,y);y+=4;if(b[2])body(cleanStr(b[2]),6);}else if(l.trim())body(cleanStr(l),6);});
+    rule();
+    // SUCCESS
+    if(succ.length){secHd("07 · WHAT SUCCESS LOOKS LIKE","Measurable milestones.","How you will know this strategy is working.");succ.slice(0,3).forEach(s=>{chk(8);doc.setFontSize(8);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("○",ML,y);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(s.trim(),ML+5,CW-5).forEach(l=>{chk(5);doc.text(l,ML+5,y);y+=4.5;});y+=2;});rule();}
+    // NEXT MOVE
+    chk(44);doc.setFillColor(...DARK);doc.rect(0,y-4,W,50,"F");doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("08 · YOUR NEXT MOVE",ML,y);y+=5;doc.setFontSize(9);doc.setTextColor(176,114,138);doc.setFont("helvetica","italic");doc.text("The single most important action you should take today",ML,y);y+=6;doc.setFontSize(14);doc.setTextColor(255,255,255);doc.setFont("helvetica","bolditalic");wrap('"'+nms+'"',ML,CW).forEach(l=>{chk(8);doc.text(l,ML,y);y+=7;});y+=4;
+    [["TIME REQUIRED","Today"],["PRIORITY","Highest"],["EXPECTED IMPACT","High"]].forEach(([lbl,val],i)=>{const mx=ML+i*(CW/3);doc.setFontSize(7);doc.setTextColor(90,85,80);doc.setFont("helvetica","bold");doc.text(lbl,mx,y);doc.setFontSize(10);doc.setTextColor(160,154,148);doc.setFont("helvetica","normal");doc.text(val,mx,y+4);});y+=14;
+    // FINAL PAGE
+    doc.addPage();pageNum++;y=ML+20;footer();
+    doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE",ML,y);y+=6;
+    doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");doc.text("This strategy was built specifically for you.",ML,y);y+=6;
+    doc.setFontSize(9);doc.setTextColor(...MUTED);doc.text("Return to My Strategies to review and continue building on this plan.",ML,y);y+=6;
+    doc.text("Generated "+meta.today+" · Your Next Move by Chat It Up",ML,y);
+    const safe=(meta.firstName||"My").replace(/[^a-zA-Z0-9]/g,"_");
+    doc.save("YourNextMove_"+safe+"_Strategy.pdf");
+  } catch(err) { console.error("PDF generation failed:",err); window.print(); }
+}
+
 
 // ─── APP ─────────────────────────────────────────────────────────────────────
 export default function App() {
@@ -2318,19 +2415,14 @@ One sentence. The single most concrete action to take right now.`;
           <div className="rpt-cover">
             <span className="rpt-cover-eyebrow">Your Next Move · Strategy Report</span>
             <h1 className="rpt-cover-title">
-              Your <em>{planCat?.label}</em><br/>Strategy
+              <em>{planCat?.label}</em><br/>Strategy
             </h1>
-            {firstName&&<p style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:13,color:"#4A4540",fontWeight:300,letterSpacing:"0.06em",marginBottom:32,marginTop:4}}>Prepared for {firstName}</p>}
-            <p style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,color:"#3A3530",fontWeight:300,lineHeight:1.75,marginBottom:28,maxWidth:440}}>A personalized strategy built around your goals, challenges, and next steps.</p>
+            {firstName&&<p style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:14,color:"#5A5450",fontWeight:300,letterSpacing:"0.04em",marginBottom:28,marginTop:-8}}>Prepared for {firstName}</p>}
             <div className="rpt-cover-tags">
               <span className="rpt-cover-tag">{effectiveIndustry||industry}</span>
               <span className="rpt-cover-tag">{stageLabel}</span>
               <span className="rpt-cover-tag">{today}</span>
-              {viewingPlanId&&<span className="rpt-cover-tag rpt-cover-tag-saved">✓ Saved</span>}
-            </div>
-            <div className="rpt-cover-actions">
-              <button className="rpt-cover-btn" onClick={()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})}>Save My Strategy</button>
-              <button className="rpt-cover-btn" onClick={()=>go("plans")}>My Strategies</button>
+              {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A",borderColor:"#2A3A33"}}>✓ Saved</span>}
             </div>
           </div>
 
@@ -2562,312 +2654,4 @@ One sentence. The single most concrete action to take right now.`;
       );
     })()}
   </>);
-}// -- PDF GENERATOR --
-function generatePDF(result, meta) {
-  try {
-    var jspdf = window.jspdf;
-    if (!jspdf || !jspdf.jsPDF) {
-      alert("PDF library loading. Please wait a moment and try again.");
-      return;
-    }
-    var doc = new jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"letter"});
-    var W = 216, H = 279, ML = 22, MR = 22, CW = W - ML - MR;
-    var BOTTOM = H - 18;
-    var y = 0, pageNum = 1;
-    var DARK = [20,18,16], INK = [36,34,30], MUTED = [100,96,90];
-    var FAINT = [160,156,152], ACCENT = [176,114,138], RULE = [220,216,212];
-    var WHITE = [255,255,255];
-
-    function setTxt(rgb){ doc.setTextColor(rgb[0],rgb[1],rgb[2]); }
-    function setFill(rgb){ doc.setFillColor(rgb[0],rgb[1],rgb[2]); }
-    function setDraw(rgb){ doc.setDrawColor(rgb[0],rgb[1],rgb[2]); }
-    function fnt(sz,st){ doc.setFont("helvetica",st||"normal"); doc.setFontSize(sz); }
-    function w(t,mw){ return doc.splitTextToSize(String(t||"").replace(/\*\*/g,""),mw); }
-    function cl(s){ return (s||"").replace(/\*\*/g,"").replace(/^[-*.\d]+\s*/,"").trim(); }
-    function rl(t){
-      var nl = String.fromCharCode(10);
-      return (t||"").split(nl).map(function(l){return l.trim();}).filter(Boolean).filter(function(l){return !l.match(/^#+/);});
-    }
-    function chk(n){
-      if(y+n>BOTTOM){ addPg(); }
-    }
-    function footer(){
-      fnt(8); setTxt(FAINT);
-      doc.text(String(pageNum),W/2,H-8,{align:"center"});
-      setDraw(RULE); doc.setLineWidth(0.2);
-      doc.line(ML,H-13,W-MR,H-13);
-    }
-    function addPg(){
-      footer(); doc.addPage(); pageNum++;
-      y = 26;
-      fnt(7); setTxt(FAINT);
-      doc.text("YOUR NEXT MOVE -- STRATEGY REPORT",ML,12);
-      if(meta.firstName){ doc.text(meta.firstName+" Strategy",W-MR,12,{align:"right"}); }
-      setDraw(RULE); doc.setLineWidth(0.2);
-      doc.line(ML,15,W-MR,15);
-    }
-    function hdr(num,title,desc){
-      chk(30);
-      fnt(8,"bold"); setTxt(ACCENT); doc.text(num,ML,y); y+=6;
-      fnt(20,"bold"); setTxt(DARK);
-      w(title,CW).forEach(function(l){ chk(9); doc.text(l,ML,y); y+=9; });
-      if(desc){ fnt(9); setTxt(MUTED); doc.text(desc,ML,y); y+=5; }
-      setDraw(ACCENT); doc.setLineWidth(0.5);
-      doc.line(ML,y,ML+18,y); y+=7;
-    }
-    function body(t,ind){
-      var x=ML+(ind||0);
-      fnt(10); setTxt(INK);
-      w(t,CW-(ind||0)).forEach(function(l){ chk(5); doc.text(l,x,y); y+=5; });
-      y+=2;
-    }
-    function hr(){
-      chk(4); setDraw(RULE); doc.setLineWidth(0.2);
-      doc.line(ML,y,W-MR,y); y+=5;
-    }
-
-    // Parse data
-    var execRaw = (result.strategicAssessment||"").replace(/\*\*/g,"");
-    var execArr = rl(execRaw);
-    var mainExec = execArr.filter(function(l){return !l.match(/^(strength|what needs)/i);}).join(" ");
-    var strengthL = execArr.filter(function(l){return l.match(/^strength/i);})[0]||"";
-    var tensionL = execArr.filter(function(l){return l.match(/^(what needs)/i);})[0]||"";
-    var blindRaw = (result.primaryConstraint||"").replace(/\*\*/g,"");
-    var blindTitle = (blindRaw.match(/^(.+?)\./) || ["",""])[1] || blindRaw.split(".")[0];
-    var insightM = blindRaw.match(/The insight:?\s*(.+?)(?:\.|$)/i);
-    var insightTxt = insightM ? insightM[1].trim() : "";
-    var blindBody = blindRaw.replace(blindTitle,"").replace(insightM&&insightM[0]||"","").replace(/^[:\s]+/,"").trim();
-    var succText = (result.successLooks||"").replace(/\*\*/g,"");
-    var succArr = succText.split(". ").filter(function(s){return s.trim().length>10;});
-    var nm = (result.yourNextMove||"").replace(/\*\*/g,"").trim();
-    var nms = nm.split(".")[0]+".";
-    var oppArr = rl(result.strategicOpportunity||"");
-    var actArr = rl(result.recommendedActions||"");
-    var planText = result.priorityPlan||"";
-    var wkThemes = ["Foundation","Momentum","Activation","Scale & Review"];
-    var wkGoals = ["Establish your foundation","Build momentum","Execute and activate","Review and scale"];
-    var actBadges = ["START HERE","THIS WEEK","THIS WEEK","THIS MONTH","THIS MONTH"];
-    var actTimes = ["Today","2-3 days","3-5 days","1-2 weeks","1-2 weeks"];
-    var lookArr = rl(result.longTermGrowth||"");
-
-    // COVER
-    setFill(DARK); doc.rect(0,0,W,H,"F");
-    y=30; fnt(8,"bold"); setTxt([60,56,50]);
-    doc.text("YOUR NEXT MOVE -- STRATEGY REPORT",ML,y); y+=10;
-    setDraw(ACCENT); doc.setLineWidth(0.4); doc.line(ML,y,ML+24,y); y+=12;
-    fnt(32,"bold"); setTxt(WHITE);
-    w("Your "+(meta.catLabel||"Strategy")+" Strategy",CW).forEach(function(l){doc.text(l,ML,y);y+=13;});
-    y+=4;
-    if(meta.firstName){ fnt(11); setTxt([80,76,70]); doc.text("Prepared for "+meta.firstName,ML,y); y+=8; }
-    fnt(10); setTxt([60,56,50]);
-    var descStr = "A personalized strategy built around your goals, challenges, and next steps.";
-    w(descStr,CW-20).forEach(function(l){doc.text(l,ML,y);y+=5.5;});
-    y+=10;
-    var tags = [meta.effectiveIndustry,meta.stageLabel,meta.today].filter(Boolean);
-    var tx = ML;
-    tags.forEach(function(tag){
-      fnt(7); setTxt([80,76,70]);
-      var tw = doc.getTextWidth(tag)+8;
-      setDraw([45,42,38]); doc.setLineWidth(0.3);
-      doc.rect(tx,y-3.5,tw,6,"S"); doc.text(tag,tx+4,y); tx+=tw+5;
-    });
-    footer();
-
-    // EXEC SUMMARY
-    addPg();
-    hdr("00 -- Executive Summary","Your strategy at a glance.","The complete picture in under sixty seconds.");
-    var summaries = [
-      ["Current Position", mainExec?mainExec.split(".")[0]+".":""],
-      ["Primary Challenge", blindTitle||""],
-      ["Primary Goal", succArr[0]||""],
-      ["Today's Next Move", nms]
-    ].filter(function(s){return s[1];});
-    summaries.forEach(function(item,i){
-      chk(16);
-      var isLast = i===summaries.length-1;
-      if(isLast){ setFill(DARK); doc.rect(ML,y-4,CW,18,"F"); }
-      fnt(7,"bold"); setTxt(isLast?[80,76,70]:ACCENT);
-      doc.text(item[0].toUpperCase(),ML+(isLast?4:0),y); y+=4;
-      fnt(10,isLast?"bolditalic":"normal"); setTxt(isLast?WHITE:INK);
-      w(item[1],CW-(isLast?8:0)).forEach(function(l){chk(5);doc.text(l,ML+(isLast?4:0),y);y+=5;});
-      y+=isLast?8:3;
-      if(!isLast) hr();
-    });
-    y+=4;
-    fnt(7,"bold"); setTxt(ACCENT); doc.text("30-DAY TIMELINE",ML,y); y+=5;
-    ["Days 1-10: Foundation","Days 11-21: Momentum","Days 22-30: Scale"].forEach(function(t){
-      chk(5); fnt(9); setTxt(INK); doc.text("-> "+t,ML+3,y); y+=5.5;
-    });
-
-    // STRATEGIC ASSESSMENT
-    addPg();
-    hdr("01 -- Strategic Assessment","Where you are today.","What we discovered from your answers.");
-    if(mainExec) body(mainExec);
-    if(strengthL){ fnt(7,"bold"); setTxt([106,158,138]); chk(4); doc.text("STRENGTHS",ML,y); y+=4; body(cl(strengthL)); }
-    if(tensionL){ fnt(7,"bold"); setTxt(ACCENT); chk(4); doc.text("WHAT NEEDS ATTENTION",ML,y); y+=4; body(cl(tensionL)); }
-
-    // PRIMARY CHALLENGE - dark page
-    addPg();
-    setFill(DARK); doc.rect(0,0,W,H,"F");
-    fnt(7); setTxt([60,56,50]); doc.text("YOUR NEXT MOVE -- STRATEGY REPORT",ML,12);
-    setDraw([40,38,36]); doc.setLineWidth(0.2); doc.line(ML,15,W-MR,15);
-    y=26;
-    fnt(8,"bold"); setTxt(ACCENT); doc.text("02 -- PRIMARY CHALLENGE",ML,y); y+=6;
-    fnt(20,"bold"); setTxt(WHITE); doc.text("The Core Constraint.",ML,y); y+=9;
-    fnt(9); setTxt([80,76,70]); doc.text("The main issue making progress harder right now.",ML,y); y+=5;
-    setDraw(ACCENT); doc.setLineWidth(0.5); doc.line(ML,y,ML+18,y); y+=10;
-    if(blindTitle){
-      fnt(16,"bolditalic"); setTxt(WHITE);
-      w('"'+blindTitle+'"',CW).forEach(function(l){chk(9);doc.text(l,ML,y);y+=9;});
-      y+=3;
-    }
-    if(blindBody){ fnt(10); setTxt([150,144,140]); w(blindBody,CW).forEach(function(l){chk(5);doc.text(l,ML,y);y+=5;}); y+=6; }
-    if(insightTxt){
-      chk(20);
-      setFill([30,28,26]); doc.rect(ML,y,CW,18,"F");
-      setDraw([50,47,44]); doc.setLineWidth(0.3); doc.rect(ML,y,CW,18,"S");
-      fnt(7,"bold"); setTxt(ACCENT); doc.text("THE INSIGHT",ML+5,y+5);
-      fnt(11,"bolditalic"); setTxt(WHITE);
-      w('"'+insightTxt+'"',CW-10).slice(0,2).forEach(function(l,i){doc.text(l,ML+5,y+10+i*5.5);});
-      y+=22;
-    }
-    footer();
-
-    // BEST OPPORTUNITY
-    addPg();
-    hdr("03 -- Best Opportunity","Where to focus your energy.","The areas most likely to move the needle.");
-    var on=0;
-    oppArr.forEach(function(l){
-      var b=l.match(/^\*\*(.+?)\*\*/);
-      if(b&&on<3){
-        on++; chk(18);
-        fnt(12,"bold"); setTxt(ACCENT); doc.text("0"+on,ML,y);
-        fnt(12,"bold"); setTxt(DARK); doc.text(b[1],ML+10,y); y+=6;
-        fnt(9); setTxt(MUTED);
-        var rest=l.replace(/^\*\*(.+?)\*\*[:\s]*/,"");
-        if(cl(rest)){w(cl(rest),CW-10).forEach(function(line){chk(5);doc.text(line,ML+10,y);y+=5;});}
-        y+=4; if(on<3) hr();
-      }
-    });
-
-    // RECOMMENDED ACTIONS
-    addPg();
-    hdr("04 -- Recommended Actions","Where to direct your energy.","In priority order.");
-    var an=0, curA=null;
-    function flushA(){
-      if(!curA||an>5) return;
-      chk(20);
-      var isF=an===1;
-      if(isF){ setFill(DARK); doc.rect(ML,y-4,CW,34,"F"); }
-      fnt(7,"bold"); setTxt(isF?ACCENT:MUTED);
-      doc.text(actBadges[an-1]||"LATER",ML+(isF?4:0),y);
-      doc.text(actTimes[an-1]||"",W-MR-(isF?4:0),y,{align:"right"}); y+=5;
-      fnt(11,"bold"); setTxt(isF?WHITE:DARK);
-      w(curA.t,CW-(isF?8:0)).forEach(function(l){chk(6);doc.text(l,ML+(isF?4:0),y);y+=6;});
-      if(curA.b){ fnt(9); setTxt(isF?[150,144,140]:MUTED); w(curA.b,CW-(isF?8:4)).forEach(function(l){chk(5);doc.text(l,ML+(isF?4:0),y);y+=5;}); }
-      if(curA.w){ y+=2; fnt(9,"italic"); setTxt(ACCENT); w("-> "+curA.w,CW-(isF?8:4)).forEach(function(l){chk(5);doc.text(l,ML+(isF?4:0),y);y+=4.5;}); }
-      y+=isF?8:5; if(!isF&&an<5) hr();
-      curA=null;
-    }
-    actArr.forEach(function(l){
-      var b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);
-      var why=l.match(/\*Why this matters:?\*?\s*(.*)/i);
-      if(b&&an<5){ flushA(); an++; curA={t:b[1],b:cl(b[2]),w:""}; }
-      else if(why&&curA){ curA.w=cl(why[1]); }
-      else if(curA&&l.trim()){ curA.b=(curA.b?curA.b+" ":"")+cl(l); }
-    });
-    flushA();
-
-    // 30-DAY PLAN - dark page
-    addPg();
-    setFill(DARK); doc.rect(0,0,W,H,"F");
-    fnt(7); setTxt([60,56,50]); doc.text("YOUR NEXT MOVE -- STRATEGY REPORT",ML,12);
-    setDraw([40,38,36]); doc.setLineWidth(0.2); doc.line(ML,15,W-MR,15); y=26;
-    fnt(8,"bold"); setTxt(ACCENT); doc.text("05 -- 30-DAY PLAN",ML,y); y+=6;
-    fnt(20,"bold"); setTxt(WHITE); doc.text("Your Week-by-Week Roadmap.",ML,y); y+=9;
-    fnt(9); setTxt([80,76,70]); doc.text("Concrete actions for the next 30 days.",ML,y); y+=5;
-    setDraw(ACCENT); doc.setLineWidth(0.5); doc.line(ML,y,ML+18,y); y+=10;
-    var wkData=["","","",""];
-    var nl10=String.fromCharCode(10);
-    planText.split(nl10).forEach(function(line){
-      var m=line.match(/week\s*([1-4])[^a-z]*(.*)/i);
-      if(m){ var wi=parseInt(m[1])-1; if(wi>=0&&wi<4&&m[2].trim()) wkData[wi]+=(wkData[wi]?" / ":"")+m[2].trim(); }
-    });
-    wkData.forEach(function(w,i){
-      chk(28);
-      fnt(8,"bold"); setTxt(ACCENT); doc.text("WEEK "+(i+1)+" -- "+wkThemes[i].toUpperCase(),ML,y); y+=5;
-      fnt(9); setTxt([80,76,70]); doc.text(wkGoals[i],ML,y); y+=5;
-      w.split(/[\/\n]/).map(function(t){return cl(t);}).filter(Boolean).slice(0,4).forEach(function(task){
-        chk(5); fnt(9); setTxt([110,104,98]); doc.text(". "+task,ML+4,y); y+=5;
-      });
-      y+=4;
-      if(i<3){ setDraw([36,34,30]); doc.setLineWidth(0.2); doc.line(ML,y,W-MR,y); y+=5; }
-    });
-    footer();
-
-    // LOOKING AHEAD
-    addPg();
-    hdr("06 -- Looking Ahead","What becomes possible next.","What to build toward after your first 30 days.");
-    var ln=0, curL=null;
-    function flushL(){
-      if(!curL) return; ln++;
-      chk(18); fnt(8,"bold"); setTxt(ACCENT); doc.text("0"+ln,ML,y);
-      fnt(12,"bold"); setTxt(DARK); doc.text(curL.t,ML+10,y); y+=6;
-      if(curL.b){ fnt(9); setTxt(MUTED); w(curL.b,CW-10).forEach(function(l){chk(5);doc.text(l,ML+10,y);y+=5;}); }
-      y+=3; if(ln<3) hr(); curL=null;
-    }
-    lookArr.forEach(function(l){
-      var b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);
-      if(b){ flushL(); curL={t:b[1],b:cl(b[2])}; }
-      else if(curL&&l.trim()){ curL.b=(curL.b?curL.b+" ":"")+cl(l); }
-    });
-    flushL();
-
-    // SUCCESS
-    if(succArr.length){
-      addPg();
-      hdr("07 -- What Success Looks Like","Measurable milestones.","How you will know this strategy is working.");
-      succArr.slice(0,3).forEach(function(s,i){
-        chk(14); setDraw(ACCENT); doc.setLineWidth(0.5); doc.circle(ML+3,y-1,2.5,"S");
-        fnt(10); setTxt(INK); w(s.trim(),CW-10).forEach(function(l){chk(5);doc.text(l,ML+10,y);y+=5;});
-        y+=3; if(i<2) hr();
-      });
-    }
-
-    // YOUR NEXT MOVE - dark page
-    addPg();
-    setFill(DARK); doc.rect(0,0,W,H,"F"); y=26;
-    fnt(8,"bold"); setTxt(ACCENT); doc.text("08 -- YOUR NEXT MOVE",ML,y); y+=8;
-    fnt(10,"italic"); setTxt([150,144,140]); doc.text("The single most important action you should take today",ML,y); y+=10;
-    setDraw(ACCENT); doc.setLineWidth(0.4); doc.line(ML,y,ML+24,y); y+=12;
-    fnt(18,"bolditalic"); setTxt(WHITE);
-    w('"'+nms+'"',CW).forEach(function(l){chk(11);doc.text(l,ML,y);y+=11;});
-    y+=8; setDraw([40,38,36]); doc.setLineWidth(0.2); doc.line(ML,y,W-MR,y); y+=10;
-    [["TIME REQUIRED","Today"],["PRIORITY","Highest"],["EXPECTED IMPACT","High"]].forEach(function(m,i){
-      var mx=ML+i*(CW/3);
-      fnt(7,"bold"); setTxt([90,86,82]); doc.text(m[0],mx,y);
-      fnt(12); setTxt(ACCENT); doc.text(m[1],mx,y+6);
-    });
-    footer();
-
-    // FINAL PAGE
-    addPg();
-    y=H/2-20;
-    fnt(8,"bold"); setTxt(ACCENT); doc.text("YOUR NEXT MOVE",ML,y); y+=7;
-    fnt(14,"bold"); setTxt(DARK); doc.text("This strategy was built specifically for you.",ML,y); y+=8;
-    fnt(9); setTxt(MUTED);
-    w("Return to My Strategies to review and continue building on this plan.",CW).forEach(function(l){doc.text(l,ML,y);y+=5;});
-    y+=6; fnt(8); setTxt(FAINT);
-    doc.text("Generated "+meta.today+" -- Your Next Move by Chat It Up",ML,y);
-    footer();
-
-    var safe=(meta.firstName||"My").replace(/[^a-zA-Z0-9]/g,"_");
-    doc.save("YourNextMove_"+safe+"_Strategy.pdf");
-
-  } catch(err) {
-    console.error("PDF error:",err);
-    alert("PDF generation failed: "+err.message);
-  }
 }
-
-
