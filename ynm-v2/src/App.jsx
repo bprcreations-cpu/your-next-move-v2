@@ -975,25 +975,37 @@ function generatePDF(result, meta) {
     const oppList=[];{let cur=null;rawLines(result.strategicOpportunity||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){if(cur)oppList.push(cur);cur={title:b[1],body:cleanStr(b[2]||"")};}else if(cur&&l.trim())cur.body=(cur.body?cur.body+" ":"")+cleanStr(l);});if(cur)oppList.push(cur);}
     const goalFirst=succ[0]||"";
 
-    // ══ PAGE — EXECUTIVE SUMMARY: "the overview" — card grid, not paragraphs ══
+    // ══ PAGE — EXECUTIVE SUMMARY: ONE unified briefing, not dashboard cards ══
     newPage("Executive Summary");
     doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("00 · THE CORE INSIGHT",ML,y);y+=8;
-    if(blindTitle){doc.setFontSize(21);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");wrap(blindTitle,0,CW).forEach(l=>{chk(9);doc.text(l,ML,y);y+=9;});y+=1;}
+    if(blindTitle){doc.setFontSize(22);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");wrap(blindTitle,0,CW).forEach(l=>{chk(9.5);doc.text(l,ML,y);y+=9.5;});y+=1;}
     const heroSub=insight||blindRaw.split(".")[0]+".";
     if(heroSub){doc.setFontSize(10.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","italic");wrap(heroSub,0,CW-20).forEach(l=>{chk(5.5);doc.text(l,ML,y);y+=5.5;});}
-    y+=10;rule();y+=4;
-    // 2x2 executive card grid
-    const gap=6,cardW=(CW-gap)/2;
-    const r1h=Math.max(cardH(position,cardW),cardH(oppList[0]?(oppList[0].title||oppList[0].body):"",cardW));
-    chk(r1h+4);
-    miniCard(ML,y,cardW,r1h,"Current Position",position||"—");
-    miniCard(ML+cardW+gap,y,cardW,r1h,"Greatest Opportunity",oppList[0]?(oppList[0].title||oppList[0].body):"—");
-    y+=r1h+gap;
-    const r2h=Math.max(cardH(goalFirst,cardW),cardH(nms,cardW));
-    chk(r2h+4);
-    miniCard(ML,y,cardW,r2h,"Primary Goal",goalFirst||"—");
-    miniCard(ML+cardW+gap,y,cardW,r2h,"Today's First Move",nms||"—",true);
-    y+=r2h+10;
+    y+=14;
+    // One unified container — thin mauve outline, no internal card borders
+    const colVals=[["Current Position",position||"—"],["Greatest Opportunity",oppList[0]?(oppList[0].title||oppList[0].body):"—"],["Primary Goal",goalFirst||"—"]];
+    const colW3=(CW-32-16)/3;
+    const colHeights=colVals.map(([,v])=>16+wrap(v,0,colW3).length*4.6);
+    const rowH=Math.max(...colHeights,26);
+    const nmLines=wrap(nms||"—",0,CW-32);
+    const nmSectionH=18+nmLines.length*6.2;
+    const boxH=24+rowH+18+nmSectionH+16;
+    chk(boxH+6);
+    doc.setDrawColor(...ACCENT);doc.setLineWidth(0.4);doc.roundedRect(ML,y,CW,boxH,3,3,"S");
+    let iy=y+22;
+    colVals.forEach(([lbl,val],i)=>{
+      const cx=ML+16+i*(colW3+8);
+      if(i>0){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(cx-8,iy-10,cx-8,iy+rowH-8);}
+      doc.setFontSize(8.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(lbl.toUpperCase(),cx,iy);
+      doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
+      wrap(val,0,colW3).forEach((l,li)=>doc.text(l,cx,iy+8+li*4.6));
+    });
+    iy+=rowH+14;
+    doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML+16,iy-8,W-MR-16,iy-8);
+    doc.setFontSize(8.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("TODAY'S FIRST MOVE",ML+16,iy);
+    doc.setFontSize(13);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");
+    nmLines.forEach((l,li)=>doc.text(l,ML+16,iy+9+li*6.2));
+    y+=boxH+10;
 
     // ══ PAGE — STRATEGIC ASSESSMENT + PRIMARY CHALLENGE: "the diagnosis" ══
     newPage("Strategic Assessment");
@@ -1004,10 +1016,10 @@ function generatePDF(result, meta) {
     if(sl||tl){
       y+=2;const half=(CW-8)/2;
       const h1=sl?cardH(cleanStr(sl),half):0, h2=tl?cardH(cleanStr(tl),half):0;
-      const rowH=Math.max(h1,h2,20);chk(rowH+4);
-      if(sl){doc.setDrawColor(...SAGE);doc.setLineWidth(0.8);doc.line(ML,y,ML,y+rowH);doc.setFontSize(7.5);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("STRENGTHS",ML+5,y+6);doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(cleanStr(sl),0,half-8).forEach((l,i)=>doc.text(l,ML+5,y+12+i*4.6));}
-      if(tl){const x2=ML+half+8;doc.setDrawColor(...ACCENT);doc.setLineWidth(0.8);doc.line(x2,y,x2,y+rowH);doc.setFontSize(7.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WHAT NEEDS ATTENTION",x2+5,y+6);doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(cleanStr(tl),0,half-8).forEach((l,i)=>doc.text(l,x2+5,y+12+i*4.6));}
-      y+=rowH+8;
+      const rowH2=Math.max(h1,h2,20);chk(rowH2+4);
+      if(sl){doc.setDrawColor(...SAGE);doc.setLineWidth(0.8);doc.line(ML,y,ML,y+rowH2);doc.setFontSize(7.5);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("STRENGTHS",ML+5,y+6);doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(cleanStr(sl),0,half-8).forEach((l,i)=>doc.text(l,ML+5,y+12+i*4.6));}
+      if(tl){const x2=ML+half+8;doc.setDrawColor(...ACCENT);doc.setLineWidth(0.8);doc.line(x2,y,x2,y+rowH2);doc.setFontSize(7.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WHAT NEEDS ATTENTION",x2+5,y+6);doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(cleanStr(tl),0,half-8).forEach((l,i)=>doc.text(l,x2+5,y+12+i*4.6));}
+      y+=rowH2+8;
     }
     rule();y+=6;
     secHd("02 · PRIMARY CHALLENGE","The core constraint.","The main issue making progress harder right now.");
@@ -1015,22 +1027,33 @@ function generatePDF(result, meta) {
     const blindBody=blindRaw.replace(insM?.[0]||"","").replace(/^[^.]+\./,"").trim();
     if(blindBody)body(blindBody);
     if(insight){
-      const insLines=wrap('"'+insight+'"',0,CW-16);const boxH=10+insLines.length*6+4;
-      chk(boxH+4);doc.setFillColor(250,246,248);doc.setDrawColor(...ACCENT);doc.setLineWidth(0.3);doc.roundedRect(ML,y,CW,boxH,1.5,1.5,"FD");
+      const insLines=wrap('"'+insight+'"',0,CW-16);const insBoxH=10+insLines.length*6+4;
+      chk(insBoxH+4);doc.setFillColor(250,246,248);doc.setDrawColor(...ACCENT);doc.setLineWidth(0.3);doc.roundedRect(ML,y,CW,insBoxH,1.5,1.5,"FD");
       doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("THE INSIGHT",ML+6,y+7);
       doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");insLines.forEach((l,i)=>doc.text(l,ML+6,y+14+i*6));
-      y+=boxH+6;
+      y+=insBoxH+6;
     }
 
-    // ══ PAGE — BEST OPPORTUNITY + RECOMMENDED ACTIONS: "the tactical page" ══
-    newPage("Recommended Actions");
+    // ══ BEST OPPORTUNITY + RECOMMENDED ACTIONS — flows naturally, no forced blank page ══
+    rule();y+=6;
     secHd("03 · BEST OPPORTUNITY","Where to focus your energy.","The areas most likely to move the needle.");
     oppList.slice(0,3).forEach((o,i)=>{chk(14);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML,y);doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.text(o.title,ML+8,y);y+=5;if(o.body)body(o.body,8);});
     rule();y+=6;
     secHd("04 · RECOMMENDED ACTIONS","Where to direct your energy.","In priority order.");
     const tiers=[{p:"Highest",im:"High",t:"Today"},{p:"High",im:"High",t:"Within 3 days"},{p:"High",im:"Medium",t:"Within 5 days"},{p:"Medium",im:"Medium",t:"Within 2 weeks"},{p:"Medium",im:"Medium",t:"Within 2 weeks"}];
-    let an=0;const actionItems=[];
-    {let cur=null;rawLines(result.recommendedActions||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);const wy=l.match(/\*Why this matters:?\*?\s*(.*)/i);if(b&&actionItems.length<5){if(cur)actionItems.push(cur);cur={title:b[1],body:cleanStr(b[2]||""),why:""};}else if(wy&&cur){cur.why=wy[1];}else if(cur&&l.trim()&&!l.match(/set aside/i)){cur.body=(cur.body?cur.body+" ":"")+cleanStr(l);}});if(cur)actionItems.push(cur);}
+    const actionItems=[];const deprioLines=[];
+    {let cur=null;let inDeprio=false;
+      rawLines(result.recommendedActions||"").forEach(l=>{
+        const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);
+        const wy=l.match(/\*Why this matters:?\*?\s*(.*)/i);
+        if(b&&/set aside/i.test(b[1])){if(cur){actionItems.push(cur);cur=null;}inDeprio=true;if(b[2])deprioLines.push(cleanStr(b[2]));return;}
+        if(inDeprio){if(l.trim())deprioLines.push(cleanStr(l));return;}
+        if(b&&actionItems.length<5){if(cur)actionItems.push(cur);cur={title:b[1],body:cleanStr(b[2]||""),why:""};}
+        else if(wy&&cur){cur.why=wy[1];}
+        else if(cur&&l.trim()){cur.body=(cur.body?cur.body+" ":"")+cleanStr(l);}
+      });
+      if(cur)actionItems.push(cur);
+    }
     actionItems.forEach((a,i)=>{
       const tier=tiers[i]||tiers[4];
       const bodyLines=wrap(a.body,0,CW-16);
@@ -1050,30 +1073,40 @@ function generatePDF(result, meta) {
       if(whyLines.length){ry+=1.5;doc.setFontSize(9);doc.setTextColor(...ACCENT_DK);doc.setFont("helvetica","italic");whyLines.forEach(l=>{doc.text(l,ML+22,ry);ry+=4.4;});}
       y+=cardHt+5;
     });
+    if(deprioLines.length){
+      const deprioText=deprioLines.join(" ").trim();
+      const dLines=wrap("Set aside for now: "+deprioText,0,CW-8);
+      chk(dLines.length*4.6+8);
+      doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","italic");
+      dLines.forEach(l=>{doc.text(l,ML,y);y+=4.6;});
+      y+=4;
+    }
 
-    // ══ PAGE — 30-DAY ROADMAP: "the execution page" — checklist visual ══
+    // ══ PAGE — 30-DAY ROADMAP: "the execution page" — checklist visual, given room to breathe ══
     newPage("30-Day Roadmap");
     secHd("05 · 30-DAY ROADMAP","Your week-by-week execution plan.","Print it. Check it off.");
+    y+=6;
     const wths=["Foundation","Momentum","Activation","Scale & Review"];
     const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
     const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim();});
-    const colGap=4,colW=(CW-colGap*3)/4,startY=y;
+    const colGap=6,colW=(CW-colGap*3)/4,startY=y;
     let maxColH=0;
     wd.forEach((w,i)=>{
       const cx=ML+i*(colW+colGap);let cy=startY;
-      doc.setFillColor(...ACCENT);doc.rect(cx,cy,colW,7,"F");
-      doc.setFontSize(7.5);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
-      doc.text("WEEK "+(i+1),cx+3,cy+4.8);
-      cy+=10;
-      doc.setFontSize(8.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");
-      wrap(wths[i],0,colW-4).forEach(l=>{doc.text(l,cx+3,cy);cy+=4.2;});
-      cy+=2;
+      doc.setFillColor(...ACCENT);doc.rect(cx,cy,colW,9,"F");
+      doc.setFontSize(8.5);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
+      doc.text("WEEK "+(i+1),cx+4,cy+6);
+      cy+=14;
+      doc.setFontSize(10);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");
+      wrap(wths[i],0,colW-6).forEach(l=>{doc.text(l,cx+4,cy);cy+=5;});
+      cy+=5;
       const tasks=w.split(/[\/\n]/).map(t=>cleanStr(t)).filter(Boolean).slice(0,5);
       tasks.forEach(t=>{
-        doc.setDrawColor(...MUTED);doc.setLineWidth(0.3);doc.rect(cx+3,cy-2.6,2.6,2.6,"S");
-        doc.setFontSize(7.8);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
-        wrap(t,0,colW-11).forEach((l,li)=>{doc.text(l,cx+8,cy+li*3.6);});
-        cy+=Math.max(wrap(t,0,colW-11).length*3.6,4.2);
+        doc.setDrawColor(...MUTED);doc.setLineWidth(0.35);doc.rect(cx+4,cy-3.2,3.4,3.4,"S");
+        doc.setFontSize(9);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
+        const tLines=wrap(t,0,colW-13);
+        tLines.forEach((l,li)=>{doc.text(l,cx+10.5,cy+li*4.6);});
+        cy+=Math.max(tLines.length*4.6,6.5)+3;
       });
       maxColH=Math.max(maxColH,cy-startY);
     });
