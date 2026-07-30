@@ -492,36 +492,72 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .hub-q-card-cta{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#B0728A;margin-top:auto;}
 
 /* ASK YOUR ADVISOR */
-.advisor-page{max-width:680px;margin:0 auto;padding:52px 28px 80px;}
-.advisor-h1{font-family:'Cormorant',serif;font-size:clamp(28px,4.5vw,44px);font-weight:600;color:#1C1917;line-height:1.1;margin-bottom:10px;letter-spacing:-0.02em;}
+.advisor-page{max-width:640px;margin:0 auto;padding:56px 28px 96px;}
+
+/* A quiet mood-setting moment before the interaction — not a full cover, just tone */
+.advisor-mood{background:#1A1916;padding:34px 36px;border-radius:6px;text-align:center;margin-bottom:48px;}
+.advisor-mood-kicker{font-size:10px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#8A7E78;margin-bottom:13px;display:block;}
+.advisor-mood-line{font-family:'Cormorant',serif;font-style:italic;font-size:19px;color:#fff;line-height:1.5;max-width:420px;margin:0 auto;}
+
+/* THE HERO — one focal point, everything centered around the act of asking */
+.advisor-hero{text-align:center;margin-bottom:6px;}
+.advisor-h1{font-family:'Cormorant',serif;font-size:clamp(28px,4.6vw,42px);font-weight:600;color:#1C1917;line-height:1.12;margin-bottom:14px;letter-spacing:-0.02em;}
 .advisor-h1 em{font-style:italic;color:#B0728A;}
-.advisor-sub{font-size:15px;color:#78716C;font-weight:300;line-height:1.7;margin-bottom:28px;}
-.advisor-ta{width:100%;padding:16px 18px;border:1.5px solid #EEEAE7;border-radius:4px;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;color:#1A1916;line-height:1.72;resize:none;min-height:130px;outline:none;background:#FAFAF8;transition:border-color 0.15s;}
+.advisor-sub{font-size:14.5px;color:#78716C;font-weight:300;line-height:1.72;max-width:420px;margin:0 auto 40px;}
+
+.advisor-input-wrap{margin-bottom:18px;}
+.advisor-input-label{font-family:'Cormorant',serif;font-style:italic;font-size:16px;color:#8A5068;margin-bottom:14px;display:block;letter-spacing:-0.005em;text-align:center;}
+.advisor-ta{width:100%;padding:24px 26px;border:1.5px solid #EEEAE7;border-radius:8px;font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;color:#1A1916;line-height:1.75;resize:none;min-height:150px;outline:none;background:#FAFAF8;transition:border-color 0.2s,background 0.2s;text-align:left;}
 .advisor-ta:focus{border-color:#B0728A;background:#fff;}
 .advisor-ta::placeholder{color:#C4B5AD;}
-.advisor-hint{font-size:12px;color:#B8AFA8;margin-top:8px;font-style:italic;margin-bottom:16px;}
-.advisor-suggested{margin-bottom:28px;}
-.advisor-suggested-label{font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:10px;}
-.advisor-suggestions{display:flex;flex-wrap:wrap;gap:7px;}
-.advisor-sugg{padding:8px 16px;border:1px solid #EEEAE7;background:#fff;border-radius:100px;font-size:12px;color:#57534E;cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
-.advisor-sugg:hover{border-color:#B0728A;color:#1C1917;background:#FDF7F9;}
-.advisor-result{margin-top:28px;border:1px solid #EEEAE7;border-radius:4px;overflow:hidden;}
-.advisor-result-header{background:#1A1916;padding:18px 24px;}
+.advisor-hint{font-size:12px;color:#B8AFA8;margin-top:8px;font-style:italic;}
+
+/* Suggestions recede — quiet inline text, not competing buttons */
+.advisor-suggestions{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;max-width:520px;margin:16px auto 28px;}
+.advisor-sugg{background:none;border:none;padding:2px 0;cursor:pointer;font-size:12.5px;color:#8A8079;font-family:'Plus Jakarta Sans',sans-serif;text-decoration:underline;text-decoration-color:#E8D9DF;text-underline-offset:3px;transition:color 0.15s;}
+.advisor-sugg:hover{color:#B0728A;text-decoration-color:#B0728A;}
+
+.advisor-cta-row{display:flex;justify-content:center;margin-bottom:4px;}
+.advisor-cta-row .btn{padding:16px 40px;font-size:12px;letter-spacing:0.14em;}
+
+/* ASKED — quiet recap once a question has been submitted, replaces the hero */
+.advisor-asked{text-align:center;margin-bottom:8px;}
+.advisor-asked-eye{font-size:10px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:#C4B5AD;margin-bottom:14px;display:block;}
+.advisor-asked-q{font-family:'Cormorant',serif;font-style:italic;font-size:19px;color:#57534E;line-height:1.45;max-width:520px;margin:0 auto;}
+
+.advisor-result{margin-top:36px;border:1px solid #EEEAE7;border-radius:8px;overflow:hidden;}
+.advisor-result-header{background:#1A1916;padding:22px 26px;}
 .advisor-result-eye{font-size:11px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:#C4A0B0;}
-.advisor-result-section{padding:20px 24px;border-bottom:1px solid #EEEAE7;}
+.advisor-result-section{padding:24px 26px;border-bottom:1px solid #EEEAE7;}
 .advisor-result-section:last-child{border-bottom:none;}
-.advisor-result-label{font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:10px;}
-.advisor-result-text{font-size:14px;color:#3A3530;line-height:1.78;font-weight:300;}
+.advisor-result-label{font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:11px;}
+.advisor-result-text{font-size:14px;color:#3A3530;line-height:1.8;font-weight:300;}
 .advisor-result-steps{display:flex;flex-direction:column;gap:8px;}
 .advisor-result-step{display:flex;gap:10px;align-items:flex-start;}
 .advisor-result-step-num{width:22px;height:22px;border-radius:50%;background:#B0728A;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .advisor-result-step-text{font-size:13px;color:#57534E;line-height:1.65;font-weight:300;}
-.advisor-history{margin-top:32px;}
-.advisor-history-label{font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:12px;}
-.advisor-history-item{padding:12px 16px;border:1px solid #EEEAE7;border-radius:4px;margin-bottom:6px;cursor:pointer;transition:all 0.15s;}
+.advisor-ask-again{display:block;margin:32px auto 0;background:none;border:none;color:#B0728A;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;text-align:center;}
+.advisor-ask-again:hover{color:#8A5068;}
+
+/* PREVIOUS SESSIONS — present, but quiet; never competes with the hero */
+.advisor-history{margin-top:64px;padding-top:32px;border-top:1px solid #F0EDEB;}
+.advisor-history-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#C4B5AD;margin-bottom:16px;}
+.advisor-history-item{padding:18px 20px;border:1px solid #EEEAE7;border-radius:6px;margin-bottom:8px;cursor:pointer;transition:all 0.18s;}
 .advisor-history-item:hover{border-color:#E8C4D4;background:#FDF7F9;}
-.advisor-history-q{font-size:13px;color:#1A1916;font-weight:400;line-height:1.4;margin-bottom:3px;}
-.advisor-history-date{font-size:12px;color:#C4B5AD;}
+.advisor-history-date{font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#C4B5AD;margin-bottom:7px;}
+.advisor-history-q{font-family:'Cormorant',serif;font-size:15.5px;font-style:italic;color:#1A1916;font-weight:500;line-height:1.4;}
+
+/* GUIDANCE — collapsed by default; a footnote, not a section competing at the top */
+.advisor-disclosure{margin-top:40px;padding-top:24px;border-top:1px solid #F0EDEB;}
+.advisor-disclosure summary{cursor:pointer;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#A8A29E;list-style:none;}
+.advisor-disclosure summary::-webkit-details-marker{display:none;}
+.advisor-disclosure summary:hover{color:#78716C;}
+.advisor-disclosure summary::after{content:'+';float:right;font-weight:400;}
+.advisor-disclosure[open] summary::after{content:'−';}
+.advisor-guidance{display:flex;gap:36px;flex-wrap:wrap;margin-top:22px;}
+.advisor-guidance-col{flex:1;min-width:200px;}
+.advisor-guidance-label{font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:10px;}
+.advisor-guidance-item{font-size:12.5px;color:#78716C;font-weight:300;line-height:1.65;padding-left:12px;margin-bottom:7px;}
 
 
 /* HAMBURGER + MOBILE MENU */
@@ -2074,106 +2110,127 @@ One sentence. The single most concrete action to take right now.`;
     {screen==="advisor"&&(
       <div className="advisor-page">
         <div className="bc"><span onClick={restart}>Home</span></div>
-        <h1 className="advisor-h1">Ask Your <em>Advisor.</em></h1>
-        <p className="advisor-sub">Need help making a decision? Working through a challenge? Not sure what to do next? Describe your situation and get a direct, honest response — like talking to a trusted advisor who actually understands your world.</p>
-        <div style={{display:"flex",gap:24,marginBottom:28,flexWrap:"wrap"}}>
-          {[{label:"Use this when",items:["You're weighing a specific decision","Something happened and you need to think it through","You want a second opinion before you act","You have one burning question"]},{label:"Use Industry Hub instead when",items:["You need a framework or process","You want to browse prompts for your field","You need a structured playbook, not a conversation"]}].map((col,i)=>(
-            <div key={i} style={{flex:1,minWidth:200}}>
-              <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.16em",textTransform:"uppercase",color:i===0?"#B0728A":"#A8A29E",marginBottom:8}}>{col.label}</p>
-              {col.items.map((item,j)=>(
-                <p key={j} style={{fontSize:13,color:"#78716C",fontWeight:300,lineHeight:1.65,paddingLeft:12,borderLeft:`2px solid ${i===0?"#E8C4D4":"#EEEAE7"}`,marginBottom:6}}>{item}</p>
-              ))}
+
+        <div className="advisor-mood">
+          <span className="advisor-mood-kicker">Your Private Advisor</span>
+          <p className="advisor-mood-line">Every strategy begins with a single honest question.</p>
+        </div>
+
+        {!advisorResult&&(
+          <>
+            <div className="advisor-hero">
+              <h1 className="advisor-h1">Ask Your <em>Advisor.</em></h1>
+              <p className="advisor-sub">Describe your situation and receive a direct, honest response — like sitting across the table from a trusted strategist.</p>
             </div>
-          ))}
-        </div>
-        <textarea className="advisor-ta" rows={5} placeholder="e.g. I have been a real estate agent for 2 years and I cannot figure out how to get consistent listings. I have tried open houses and cold calling but nothing is working…" value={advisorQ} onChange={e=>setAdvisorQ(e.target.value)}/>
-        <p className="advisor-hint">Type your question above or choose a suggested question below.</p>
-        <div className="advisor-suggested">
-          <div className="advisor-suggested-label">Common questions — tap to use</div>
-          <div className="advisor-suggestions">
-            {[
-              "How do I get my first paying clients?",
-              "How do I ask for a raise or promotion?",
-              "How do I raise my prices without losing clients?",
-              "How do I build a referral system that actually works?",
-              "How do I transition to a new career or industry?",
-              "Should I niche down or stay broad?",
-              "How do I stand out in a crowded market?",
-              "How do I stay motivated when progress feels slow?",
-              "How do I manage a difficult conversation at work?",
-              "When should I hire help or delegate?",
-            ].map(s=>(
-              <button key={s} className="advisor-sugg" onClick={()=>{setAdvisorQ(s);window.scrollTo({top:0,behavior:"smooth"});}}>{s}</button>
-            ))}
-          </div>
-        </div>
-        <div style={{display:"flex",gap:8,marginBottom:24}}>
-          <button className="btn" disabled={advisorLoading||!advisorQ.trim()} onClick={()=>askAdvisor(advisorQ)}>
-            {advisorLoading?"Getting your answer…":"Get My Advice →"}
-          </button>
-          {advisorQ&&<button className="btn-out" onClick={()=>{setAdvisorQ("");setAdvisorResult(null);}}>Clear</button>}
-        </div>
+            <div className="advisor-input-wrap">
+              <textarea className="advisor-ta" rows={5} placeholder="e.g. I have been a real estate agent for 2 years and I cannot figure out how to get consistent listings…" value={advisorQ} onChange={e=>setAdvisorQ(e.target.value)}/>
+            </div>
+            {!advisorLoading&&(
+              <div className="advisor-suggestions">
+                {[
+                  "How do I get my first paying clients?",
+                  "How do I ask for a raise or promotion?",
+                  "How do I raise my prices without losing clients?",
+                  "How do I build a referral system that works?",
+                  "How do I transition to a new career?",
+                  "Should I niche down or stay broad?",
+                  "How do I stand out in a crowded market?",
+                  "When should I hire help or delegate?",
+                ].map(s=>(
+                  <button key={s} className="advisor-sugg" onClick={()=>setAdvisorQ(s)}>{s}</button>
+                ))}
+              </div>
+            )}
+            <div className="advisor-cta-row">
+              <button className="btn" disabled={advisorLoading||!advisorQ.trim()} onClick={()=>askAdvisor(advisorQ)}>
+                {advisorLoading?"Getting your answer…":"Get My Advice →"}
+              </button>
+            </div>
+          </>
+        )}
+
         {advisorLoading&&(
-          <div style={{textAlign:"center",padding:"32px 0"}}>
+          <div style={{textAlign:"center",padding:"48px 0"}}>
             <div className="load-ring" style={{margin:"0 auto 16px"}}/>
             <p style={{fontSize:13,color:"#78716C"}}>{firstName?firstName+", your":"Your"} advisor is thinking…</p>
           </div>
         )}
+
         {advisorResult&&!advisorResult.error&&(
-          <div className="advisor-result">
-            <div className="advisor-result-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div>
-                <div className="advisor-result-eye" style={{marginBottom:6}}>Your Advisor</div>
-                <p style={{fontFamily:"'Cormorant',serif",fontSize:15,fontStyle:"italic",color:"#8A7E78",lineHeight:1.4}}>"{advisorResult.question.length>60?advisorResult.question.substring(0,58)+"…":advisorResult.question}"</p>
-              </div>
+          <>
+            <div className="advisor-asked">
+              <span className="advisor-asked-eye">You asked</span>
+              <p className="advisor-asked-q">"{advisorResult.question}"</p>
             </div>
-            {advisorResult.hearing&&(
-              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label" style={{color:"#A8A29E"}}>What I'm Hearing</div>
-                <div className="advisor-result-text" style={{fontStyle:"italic",color:"#57534E"}}>{advisorResult.hearing}</div>
+            <div className="advisor-result">
+              <div className="advisor-result-header">
+                <div className="advisor-result-eye">Your Advisor</div>
               </div>
-            )}
-            {advisorResult.think&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label" style={{color:"#1A1916"}}>Here's What I Think</div>
-                <div className="advisor-result-text">{advisorResult.think}</div>
-              </div>
-            )}
-            {advisorResult.means&&(
-              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label" style={{color:"#A8A29E"}}>What This Means For You</div>
-                <div className="advisor-result-text">{advisorResult.means}</div>
-              </div>
-            )}
-            {(advisorResult.move||advisorResult.first)&&(
-              <div className="advisor-result-section" style={{borderTop:"2px solid #B0728A"}}>
-                <div className="advisor-result-label" style={{color:"#B0728A"}}>Your Single Next Move</div>
-                <div className="advisor-result-text" style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1A1916",lineHeight:1.4}}>{advisorResult.move||advisorResult.first}</div>
-              </div>
-            )}
-            {!advisorResult.hearing&&!advisorResult.think&&!advisorResult.means&&!advisorResult.move&&!advisorResult.first&&advisorResult.raw&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{advisorResult.raw}</div>
-              </div>
-            )}
-            {/* Follow-up prompt */}
-            <div style={{padding:"16px 24px",background:"#FAFAF8",borderTop:"1px solid #EEEAE7"}}>
-              <p style={{fontSize:13,color:"#A8A29E",fontStyle:"italic"}}>Does this resonate? Ask a follow-up or try a different question above.</p>
+              {advisorResult.hearing&&(
+                <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
+                  <div className="advisor-result-label" style={{color:"#A8A29E"}}>What I'm Hearing</div>
+                  <div className="advisor-result-text" style={{fontStyle:"italic",color:"#57534E"}}>{advisorResult.hearing}</div>
+                </div>
+              )}
+              {advisorResult.think&&(
+                <div className="advisor-result-section">
+                  <div className="advisor-result-label" style={{color:"#1A1916"}}>Here's What I Think</div>
+                  <div className="advisor-result-text">{advisorResult.think}</div>
+                </div>
+              )}
+              {advisorResult.means&&(
+                <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
+                  <div className="advisor-result-label" style={{color:"#A8A29E"}}>What This Means For You</div>
+                  <div className="advisor-result-text">{advisorResult.means}</div>
+                </div>
+              )}
+              {(advisorResult.move||advisorResult.first)&&(
+                <div className="advisor-result-section" style={{borderTop:"2px solid #B0728A"}}>
+                  <div className="advisor-result-label" style={{color:"#B0728A"}}>Your Single Next Move</div>
+                  <div className="advisor-result-text" style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1A1916",lineHeight:1.4}}>{advisorResult.move||advisorResult.first}</div>
+                </div>
+              )}
+              {!advisorResult.hearing&&!advisorResult.think&&!advisorResult.means&&!advisorResult.move&&!advisorResult.first&&advisorResult.raw&&(
+                <div className="advisor-result-section">
+                  <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{advisorResult.raw}</div>
+                </div>
+              )}
             </div>
-          </div>
+            <button className="advisor-ask-again" onClick={()=>{setAdvisorQ("");setAdvisorResult(null);}}>Ask another question →</button>
+          </>
         )}
-        {advisorResult?.error&&<div className="err">⚠ {advisorResult.error}</div>}
-        {advisorHistory.length>0&&!advisorResult&&(
+        {advisorResult?.error&&(
+          <>
+            <div className="err">⚠ {advisorResult.error}</div>
+            <button className="advisor-ask-again" onClick={()=>{setAdvisorQ("");setAdvisorResult(null);}}>Try again →</button>
+          </>
+        )}
+
+        {advisorHistory.length>0&&(
           <div className="advisor-history">
-            <div className="advisor-history-label">Recent questions</div>
+            <div className="advisor-history-label">Your previous sessions</div>
             {advisorHistory.slice(0,5).map((h,i)=>(
               <div key={i} className="advisor-history-item" onClick={()=>{setAdvisorQ(h.question);setAdvisorResult(h);}}>
-                <div className="advisor-history-q">{h.question}</div>
                 <div className="advisor-history-date">{h.date}</div>
+                <div className="advisor-history-q">"{h.question}"</div>
               </div>
             ))}
           </div>
         )}
+
+        <details className="advisor-disclosure">
+          <summary>Advisor vs. Industry Hub — which should I use?</summary>
+          <div className="advisor-guidance">
+            {[{label:"Use this when",items:["You're weighing a specific decision","Something happened and you need to think it through","You want a second opinion before you act","You have one burning question"]},{label:"Use Industry Hub instead when",items:["You need a framework or process","You want to browse prompts for your field","You need a structured playbook, not a conversation"]}].map((col,i)=>(
+              <div key={i} className="advisor-guidance-col">
+                <p className="advisor-guidance-label" style={{color:i===0?"#B0728A":"#A8A29E"}}>{col.label}</p>
+                {col.items.map((item,j)=>(
+                  <p key={j} className="advisor-guidance-item" style={{borderLeft:`2px solid ${i===0?"#E8C4D4":"#EEEAE7"}`}}>{item}</p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </details>
       </div>
     )}
 
