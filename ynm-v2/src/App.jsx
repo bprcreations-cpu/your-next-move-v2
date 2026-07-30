@@ -1373,28 +1373,32 @@ Sentence 3: What specifically changes in 2 weeks if they do this.`;
   async function askAdvisor(question){
     if(!question.trim())return;
     setAdvisorLoading(true);setAdvisorResult(null);
-    const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry, ${savedPlans[0].journeyStage} stage.`:"";
-    const prompt=`You are a trusted personal advisor. You are warm, direct, and speak plainly. You have deep knowledge across business, careers, finance, real estate, marketing, leadership, and personal development. You respond like a brilliant friend who happens to know everything — not like an AI assistant.
+    const context=savedPlans[0]?`Background only, may or may not be relevant: this person previously built a strategy involving ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} work in ${savedPlans[0].industry} (${savedPlans[0].journeyStage} stage). Use this ONLY if their question below actually relates to it. If their question is about something else entirely, ignore this completely and follow the question wherever it leads — do not force a connection that isn't there.`:"";
+    const prompt=`You are a trusted personal advisor with deep, genuine expertise across every domain of business and life — careers, finance, real estate, marketing, operations, law, health, relationships, parenting, creative work, technology, and more. You are warm, direct, and speak plainly, like a brilliant friend who happens to know everything — not like an AI assistant, and not like a narrow specialist.
+
+SILENT REASONING (apply this internally — never show it in your response):
+Before answering, determine what this person is actually trying to accomplish and what expertise their situation calls for. Adopt whichever expert lens — or blend of experts — the CURRENT question genuinely needs. A question about buying a home calls for a mortgage-and-credit lens. A question about a difficult employee calls for an HR-and-leadership lens. A question about opening a restaurant calls for an operations-and-hospitality lens. Let the question decide who you become each time — never stay anchored to a domain just because the person explored it before on this platform.
 
 CRITICAL RULES:
-1. NO BULLET POINTS. No numbered lists. Write in natural flowing sentences and paragraphs only.
+1. FOLLOW THE CURRENT QUESTION, NOT PAST HISTORY. Any background context below is supporting color, never a constraint. If it doesn't fit, drop it entirely.
 2. ONE CLEAR OPINION. Do not present multiple options and let them choose. Pick the best path and advocate for it.
-3. NEVER ASSUME. The person may have a corporate job, a side business, multiple income streams, or none. Respond only to what they actually said.
+3. NEVER ASSUME. Respond only to what they actually said about their actual situation.
 4. BE DIRECT. Say what you think. "I think you should..." not "You might want to consider..."
-5. FEEL HUMAN. Read like someone who knows this person, not a chatbot completing a template.
-6. SHORT ENOUGH TO READ. The whole response should take 60-90 seconds to read. Cut anything that doesn't add value.
+5. FORM FOLLOWS FUNCTION. Default to flowing prose for your recommendation — but if the answer is genuinely clearer as a short checklist, a few numbered steps, or a quick comparison, use that instead. Choose whatever format actually serves this specific answer.
+6. FEEL HUMAN. Read like someone who knows this person, not a chatbot completing a template.
+7. SHORT ENOUGH TO READ. The whole response should take 60-90 seconds to read. Cut anything that doesn't add value.
 
 ${firstName?`The person's name is ${firstName}. Use it once naturally — not at the start of every section.`:""} ${context}
 
 Their question or situation: ${question}
 
-Respond with exactly these four sections. Write each section as flowing prose — never as a list.
+Respond with exactly these four sections. Use the section header text exactly as shown.
 
 **What I'm hearing**
 One to two sentences reflecting what they said back to them. Make them feel understood before you give any advice.
 
 **Here's what I think**
-Two to four sentences. Your direct recommendation. Take a position. Be specific to their exact situation — not general career advice.
+Your direct recommendation, in whatever format best serves it — prose, a short list, or a brief comparison. Be specific to their exact situation, drawing on whichever expertise it actually requires.
 
 **What this means for you**
 One to two sentences on why this matters right now for their specific situation. Connect it to something they mentioned.
@@ -1440,63 +1444,63 @@ One sentence. The single most important action to take in the next 24 hours. Be 
   async function askHubSearch(query){
     if(!query.trim())return;
     setHubSearchLoading(true);setHubSearchResult(null);
-    const context=savedPlans[0]?`User context: ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} focus, ${savedPlans[0].industry} industry.`:"";
-    const prompt=`You are an expert consultant delivering a professional resource. Every response should feel like it was created by a senior advisor with 20 years of experience in this exact topic — not generated by a tool.
+    const context=savedPlans[0]?`Background only, may or may not be relevant: this person has explored ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} work in ${savedPlans[0].industry} on this platform before. Use this only if their question below actually relates to it — otherwise ignore it completely.`:"";
+    const prompt=`You are a universal knowledge engine and expert teacher. There is no topic you decline — from a simple fact, to a definition, to a deep framework, to a step-by-step how-to, across any domain of business, finance, careers, creativity, technology, health, or everyday life. The person should never wonder whether they're "allowed" to ask something here. If they can think of the question, you answer it, at whatever depth it deserves.
 
 ${firstName?`This is for ${firstName}.`:""} ${context}
 
 Request: ${query}
 
-STEP 1 — Classify this request:
-- Is this a KNOWLEDGE question (what is X, how does X work, define X)? → Write 2-3 clear explanatory paragraphs with a bold header. No lists needed unless they add clarity.
-- Is this a CHECKLIST or TEMPLATE request (create a checklist, give me a template)? → Deliver a numbered checklist or template immediately. Clean, complete, ready to use.
-- Is this a STRATEGY or PLAN request? → Deliver a structured response with clear sections: Situation Overview, Key Recommendations, Action Steps, What to Watch For.
-- Is this a COMPARISON or DECISION? → Use a clear comparison format. Give a recommendation at the end.
-- Is this a GENERAL professional question? → Answer directly and practically in 3-4 paragraphs.
+SILENT REASONING (apply internally, never show it):
+First, determine what kind of request this actually is — a quick fact, a definition, a how-to, a strategic framework, a comparison, or a creative deliverable like an email or calendar — and what depth genuinely serves it. A request for "what is 2+2" deserves a one-line answer, not a six-section teaching breakdown. A request to "teach me commercial real estate" deserves real depth. Match the response to the actual request, not to a template.
 
-STEP 2 — Write the response:
-Use the right format for the request type above. Do not force every response into the same structure.
+HOW TO RESPOND:
+Write a genuinely educational, specific answer — like a senior expert with real experience in exactly this topic, not a generic summary. Where it truly adds value for the person's understanding, naturally include any of the following that fit (skip any that don't apply — never force a section that adds nothing):
 
-Every response must be:
-- Professional in tone — like reading a consultant's memo
-- Specific — not generic advice that applies to everyone
-- Actionable — the person should know exactly what to do
-- Complete — do not cut off before finishing
+**Direct Answer**
+The core answer or explanation itself, clear and complete.
 
-End every response with:
+**Why It Matters**
+Why this is relevant or useful to understand.
 
-**Your First Step**
-One sentence. The single most concrete action to take right now.`;
+**Practical Example**
+A concrete, real-world example that makes it click.
+
+**Common Mistakes**
+Common misunderstandings or errors people make with this — as a short list, only if genuinely useful.
+
+**Related Concepts**
+One or two closely related ideas worth knowing — only if it deepens understanding.
+
+**Next Steps**
+A short list of concrete next actions, only for how-to or strategic requests where action is the point.
+
+For a simple factual question, "Direct Answer" alone is a complete, correct response — do not pad it with unnecessary sections.`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
-      if(!res.ok)throw new Error("Failed");
+      if(!res.ok){const errBody=await res.json().catch(()=>({}));throw new Error(`API ${res.status}: ${errBody.error||errBody.code||"Unknown error"}`);}
       const data=await res.json();
       const text=data.text||"";
-      const frameworkMatch=text.match(/\*\*The Framework\*\*\s*([\s\S]*?)(?=\*\*Applied to Your Situation\*\*|$)/i);
-      const appliedMatch=text.match(/\*\*Applied to Your Situation\*\*\s*([\s\S]*?)(?=\*\*Step-by-Step\*\*|$)/i);
-      const stepsMatch=text.match(/\*\*Step-by-Step\*\*\s*([\s\S]*?)(?=\*\*Common Mistakes\*\*|$)/i);
-      const mistakesMatch=text.match(/\*\*Common Mistakes\*\*\s*([\s\S]*?)(?=\*\*Your Starting Point\*\*|$)/i);
-      const startMatch=text.match(/\*\*Your Starting Point\*\*\s*([\s\S]*?)(?=$)/i);
-      // Smart format detection
-      const hasStructured = frameworkMatch||appliedMatch||stepsMatch;
-      // Parse title from response
-      const titleMatch = text.match(/^#+\s*(.+)|^\*\*(.+?)\*\*/);
-      const responseTitle = titleMatch?(titleMatch[1]||titleMatch[2]||"").replace(/\*\*/g,"").trim():"";
-      // Get first step from various formats
-      const firstStepMatch = text.match(/\*\*Your First Step\*\*\s*([\s\S]*?)(?=$)/i);
+      const directMatch=text.match(/\*\*Direct Answer\*\*\s*([\s\S]*?)(?=\*\*Why It Matters\*\*|\*\*Practical Example\*\*|\*\*Common Mistakes\*\*|\*\*Related Concepts\*\*|\*\*Next Steps\*\*|$)/i);
+      const whyMatch=text.match(/\*\*Why It Matters\*\*\s*([\s\S]*?)(?=\*\*Practical Example\*\*|\*\*Common Mistakes\*\*|\*\*Related Concepts\*\*|\*\*Next Steps\*\*|$)/i);
+      const exampleMatch=text.match(/\*\*Practical Example\*\*\s*([\s\S]*?)(?=\*\*Common Mistakes\*\*|\*\*Related Concepts\*\*|\*\*Next Steps\*\*|$)/i);
+      const mistakesMatch=text.match(/\*\*Common Mistakes\*\*\s*([\s\S]*?)(?=\*\*Related Concepts\*\*|\*\*Next Steps\*\*|$)/i);
+      const relatedMatch=text.match(/\*\*Related Concepts\*\*\s*([\s\S]*?)(?=\*\*Next Steps\*\*|$)/i);
+      const stepsMatch=text.match(/\*\*Next Steps\*\*\s*([\s\S]*?)(?=$)/i);
+      const hasStructured = directMatch||whyMatch||exampleMatch||mistakesMatch||relatedMatch||stepsMatch;
       setHubSearchResult({
         query,
         isPlaybook: !!hasStructured,
         rawText: !hasStructured ? text.replace(/\*\*/g,"").trim() : "",
-        responseTitle,
-        framework:(frameworkMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        applied:(appliedMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        steps:lines((stepsMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
-        mistakes:lines((mistakesMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
-        start:(firstStepMatch?.[1]||startMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        direct:(directMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        why:(whyMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        example:(exampleMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        mistakes:lines((mistakesMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
+        related:(relatedMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        steps:lines((stepsMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
       });
-    }catch(e){setHubSearchResult({query,error:"We hit a snag on our end. Please try again in a moment."});}
+    }catch(e){console.error("[askHubSearch] failed:",e.message);setHubSearchResult({query,error:"We hit a snag on our end. Please try again in a moment."});}
     finally{setHubSearchLoading(false);}
   }
 
@@ -1881,12 +1885,13 @@ One sentence. The single most concrete action to take right now.`;
               <div><p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>Expert Response</p><p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:500,color:"#fff"}}>"{hubSearchResult.query}"</p></div>
               <button onClick={()=>{setHubSearchResult(null);setHubSearchQuery("");}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"5px 14px",color:"#A8A29E",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Clear</button>
             </div>
-            {hubSearchResult.framework&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>The Framework</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.framework}</p></div>}
-            {hubSearchResult.applied&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Applied to Your Situation</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.applied}</p></div>}
-            {hubSearchResult.steps?.length>0&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Step-by-Step</p><div style={{display:"flex",flexDirection:"column",gap:10}}>{hubSearchResult.steps.map((s,i)=><div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}><div style={{width:24,height:24,borderRadius:"50%",background:"#1A1916",color:"#fff",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div><p style={{fontSize:14,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p></div>)}</div></div>}
+            {hubSearchResult.direct&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Direct Answer</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.direct}</p></div>}
+            {hubSearchResult.why&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Why It Matters</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.why}</p></div>}
+            {hubSearchResult.example&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Practical Example</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.example}</p></div>}
             {hubSearchResult.mistakes?.length>0&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FEF9F6"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#B8936A",marginBottom:12}}>Common Mistakes</p><div style={{display:"flex",flexDirection:"column",gap:8}}>{hubSearchResult.mistakes.map((m,i)=><div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}><span style={{color:"#B8936A",fontSize:14,fontWeight:700,flexShrink:0}}>!</span><p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{m}</p></div>)}</div></div>}
+            {hubSearchResult.related&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Related Concepts</p><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.related}</p></div>}
+            {hubSearchResult.steps?.length>0&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Next Steps</p><div style={{display:"flex",flexDirection:"column",gap:10}}>{hubSearchResult.steps.map((s,i)=><div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}><div style={{width:24,height:24,borderRadius:"50%",background:"#1A1916",color:"#fff",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div><p style={{fontSize:14,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p></div>)}</div></div>}
             {!hubSearchResult.isPlaybook&&hubSearchResult.rawText&&<div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}><p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300,whiteSpace:"pre-wrap"}}>{hubSearchResult.rawText}</p></div>}
-            {hubSearchResult.start&&<div style={{padding:"18px 22px",background:"#FAFAF8",borderTop:"2px solid #1A1916"}}><p style={{fontSize:11,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Your Starting Point</p><p style={{fontSize:15,color:"#1A1916",fontWeight:600,lineHeight:1.5,fontFamily:"'Cormorant',serif"}}>{hubSearchResult.start}</p></div>}
           </div>
         )}
 
@@ -1963,29 +1968,22 @@ One sentence. The single most concrete action to take right now.`;
               </div>
               <button onClick={()=>{setHubSearchResult(null);setHubSearchQuery("");setHubSearch("");}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"5px 14px",color:"#A8A29E",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.08em",textTransform:"uppercase"}}>Clear</button>
             </div>
-            {hubSearchResult.framework&&(
+            {hubSearchResult.direct&&(
               <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>The Framework</p>
-                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.framework}</p>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Direct Answer</p>
+                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.direct}</p>
               </div>
             )}
-            {hubSearchResult.applied&&(
+            {hubSearchResult.why&&(
               <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Applied to Your Situation</p>
-                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.applied}</p>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Why It Matters</p>
+                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.why}</p>
               </div>
             )}
-            {hubSearchResult.steps?.length>0&&(
-              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Next Steps</p>
-                <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                  {hubSearchResult.steps.map((s,i)=>(
-                    <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-                      <div style={{width:22,height:22,borderRadius:"50%",background:"#B0728A",color:"#fff",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div>
-                      <p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p>
-                    </div>
-                  ))}
-                </div>
+            {hubSearchResult.example&&(
+              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Practical Example</p>
+                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.example}</p>
               </div>
             )}
             {hubSearchResult.mistakes?.length>0&&(
@@ -2001,15 +1999,28 @@ One sentence. The single most concrete action to take right now.`;
                 </div>
               </div>
             )}
+            {hubSearchResult.related&&(
+              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Related Concepts</p>
+                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.related}</p>
+              </div>
+            )}
+            {hubSearchResult.steps?.length>0&&(
+              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
+                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Next Steps</p>
+                <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                  {hubSearchResult.steps.map((s,i)=>(
+                    <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}>
+                      <div style={{width:22,height:22,borderRadius:"50%",background:"#B0728A",color:"#fff",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div>
+                      <p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {!hubSearchResult.isPlaybook&&hubSearchResult.rawText&&(
               <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
                 <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300,whiteSpace:"pre-wrap"}}>{hubSearchResult.rawText}</p>
-              </div>
-            )}
-            {hubSearchResult.start&&(
-              <div style={{padding:"18px 22px",background:"#FAFAF8"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Your Starting Point</p>
-                <p style={{fontSize:14,color:"#1A1916",fontWeight:500,lineHeight:1.6}}>{hubSearchResult.start}</p>
               </div>
             )}
           </div>
