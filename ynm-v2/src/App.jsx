@@ -931,7 +931,13 @@ function generatePDF(result, meta) {
     const W=216,H=279,ML=20,MR=20,CW=W-ML-MR;
     const ACCENT=[176,114,138],ACCENT_DK=[138,80,104],DARK=[26,25,22],INK=[42,40,38],MUTED=[120,113,108],RULE=[230,226,223],SAGE=[106,158,138];
     let y=ML+5, pageNum=1;
-    const wrap=(t,x,w)=>doc.splitTextToSize(String(t||""),w);
+    const wrap=(t,x,w)=>{
+      let s=String(t||"");
+      s=s.replace(/\*\*/g,"");                          // stray bold markers
+      s=s.replace(/(^|\s)\*([^*\n]+?)\*(?=\s|$)/g,"$1$2"); // stray *italic* markers -> plain text (styling comes from the font itself)
+      s=s.replace(/[ \t]*-{2,}[ \t]*$/gm,"");            // stray markdown horizontal-rule artifacts ("---")
+      return doc.splitTextToSize(s,w);
+    };
     const rawLines=(t)=>(t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/));
     const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").trim().replace(/^[-–—•*✓✗\d.]+\s*/,"").trim();
     function chk(n){if(y+n>H-14){doc.addPage();pageNum++;y=ML+5;footer();}}
@@ -942,7 +948,7 @@ function generatePDF(result, meta) {
     function body(t,ind,w){const x=ML+(ind||0);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(t,0,(w||CW)-(ind||0)).forEach(l=>{chk(5);doc.text(l,x,y);y+=5;});y+=1;}
     function secHd(num,title,desc){chk(28);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(num,ML,y);y+=4.5;doc.setFontSize(17);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");wrap(title,0,CW).forEach((l)=>{doc.text(l,ML,y);y+=6.8;});if(desc){doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(desc,ML,y);y+=4.5;}doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.line(ML,y,ML+18,y);y+=5.5;}
     // Card height for a label+value mini-card, given target width
-    function cardH(value,w){const lines=wrap(value,0,w-14);return 15+lines.length*4.6+7;}
+    function cardH(value,w){doc.setFontSize(9.5);doc.setFont("helvetica","normal");const lines=wrap(value,0,w-14);return 15+lines.length*4.6+7;}
     function miniCard(x,cy,w,h,label,value,dark){
       if(dark){doc.setFillColor(...DARK);doc.rect(x,cy,w,h,"F");}
       else{doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.setFillColor(255,255,255);doc.rect(x,cy,w,h,"FD");}
@@ -985,8 +991,10 @@ function generatePDF(result, meta) {
     // One unified container — thin mauve outline, no internal card borders
     const colVals=[["Current Position",position||"—"],["Greatest Opportunity",oppList[0]?(oppList[0].title||oppList[0].body):"—"],["Primary Goal",goalFirst||"—"]];
     const colW3=(CW-32-16)/3;
+    doc.setFontSize(9.5);
     const colHeights=colVals.map(([,v])=>16+wrap(v,0,colW3).length*4.6);
     const rowH=Math.max(...colHeights,26);
+    doc.setFontSize(13);doc.setFont("helvetica","bolditalic");
     const nmLines=wrap(nms||"—",0,CW-32);
     const nmSectionH=18+nmLines.length*6.2;
     const boxH=24+rowH+18+nmSectionH+16;
@@ -1027,7 +1035,7 @@ function generatePDF(result, meta) {
     const blindBody=blindRaw.replace(insM?.[0]||"","").replace(/^[^.]+\./,"").trim();
     if(blindBody)body(blindBody);
     if(insight){
-      const insLines=wrap('"'+insight+'"',0,CW-16);const insBoxH=10+insLines.length*6+4;
+      doc.setFontSize(10.5);const insLines=wrap('"'+insight+'"',0,CW-16);const insBoxH=10+insLines.length*6+4;
       chk(insBoxH+4);doc.setFillColor(250,246,248);doc.setDrawColor(...ACCENT);doc.setLineWidth(0.3);doc.roundedRect(ML,y,CW,insBoxH,1.5,1.5,"FD");
       doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("THE INSIGHT",ML+6,y+7);
       doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");insLines.forEach((l,i)=>doc.text(l,ML+6,y+14+i*6));
@@ -1056,8 +1064,11 @@ function generatePDF(result, meta) {
     }
     actionItems.forEach((a,i)=>{
       const tier=tiers[i]||tiers[4];
+      doc.setFontSize(11.5);doc.setFont("helvetica","bold");
       const titleLines=wrap(a.title,0,CW-30);
+      doc.setFontSize(9.5);doc.setFont("helvetica","normal");
       const bodyLines=wrap(a.body,0,CW-16);
+      doc.setFontSize(9);doc.setFont("helvetica","italic");
       const whyLines=a.why?wrap("Why this matters: "+a.why,0,CW-16):[];
       // Height derived from the exact same arithmetic used below to position content —
       // guarantees the border always contains the text, regardless of title/body length.
@@ -1078,6 +1089,7 @@ function generatePDF(result, meta) {
     });
     if(deprioLines.length){
       const deprioText=deprioLines.join(" ").trim();
+      doc.setFontSize(9);doc.setFont("helvetica","italic");
       const dLines=wrap("Set aside for now: "+deprioText,0,CW-8);
       chk(dLines.length*4.6+8);
       doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","italic");
@@ -1123,6 +1135,7 @@ function generatePDF(result, meta) {
       rule();y+=6;
       secHd("07 · MEASURABLE MILESTONES","How you will know this is working.","Concrete signals of progress.");
       succ.slice(0,3).forEach((s,i)=>{
+        doc.setFontSize(10);doc.setFont("helvetica","normal");
         const lines=wrap(s.trim(),0,CW-16);const rowH=Math.max(lines.length*4.8,9)+6;
         chk(rowH+2);
         doc.setFillColor(...SAGE);doc.circle(ML+3.5,y+3.2,3.5,"F");
