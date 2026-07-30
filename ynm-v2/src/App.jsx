@@ -617,7 +617,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt{max-width:860px;margin:0 auto;background:#fff;}
 
 /* ── COVER ─────────────────────────────────────────────────── */
-.rpt-cover{background:var(--r-bg-dark);padding:92px var(--r-pad) 76px;}
+.rpt-cover{background:var(--r-bg-dark);padding:92px var(--r-pad) 48px;}
 .rpt-cover-eyebrow{font-size:10px;font-weight:500;letter-spacing:0.38em;text-transform:uppercase;color:var(--r-dark-meta);margin-bottom:32px;display:block;}
 .rpt-cover-title{font-family:'Cormorant',serif;font-size:clamp(46px,7.2vw,80px);font-weight:600;color:#fff;line-height:0.98;letter-spacing:-0.03em;margin-bottom:22px;}
 .rpt-cover-title em{font-style:italic;color:var(--r-accent);}
@@ -649,7 +649,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 
 /* ── EXECUTIVE SUMMARY — THE DIAGNOSIS ─────────────────────── */
 /* One unmistakable headline. Everything else recedes to a quiet byline strip. */
-.rpt-exec-hero{background:var(--r-bg-dark);padding:76px var(--r-pad) 60px;}
+.rpt-exec-hero{background:var(--r-bg-dark);padding:48px var(--r-pad) 60px;border-top:1px solid var(--r-rule-dark);}
 .rpt-exec-hero-label{font-size:10px;font-weight:600;letter-spacing:0.34em;text-transform:uppercase;color:var(--r-accent);margin-bottom:28px;display:block;}
 .rpt-exec-hero-headline{font-family:'Cormorant',serif;font-size:clamp(32px,5.6vw,54px);font-weight:600;font-style:italic;color:#fff;line-height:1.16;letter-spacing:-0.015em;max-width:760px;margin-bottom:22px;}
 .rpt-exec-hero-sub{font-size:14.5px;color:var(--r-dark-body);font-weight:300;line-height:1.75;max-width:520px;}
@@ -657,7 +657,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-exec-glance{display:flex;flex-wrap:wrap;padding:34px var(--r-pad);border-bottom:1px solid var(--r-rule);}
 .rpt-exec-glance-item{flex:1;min-width:180px;padding:0 30px;border-left:1px solid var(--r-rule);}
 .rpt-exec-glance-item:first-child{border-left:none;padding-left:0;}
-.rpt-exec-glance-label{font-size:9px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--r-ink-3);margin-bottom:9px;opacity:0.85;}
+.rpt-exec-glance-label{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--r-accent);margin-bottom:9px;}
 .rpt-exec-glance-value{font-size:13px;color:var(--r-ink-2);line-height:1.6;font-weight:300;}
 
 .rpt-exec-nextmove{padding:30px var(--r-pad) 40px;}
@@ -2527,7 +2527,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
           {/* 00 — EXECUTIVE SUMMARY — THE DIAGNOSIS */}
           <div className="rpt-sec rpt-sec-alt" style={{padding:0}}>
             <div className="rpt-exec-hero">
-              <span className="rpt-exec-hero-label">00 · The Diagnosis</span>
+              <span className="rpt-exec-hero-label">00 · The Core Insight</span>
               {challenge&&<h2 className="rpt-exec-hero-headline">{challenge}</h2>}
               {(insightText||cleanBlind)&&<p className="rpt-exec-hero-sub">{insightText||cleanBlind.split(".")[0]+"."}</p>}
             </div>
