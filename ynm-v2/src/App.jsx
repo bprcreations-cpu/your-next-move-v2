@@ -2797,8 +2797,7 @@ function generatePDF(result, meta) {
       chk(28);
       fnt(8,"bold"); setTxt(ACCENT); doc.text("WEEK "+(i+1)+" -- "+wkThemes[i].toUpperCase(),ML,y); y+=5;
       fnt(9); setTxt([80,76,70]); doc.text(wkGoals[i],ML,y); y+=5;
-      w.split(/[\/
-]/).map(function(t){return cl(t);}).filter(Boolean).slice(0,4).forEach(function(task){
+      w.split(/[\/]/).map(function(t){return cl(t);}).filter(Boolean).slice(0,4).forEach(function(task){
         chk(5); fnt(9); setTxt([110,104,98]); doc.text(". "+task,ML+4,y); y+=5;
       });
       y+=4;
