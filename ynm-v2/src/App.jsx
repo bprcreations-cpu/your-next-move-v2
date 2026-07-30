@@ -513,8 +513,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .advisor-hint{font-size:12px;color:#B8AFA8;margin-top:8px;font-style:italic;}
 
 /* Suggestions recede — quiet inline text, not competing buttons */
-.advisor-suggestions{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;max-width:520px;margin:16px auto 28px;}
-.advisor-sugg{background:none;border:none;padding:2px 0;cursor:pointer;font-size:12.5px;color:#8A8079;font-family:'Plus Jakarta Sans',sans-serif;text-decoration:underline;text-decoration-color:#E8D9DF;text-underline-offset:3px;transition:color 0.15s;}
+.advisor-suggestions{display:flex;flex-wrap:wrap;gap:11px 12px;justify-content:center;max-width:570px;margin:18px auto 30px;}
+.advisor-sugg{background:#fff;border:1px solid rgba(176,114,138,0.32);border-radius:100px;padding:10px 20px;cursor:pointer;font-size:12.5px;color:#57534E;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.4;transition:all 0.18s;}
+.advisor-sugg:hover{background:#FDF4F7;border-color:#B0728A;color:#1C1917;}
 .advisor-sugg:hover{color:#B0728A;text-decoration-color:#B0728A;}
 
 .advisor-cta-row{display:flex;justify-content:center;margin-bottom:4px;}
@@ -647,20 +648,22 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-sec-div{width:32px;height:1px;background:var(--r-accent);margin-top:20px;}
 .rpt-sec-dark .rpt-sec-div{background:var(--r-accent-dk);}
 
-/* ── EXECUTIVE SUMMARY ──────────────────────────────────────── */
-/* One dominant anchor (Primary Challenge), one quiet supporting strip */
-.rpt-exec-anchor{background:var(--r-bg-dark);padding:60px var(--r-pad) 56px;}
-.rpt-exec-anchor-label{font-size:10px;font-weight:600;letter-spacing:0.32em;text-transform:uppercase;color:var(--r-accent);margin-bottom:22px;display:block;}
-.rpt-exec-anchor-text{font-family:'Cormorant',serif;font-size:clamp(25px,3.4vw,34px);font-weight:500;font-style:italic;color:#fff;line-height:1.48;letter-spacing:-0.01em;max-width:660px;}
-.rpt-exec-support{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--r-rule);}
-.rpt-exec-support-item{background:#fff;padding:26px var(--r-pad);}
-.rpt-exec-support-item:first-child{padding-left:var(--r-pad);}
-.rpt-exec-support-label{font-size:9px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--r-ink-3);margin-bottom:10px;opacity:0.85;}
-.rpt-exec-support-value{font-size:13px;color:var(--r-ink-2);line-height:1.62;font-weight:300;}
-.rpt-exec-tl{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--r-rule);margin-top:0;border-top:2px solid var(--r-ink);}
-.rpt-exec-tl-cell{padding:20px 32px;background:#fff;}
-.rpt-exec-tl-period{font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--r-accent);margin-bottom:6px;opacity:0.9;}
-.rpt-exec-tl-text{font-size:12px;color:var(--r-ink-3);font-weight:300;line-height:1.6;}
+/* ── EXECUTIVE SUMMARY — THE DIAGNOSIS ─────────────────────── */
+/* One unmistakable headline. Everything else recedes to a quiet byline strip. */
+.rpt-exec-hero{background:var(--r-bg-dark);padding:76px var(--r-pad) 60px;}
+.rpt-exec-hero-label{font-size:10px;font-weight:600;letter-spacing:0.34em;text-transform:uppercase;color:var(--r-accent);margin-bottom:28px;display:block;}
+.rpt-exec-hero-headline{font-family:'Cormorant',serif;font-size:clamp(32px,5.6vw,54px);font-weight:600;font-style:italic;color:#fff;line-height:1.16;letter-spacing:-0.015em;max-width:760px;margin-bottom:22px;}
+.rpt-exec-hero-sub{font-size:14.5px;color:var(--r-dark-body);font-weight:300;line-height:1.75;max-width:520px;}
+
+.rpt-exec-glance{display:flex;flex-wrap:wrap;padding:34px var(--r-pad);border-bottom:1px solid var(--r-rule);}
+.rpt-exec-glance-item{flex:1;min-width:180px;padding:0 30px;border-left:1px solid var(--r-rule);}
+.rpt-exec-glance-item:first-child{border-left:none;padding-left:0;}
+.rpt-exec-glance-label{font-size:9px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--r-ink-3);margin-bottom:9px;opacity:0.85;}
+.rpt-exec-glance-value{font-size:13px;color:var(--r-ink-2);line-height:1.6;font-weight:300;}
+
+.rpt-exec-nextmove{padding:30px var(--r-pad) 40px;}
+.rpt-exec-nextmove-label{font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--r-accent);margin-bottom:11px;display:block;}
+.rpt-exec-nextmove-text{font-family:'Cormorant',serif;font-style:italic;font-size:19px;color:var(--r-ink);line-height:1.5;max-width:600px;}
 
 /* ── ASSESSMENT ─────────────────────────────────────────────── */
 .rpt-body{font-size:15px;color:var(--r-ink);line-height:1.9;font-weight:300;margin-bottom:32px;}
@@ -797,9 +800,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
   .nav,.rpt-end,.rpt-edit,.rpt-cover-actions,body>*:not(.rpt){display:none!important;}
   .rpt-cover{background:#141210!important;-webkit-print-color-adjust:exact!important;}
-  .rpt-sec-dark,.rpt-nm,.rpt-weeks,.rpt-exec-anchor{background:#141210!important;}
+  .rpt-sec-dark,.rpt-nm,.rpt-weeks,.rpt-exec-hero{background:#141210!important;}
   .rpt-weeks{grid-template-columns:repeat(4,1fr)!important;}
-  .rpt-exec-support{grid-template-columns:repeat(4,1fr)!important;}
   .rpt-action-row.is-first{background:#141210!important;}
   .rpt-sec{padding:48px 64px;}
   .rpt-nm{padding:64px;}
@@ -808,20 +810,20 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 
   /* Never split a heading from what follows it, and never split a card/row mid-content */
   .rpt-sec-hd{break-after:avoid;page-break-after:avoid;}
-  .rpt-exec-anchor,.rpt-exec-support-item,.rpt-exec-tl-cell,
+  .rpt-exec-hero,.rpt-exec-glance-item,
   .rpt-opp-row,.rpt-action-row,.rpt-ahead-row,.rpt-success-row,
   .rpt-week-col,.rpt-str-cell,.rpt-insight-block,.rpt-nm{
     break-inside:avoid;page-break-inside:avoid;
   }
   /* Prevent a single stray line stranded at the top or bottom of a page */
   .rpt-body,.rpt-chal-body,.rpt-opp-body,.rpt-action-desc,.rpt-ahead-body,
-  .rpt-str-text,.rpt-success-text,.rpt-exec-support-value{
+  .rpt-str-text,.rpt-success-text,.rpt-exec-glance-value{
     orphans:3;widows:3;
   }
 }
 
 /* Screen fallback for browsers that don't fully support break-inside in flex/grid contexts */
-.rpt-sec-hd,.rpt-exec-anchor,.rpt-opp-row,.rpt-action-row,.rpt-ahead-row{break-inside:avoid;}
+.rpt-sec-hd,.rpt-exec-hero,.rpt-opp-row,.rpt-action-row,.rpt-ahead-row{break-inside:avoid;}
 
 /* RESPONSIVE */
 @media(max-width:860px){
@@ -2523,31 +2525,24 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
             </div>
           </div>
 
-          {/* 00 — EXECUTIVE SUMMARY */}
+          {/* 00 — EXECUTIVE SUMMARY — THE DIAGNOSIS */}
           <div className="rpt-sec rpt-sec-alt" style={{padding:0}}>
-            <div className="rpt-sec-hd" style={{padding:"var(--r-pad-v) var(--r-pad) 0"}}>
-              <span className="rpt-sec-num">00 · Executive Summary</span>
-              <h2 className="rpt-sec-title">Your strategy at a glance.</h2>
-              <p className="rpt-sec-desc">Understand the complete picture in under sixty seconds.</p>
-              <div className="rpt-sec-div" style={{marginBottom:44}}/>
+            <div className="rpt-exec-hero">
+              <span className="rpt-exec-hero-label">00 · The Diagnosis</span>
+              {challenge&&<h2 className="rpt-exec-hero-headline">{challenge}</h2>}
+              {(insightText||cleanBlind)&&<p className="rpt-exec-hero-sub">{insightText||cleanBlind.split(".")[0]+"."}</p>}
             </div>
-            {challenge&&(
-              <div className="rpt-exec-anchor">
-                <span className="rpt-exec-anchor-label">Primary Challenge</span>
-                <p className="rpt-exec-anchor-text">{challenge}</p>
+            <div className="rpt-exec-glance">
+              {position&&<div className="rpt-exec-glance-item"><div className="rpt-exec-glance-label">Current Position</div><div className="rpt-exec-glance-value">{position}</div></div>}
+              {opportunity&&<div className="rpt-exec-glance-item"><div className="rpt-exec-glance-label">Greatest Opportunity</div><div className="rpt-exec-glance-value">{opportunity}</div></div>}
+              {goal&&<div className="rpt-exec-glance-item"><div className="rpt-exec-glance-label">Primary Goal</div><div className="rpt-exec-glance-value">{goal}</div></div>}
+            </div>
+            {nextMoveSentence&&(
+              <div className="rpt-exec-nextmove">
+                <span className="rpt-exec-nextmove-label">Today's First Move</span>
+                <p className="rpt-exec-nextmove-text">{nextMoveSentence}</p>
               </div>
             )}
-            <div className="rpt-exec-support">
-              {position&&<div className="rpt-exec-support-item"><div className="rpt-exec-support-label">Current Position</div><div className="rpt-exec-support-value">{position}</div></div>}
-              {opportunity&&<div className="rpt-exec-support-item"><div className="rpt-exec-support-label">Greatest Opportunity</div><div className="rpt-exec-support-value">{opportunity}</div></div>}
-              {goal&&<div className="rpt-exec-support-item"><div className="rpt-exec-support-label">Primary Goal</div><div className="rpt-exec-support-value">{goal}</div></div>}
-              {nextMoveSentence&&<div className="rpt-exec-support-item"><div className="rpt-exec-support-label">Today's Next Move</div><div className="rpt-exec-support-value">{nextMoveSentence}</div></div>}
-            </div>
-            <div className="rpt-exec-tl">
-              <div className="rpt-exec-tl-cell"><div className="rpt-exec-tl-period">Days 1–10</div><div className="rpt-exec-tl-text">Foundation — establish systems and take first actions</div></div>
-              <div className="rpt-exec-tl-cell"><div className="rpt-exec-tl-period">Days 11–21</div><div className="rpt-exec-tl-text">Momentum — activate your strategy and measure progress</div></div>
-              <div className="rpt-exec-tl-cell"><div className="rpt-exec-tl-period">Days 22–30</div><div className="rpt-exec-tl-text">Scale — review results and set your 60-day targets</div></div>
-            </div>
           </div>
 
 
