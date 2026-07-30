@@ -40,7 +40,7 @@ function parseActions(text){
 }
 function parseRoadmap(text){
   const weeks=["","","",""];
-  const hits=[...(text||"").matchAll(/week\s*([1-4])[:\s\-–]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
+  const hits=[...(text||"").matchAll(/week\s*([1-4])[:\s\-–—]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
   hits.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)weeks[i]=m[2].trim();});
   if(!weeks.some(Boolean)){const ls=lines(text);const c=Math.ceil(ls.length/4);for(let i=0;i<4;i++)weeks[i]=ls.slice(i*c,(i+1)*c).join("\n");}
   return weeks.map(w=>{
@@ -933,7 +933,7 @@ function generatePDF(result, meta) {
     let y=ML+5, pageNum=1;
     const wrap=(t,x,w)=>doc.splitTextToSize(String(t||""),w);
     const rawLines=(t)=>(t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/));
-    const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").replace(/^[-•*✓✗\d.]+\s*/,"").trim();
+    const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").trim().replace(/^[-–—•*✓✗\d.]+\s*/,"").trim();
     function chk(n){if(y+n>H-14){doc.addPage();pageNum++;y=ML+5;footer();}}
     function footer(){doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});}
     function pageHeader(label){doc.setFontSize(7);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text("YOUR NEXT MOVE",ML,14);doc.text((label||"").toUpperCase(),W-MR,14,{align:"right"});doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,17,W-MR,17);y=27;}
@@ -1056,15 +1056,18 @@ function generatePDF(result, meta) {
     }
     actionItems.forEach((a,i)=>{
       const tier=tiers[i]||tiers[4];
+      const titleLines=wrap(a.title,0,CW-30);
       const bodyLines=wrap(a.body,0,CW-16);
       const whyLines=a.why?wrap("Why this matters: "+a.why,0,CW-16):[];
-      const cardHt=13+bodyLines.length*4.6+(whyLines.length?whyLines.length*4.4+4:0)+8;
+      // Height derived from the exact same arithmetic used below to position content —
+      // guarantees the border always contains the text, regardless of title/body length.
+      const cardHt=9+titleLines.length*5.5+1+5.5+bodyLines.length*4.6+(whyLines.length?1.5+whyLines.length*4.4:0)+7;
       chk(cardHt+5);
       doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.roundedRect(ML,y,CW,cardHt,1.5,1.5,"S");
       if(i===0){doc.setFillColor(...ACCENT);doc.rect(ML,y,3,cardHt,"F");}
       doc.setFontSize(15);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML+7,y+11);
-      doc.setFontSize(11.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");wrap(a.title,0,CW-30).forEach((l,li)=>doc.text(l,ML+22,y+9+li*5.5));
-      let ry=y+9+wrap(a.title,0,CW-30).length*5.5+1;
+      doc.setFontSize(11.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");titleLines.forEach((l,li)=>doc.text(l,ML+22,y+9+li*5.5));
+      let ry=y+9+titleLines.length*5.5+1;
       doc.setFontSize(7);doc.setTextColor(...MUTED);doc.setFont("helvetica","bold");
       doc.text(`PRIORITY: ${tier.p.toUpperCase()}   ·   IMPACT: ${tier.im.toUpperCase()}   ·   TIMING: ${tier.t.toUpperCase()}`,ML+22,ry);
       ry+=5.5;
@@ -1087,8 +1090,8 @@ function generatePDF(result, meta) {
     secHd("05 · 30-DAY ROADMAP","Your week-by-week execution plan.","Print it. Check it off.");
     y+=6;
     const wths=["Foundation","Momentum","Activation","Scale & Review"];
-    const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
-    const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim();});
+    const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–—]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
+    const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim().replace(/^(Foundation|Momentum|Activation|Scale\s*&?\s*Review)\s*:?\s*[-–—]?\s*/i,"");});
     const colGap=6,colW=(CW-colGap*3)/4,startY=y;
     let maxColH=0;
     wd.forEach((w,i)=>{
