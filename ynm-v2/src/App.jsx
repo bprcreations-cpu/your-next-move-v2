@@ -580,13 +580,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt{max-width:860px;margin:0 auto;background:#fff;}
 
 /* ── COVER ─────────────────────────────────────────────────── */
-.rpt-cover{background:var(--r-bg-dark);padding:88px var(--r-pad) 72px;}
-.rpt-cover-eyebrow{font-size:10px;font-weight:500;letter-spacing:0.38em;text-transform:uppercase;color:#3A3530;margin-bottom:40px;display:block;}
-.rpt-cover-title{font-family:'Cormorant',serif;font-size:clamp(44px,7vw,76px);font-weight:600;color:#fff;line-height:0.98;letter-spacing:-0.03em;margin-bottom:40px;}
+.rpt-cover{background:var(--r-bg-dark);padding:92px var(--r-pad) 76px;}
+.rpt-cover-eyebrow{font-size:10px;font-weight:500;letter-spacing:0.38em;text-transform:uppercase;color:var(--r-dark-meta);margin-bottom:32px;display:block;}
+.rpt-cover-title{font-family:'Cormorant',serif;font-size:clamp(46px,7.2vw,80px);font-weight:600;color:#fff;line-height:0.98;letter-spacing:-0.03em;margin-bottom:22px;}
 .rpt-cover-title em{font-style:italic;color:var(--r-accent);}
+.rpt-cover-forname{font-family:'Cormorant',serif;font-style:italic;font-size:19px;font-weight:500;color:var(--r-dark-label);letter-spacing:0.01em;margin-bottom:44px;}
+.rpt-cover-forname strong{font-style:normal;font-weight:600;color:#fff;}
 .rpt-cover-meta{font-size:12px;color:#4A4540;letter-spacing:0.06em;line-height:2;margin-bottom:36px;}
 .rpt-cover-meta span{margin:0 12px 0 0;}
 .rpt-cover-meta span:not(:last-child)::after{content:'·';margin-left:12px;color:#2A2520;}
+.rpt-cover-tags{display:flex;flex-wrap:wrap;align-items:center;gap:0;padding-top:28px;border-top:1px solid var(--r-rule-dark);}
+.rpt-cover-tag{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--r-dark-meta);}
+.rpt-cover-tag:not(:last-child)::after{content:'·';margin:0 14px;color:#3A3430;}
 .rpt-cover-saved{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--r-sage);margin-top:16px;}
 
 /* ── SECTION ANATOMY — identical every time ────────────────── */
@@ -612,23 +617,24 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-exec-row{display:grid;gap:1px;background:var(--r-rule);}
 .rpt-exec-row-2{grid-template-columns:1fr 1fr;}
 .rpt-exec-row-1{grid-template-columns:1fr;}
-.rpt-exec-cell{padding:32px;background:#fff;}
+.rpt-exec-cell{padding:30px 32px;background:#fff;}
 .rpt-exec-cell.position{background:#fff;}
 .rpt-exec-cell.challenge{background:var(--r-bg-dark);}
 .rpt-exec-cell.opportunity{background:#fff;border-left:3px solid var(--r-accent);}
 .rpt-exec-cell.goal{background:var(--r-bg);}
-.rpt-exec-cell.nextmove{background:var(--r-bg-dark);padding:32px;}
-.rpt-exec-label{font-size:10px;font-weight:600;letter-spacing:0.24em;text-transform:uppercase;color:var(--r-ink-3);margin-bottom:12px;}
+.rpt-exec-cell.nextmove{background:var(--r-bg-dark);padding:38px 32px;}
+.rpt-exec-label{font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--r-ink-3);margin-bottom:11px;opacity:0.85;}
+.rpt-exec-cell.challenge .rpt-exec-label,.rpt-exec-cell.nextmove .rpt-exec-label{font-weight:600;letter-spacing:0.26em;opacity:1;}
 .rpt-exec-cell.challenge .rpt-exec-label{color:var(--r-dark-label);}
-.rpt-exec-cell.nextmove .rpt-exec-label{color:var(--r-dark-label);}
-.rpt-exec-value{font-family:'Cormorant',serif;font-size:17px;font-weight:600;color:var(--r-ink);line-height:1.5;letter-spacing:-0.01em;}
-.rpt-exec-cell.challenge .rpt-exec-value{color:#F3F0ED;}
+.rpt-exec-cell.nextmove .rpt-exec-label{color:var(--r-accent);}
+.rpt-exec-value{font-family:'Cormorant',serif;font-size:15px;font-weight:500;color:var(--r-ink-2);line-height:1.5;letter-spacing:-0.005em;}
 .rpt-exec-cell.opportunity .rpt-exec-value{color:var(--r-ink);}
-.rpt-exec-cell.nextmove .rpt-exec-value{color:#fff;font-size:19px;}
+.rpt-exec-cell.challenge .rpt-exec-value{color:#F3F0ED;font-size:21px;font-weight:600;font-style:italic;line-height:1.4;}
+.rpt-exec-cell.nextmove .rpt-exec-value{color:#fff;font-size:24px;font-weight:500;font-style:italic;line-height:1.42;letter-spacing:-0.01em;}
 .rpt-exec-tl{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--r-rule);margin-top:0;border-top:2px solid var(--r-ink);}
-.rpt-exec-tl-cell{padding:22px 32px;background:#fff;}
-.rpt-exec-tl-period{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--r-accent);margin-bottom:7px;}
-.rpt-exec-tl-text{font-size:13px;color:var(--r-ink-2);font-weight:300;line-height:1.6;}
+.rpt-exec-tl-cell{padding:20px 32px;background:#fff;}
+.rpt-exec-tl-period{font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--r-accent);margin-bottom:6px;opacity:0.9;}
+.rpt-exec-tl-text{font-size:12px;color:var(--r-ink-3);font-weight:300;line-height:1.6;}
 
 /* ── ASSESSMENT ─────────────────────────────────────────────── */
 .rpt-body{font-size:15px;color:var(--r-ink);line-height:1.9;font-weight:300;margin-bottom:32px;}
@@ -663,14 +669,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-action-row:last-child{border-bottom:none;}
 .rpt-action-row.is-first{background:var(--r-bg-dark);}
 .rpt-action-row.is-first .rpt-action-rule{border-right-color:var(--r-rule-dark);}
-.rpt-action-rule{border-right:1px solid var(--r-rule);padding:28px 24px 28px;display:flex;flex-direction:column;gap:12px;align-items:flex-start;justify-content:flex-start;}
-.rpt-action-badge{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;padding:6px 13px;display:inline-block;white-space:nowrap;border-radius:2px;}
-.rpt-action-badge-1{background:var(--r-accent);color:#fff;}
-.rpt-action-badge-2{color:var(--r-accent-dk);background:var(--r-accent-soft);}
-.rpt-action-badge-n{color:var(--r-ink-3);background:var(--r-bg);}
-.rpt-action-row.is-first .rpt-action-badge-n{color:var(--r-dark-label);background:rgba(255,255,255,0.05);}
-.rpt-action-time{font-size:11px;color:var(--r-ink-3);margin-top:auto;letter-spacing:0.02em;}
-.rpt-action-row.is-first .rpt-action-time{color:var(--r-dark-meta);}
+.rpt-action-rule{border-right:1px solid var(--r-rule);padding:28px 24px 28px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;justify-content:flex-start;}
+.rpt-action-num{font-family:'Cormorant',serif;font-size:27px;font-weight:600;color:var(--r-accent);line-height:1;letter-spacing:-0.01em;}
+.rpt-action-cap{font-size:10px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--r-ink-3);margin-top:auto;}
+.rpt-action-row.is-first .rpt-action-cap{color:var(--r-dark-meta);}
 .rpt-action-body{padding:28px 32px;}
 .rpt-action-title{font-size:15px;font-weight:600;color:var(--r-ink);line-height:1.4;margin-bottom:8px;letter-spacing:-0.01em;}
 .rpt-action-row.is-first .rpt-action-title{color:#fff;}
@@ -903,7 +905,7 @@ function generatePDF(result, meta) {
     const wrap=(t,x,w)=>doc.splitTextToSize(String(t||""),w);
     const rawLines=(t)=>(t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/));
     const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").replace(/^[-•*✓✗\d.]+\s*/,"").trim();
-    function chk(n){if(y+n>H-18){doc.addPage();y=ML+5;pageNum++;footer();}}
+    function chk(n){if(y+n>H-14){doc.addPage();y=ML+5;pageNum++;footer();}}
     function footer(){doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});}
     function rule(){chk(4);doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,y,W-MR,y);y+=4;}
     function body(t,ind){const x=ML+(ind||0);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(t,x,CW-(ind||0)).forEach(l=>{chk(5);doc.text(l,x,y);y+=5;});y+=1;}
@@ -957,9 +959,9 @@ function generatePDF(result, meta) {
     rule();
     // ACTIONS
     secHd("04 · RECOMMENDED ACTIONS","Where to direct your energy.","In priority order.");
-    const bdgs=["START HERE","THIS WEEK","THIS WEEK","THIS MONTH","THIS MONTH"];
+    const caps=["BEGIN TODAY","WITHIN 3 DAYS","WITHIN 5 DAYS","WITHIN 2 WEEKS","WITHIN 2 WEEKS"];
     let an=0;
-    rawLines(result.recommendedActions||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);const wy=l.match(/\*Why this matters:?\*?\s*(.*)/i);if(b&&an<5){chk(12);doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(bdgs[an]||"LATER",ML,y);y+=4;doc.setFontSize(11);doc.setTextColor(...DARK);doc.text(b[1],ML,y);y+=5;if(b[2])body(cleanStr(b[2]),4);an++;}else if(wy){doc.setFontSize(9);doc.setTextColor(...ACCENT);doc.setFont("helvetica","italic");wrap("→ "+wy[1],ML+4,CW-4).forEach(l=>{chk(5);doc.text(l,ML+4,y);y+=4.5;});y+=1;}});
+    rawLines(result.recommendedActions||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);const wy=l.match(/\*Why this matters:?\*?\s*(.*)/i);if(b&&an<5){chk(12);doc.setFontSize(13);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+(an+1),ML,y);doc.setFontSize(11);doc.setTextColor(...DARK);doc.text(b[1],ML+10,y);y+=4.3;doc.setFontSize(6.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(caps[an]||"ONGOING",ML+10,y);y+=4.2;if(b[2])body(cleanStr(b[2]),10);an++;}else if(wy){doc.setFontSize(9);doc.setTextColor(...ACCENT);doc.setFont("helvetica","italic");wrap("→ "+wy[1],ML+10,CW-10).forEach(l=>{chk(5);doc.text(l,ML+10,y);y+=4.5;});y+=1;}});
     rule();
     // 30-DAY PLAN
     secHd("05 · 30-DAY PLAN","Your week-by-week roadmap.","Concrete actions for the next 30 days.");
@@ -979,7 +981,7 @@ function generatePDF(result, meta) {
     chk(38);doc.setFillColor(...DARK);doc.rect(0,y-4,W,44,"F");doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("08 · YOUR NEXT MOVE",ML,y);y+=4.5;doc.setFontSize(9);doc.setTextColor(176,114,138);doc.setFont("helvetica","italic");doc.text("The single most important action you should take today",ML,y);y+=5.5;doc.setFontSize(14);doc.setTextColor(255,255,255);doc.setFont("helvetica","bolditalic");wrap('"'+nms+'"',ML,CW).forEach(l=>{chk(7);doc.text(l,ML,y);y+=7;});y+=3;
     [["TIME REQUIRED","Today"],["PRIORITY","Highest"],["EXPECTED IMPACT","High"]].forEach(([lbl,val],i)=>{const mx=ML+i*(CW/3);doc.setFontSize(7);doc.setTextColor(90,85,80);doc.setFont("helvetica","bold");doc.text(lbl,mx,y);doc.setFontSize(10);doc.setTextColor(160,154,148);doc.setFont("helvetica","normal");doc.text(val,mx,y+4);});y+=12;
     // CLOSING NOTE — stays on current page if room allows, avoiding a wasted near-empty page
-    if(y+50>H-18){doc.addPage();pageNum++;y=ML+20;footer();}else{rule();y+=6;}
+    if(y+50>H-14){doc.addPage();pageNum++;y=ML+20;footer();}else{rule();y+=6;}
     doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE",ML,y);y+=6;
     doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");doc.text("This strategy was built specifically for you.",ML,y);y+=6;
     doc.setFontSize(9);doc.setTextColor(...MUTED);doc.text("Return to My Strategies to review and continue building on this plan.",ML,y);y+=6;
@@ -2452,12 +2454,12 @@ One sentence. The single most concrete action to take right now.`;
             <h1 className="rpt-cover-title">
               <em>{planCat?.label}</em><br/>Strategy
             </h1>
-            {firstName&&<p style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:14,color:"#5A5450",fontWeight:300,letterSpacing:"0.04em",marginBottom:28,marginTop:-8}}>Prepared for {firstName}</p>}
+            {firstName&&<p className="rpt-cover-forname">Prepared exclusively for <strong>{firstName}</strong>.</p>}
             <div className="rpt-cover-tags">
               <span className="rpt-cover-tag">{effectiveIndustry||industry}</span>
               <span className="rpt-cover-tag">{stageLabel}</span>
               <span className="rpt-cover-tag">{today}</span>
-              {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A",borderColor:"#2A3A33"}}>✓ Saved</span>}
+              {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A"}}>✓ Saved</span>}
             </div>
           </div>
 
@@ -2563,14 +2565,12 @@ One sentence. The single most concrete action to take right now.`;
             </div>
             <div className="rpt-actions-stack">
               {actions.map((a,i)=>{
-                const badges=["Start Here","This Week","This Week","This Month","This Month"];
-                const cls=["rpt-action-badge-1","rpt-action-badge-2","rpt-action-badge-2","rpt-action-badge-n","rpt-action-badge-n"];
-                const times=["Today","2–3 days","3–5 days","1–2 weeks","1–2 weeks"];
+                const caps=["Begin today","Within 3 days","Within 5 days","Within 2 weeks","Within 2 weeks"];
                 return(
                   <div className={`rpt-action-row${i===0?" is-first":""}`} key={i}>
                     <div className="rpt-action-rule">
-                      <span className={`rpt-action-badge ${cls[i]||"rpt-action-badge-n"}`}>{badges[i]||"Later"}</span>
-                      <span className="rpt-action-time">{times[i]||"Ongoing"}</span>
+                      <span className="rpt-action-num">{"0"+(i+1)}</span>
+                      <span className="rpt-action-cap">{caps[i]||"Ongoing"}</span>
                     </div>
                     <div className="rpt-action-body">
                       <div className="rpt-action-title">{a.title||clean(a.body)}</div>
