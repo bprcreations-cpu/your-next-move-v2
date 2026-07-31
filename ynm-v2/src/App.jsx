@@ -940,10 +940,11 @@ function generatePDF(result, meta) {
     };
     const rawLines=(t)=>(t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/));
     const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").trim().replace(/^[-–—•*✓✗\d.]+\s*/,"").trim();
-    function chk(n){if(y+n>H-14){doc.addPage();pageNum++;y=ML+5;footer();}}
+    let currentLabel="";
+    function chk(n){if(y+n>H-14){doc.addPage();pageNum++;pageHeader(currentLabel);}}
     function footer(){doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});}
-    function pageHeader(label){doc.setFontSize(7);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text("YOUR NEXT MOVE",ML,14);doc.text((label||"").toUpperCase(),W-MR,14,{align:"right"});doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,17,W-MR,17);y=27;}
-    function newPage(label){doc.addPage();pageNum++;pageHeader(label);footer();}
+    function pageHeader(label){doc.setFontSize(7);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text("YOUR NEXT MOVE",ML,14);doc.text((label||"").toUpperCase(),W-MR,14,{align:"right"});doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,17,W-MR,17);y=27;footer();}
+    function newPage(label){currentLabel=label;doc.addPage();pageNum++;pageHeader(label);}
     function rule(){chk(4);doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,y,W-MR,y);y+=4;}
     function body(t,ind,w){const x=ML+(ind||0);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(t,0,(w||CW)-(ind||0)).forEach(l=>{chk(5);doc.text(l,x,y);y+=5;});y+=1;}
     function secHd(num,title,desc){chk(28);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(num,ML,y);y+=4.5;doc.setFontSize(17);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");wrap(title,0,CW).forEach((l)=>{doc.text(l,ML,y);y+=6.8;});if(desc){doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(desc,ML,y);y+=4.5;}doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.line(ML,y,ML+18,y);y+=5.5;}
@@ -1021,10 +1022,10 @@ function generatePDF(result, meta) {
     doc.setFontSize(9);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("TODAY'S FIRST MOVE",ML+16,iy);
     doc.setFontSize(15.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");
     nmLines.forEach((l,li)=>doc.text(l,ML+16,iy+11+li*7.2));
-    y+=boxH+10;
+    y+=boxH+16;
 
-    // ══ PAGE — STRATEGIC ASSESSMENT + PRIMARY CHALLENGE: "the diagnosis" ══
-    newPage("Strategic Assessment");
+    // ══ STRATEGIC ASSESSMENT + PRIMARY CHALLENGE — flows from Executive Summary, no forced break ══
+    currentLabel="Strategic Assessment";
     secHd("01 · STRATEGIC ASSESSMENT","Where you are today.","What we discovered from your answers.");
     if(mainExec)body(mainExec);
     const sl=execLines.find(l=>l.match(/^strength/i))||"";
@@ -1052,9 +1053,11 @@ function generatePDF(result, meta) {
 
     // ══ BEST OPPORTUNITY + RECOMMENDED ACTIONS — flows naturally, no forced blank page ══
     rule();y+=6;
+    currentLabel="Best Opportunity";
     secHd("03 · BEST OPPORTUNITY","Where to focus your energy.","The areas most likely to move the needle.");
     oppList.slice(0,3).forEach((o,i)=>{chk(14);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML,y);doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.text(o.title,ML+8,y);y+=5;if(o.body)body(o.body,8);});
     rule();y+=6;
+    currentLabel="Recommended Actions";
     secHd("04 · RECOMMENDED ACTIONS","Where to direct your energy.","In priority order.");
     const tiers=[{p:"Highest",im:"High",t:"Today"},{p:"High",im:"High",t:"Within 3 days"},{p:"High",im:"Medium",t:"Within 5 days"},{p:"Medium",im:"Medium",t:"Within 2 weeks"},{p:"Medium",im:"Medium",t:"Within 2 weeks"}];
     const actionItems=[];const deprioLines=[];
@@ -1072,31 +1075,33 @@ function generatePDF(result, meta) {
     }
     actionItems.forEach((a,i)=>{
       const tier=tiers[i]||tiers[4];
-      doc.setFontSize(11.5);doc.setFont("helvetica","bold");
-      const titleLines=wrap(a.title,0,CW-30);
+      const isFirst=i===0;
+      const titleSize=isFirst?13:11.5;
+      const titleLH=isFirst?6.2:5.5;
+      doc.setFontSize(titleSize);doc.setFont("helvetica","bold");
+      const titleLines=wrap(a.title,0,CW-20);
       doc.setFontSize(9.5);doc.setFont("helvetica","normal");
-      const bodyLines=wrap(a.body,0,CW-16);
+      const bodyLines=wrap(a.body,0,CW-20);
       doc.setFontSize(9);doc.setFont("helvetica","italic");
-      const whyLines=a.why?wrap("Why this matters: "+a.why,0,CW-16):[];
-      // Height derived from the exact same arithmetic used below to position content —
-      // guarantees the border always contains the text, regardless of title/body length.
-      const cardHt=9+titleLines.length*5.5+1+5.5+bodyLines.length*4.6+(whyLines.length?1.5+whyLines.length*4.4:0)+7;
-      chk(cardHt+5);
-      doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.roundedRect(ML,y,CW,cardHt,1.5,1.5,"S");
-      if(i===0){doc.setFillColor(...ACCENT);doc.rect(ML,y,3,cardHt,"F");}
-      doc.setFontSize(12);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML+7,y+11);
-      if(i===0){doc.setFontSize(6.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("START",ML+7,y+16);doc.text("HERE",ML+7,y+19.5);}
-      doc.setFontSize(11.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");titleLines.forEach((l,li)=>doc.text(l,ML+22,y+9+li*5.5));
-      let ry=y+9+titleLines.length*5.5+1;
-      doc.setFontSize(7.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(`${tier.p.toUpperCase()} PRIORITY`,ML+22,ry);
+      const whyLines=a.why?wrap("Why this matters: "+a.why,0,CW-20):[];
+      const blockH=titleLines.length*titleLH+6+5.5+bodyLines.length*4.6+(whyLines.length?1.5+whyLines.length*4.4:0)+(isFirst?16:11);
+      chk(blockH+6);
+      doc.setFontSize(isFirst?13:10);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");
+      doc.text("0"+(i+1),ML,y+(isFirst?2:0));
+      if(isFirst){doc.setFontSize(6.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("START HERE",ML,y+8);}
+      doc.setFontSize(titleSize);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");
+      titleLines.forEach((l,li)=>doc.text(l,ML+20,y+li*titleLH));
+      let ry=y+titleLines.length*titleLH+3;
+      doc.setFontSize(7.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(`${tier.p.toUpperCase()} PRIORITY`,ML+20,ry);
       const priW=doc.getTextWidth(`${tier.p.toUpperCase()} PRIORITY`);
       doc.setFontSize(7.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");
-      doc.text(`   ·  ${tier.im} impact  ·  ${tier.t}`,ML+22+priW,ry);
-      ry+=5.5;
+      doc.text(`   ·  ${tier.im} impact  ·  ${tier.t}`,ML+20+priW,ry);
+      ry+=6;
       doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
-      bodyLines.forEach(l=>{doc.text(l,ML+22,ry);ry+=4.6;});
-      if(whyLines.length){ry+=1.5;doc.setFontSize(9);doc.setTextColor(...ACCENT_DK);doc.setFont("helvetica","italic");whyLines.forEach(l=>{doc.text(l,ML+22,ry);ry+=4.4;});}
-      y+=cardHt+5;
+      bodyLines.forEach(l=>{doc.text(l,ML+20,ry);ry+=4.6;});
+      if(whyLines.length){ry+=1.5;doc.setFontSize(9);doc.setTextColor(...ACCENT_DK);doc.setFont("helvetica","italic");whyLines.forEach(l=>{doc.text(l,ML+20,ry);ry+=4.4;});}
+      y=ry+(isFirst?9:7);
+      if(i<actionItems.length-1){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,y-4,W-MR,y-4);}
     });
     if(deprioLines.length){
       const deprioText=deprioLines.join(" ").trim();
@@ -1145,8 +1150,8 @@ function generatePDF(result, meta) {
     doc.text("Revisit this page every Friday. Consistency compounds faster than intensity.",ML,gridBottom+10);
     y=gridBottom+20;
 
-    // ══ PAGE — LOOKING AHEAD + MEASURABLE MILESTONES: "the reflective page" ══
-    newPage("Looking Ahead");
+    // ══ LOOKING AHEAD + MEASURABLE MILESTONES — flows naturally ══
+    currentLabel="Looking Ahead";
     secHd("06 · LOOKING AHEAD","What becomes possible next.","What to build toward after your first 30 days.");
     let ln=0;rawLines(result.longTermGrowth||"").forEach(l=>{
       const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);
@@ -1160,6 +1165,7 @@ function generatePDF(result, meta) {
     });
     if(succ.length){
       rule();y+=6;
+      currentLabel="Measurable Milestones";
       secHd("07 · MEASURABLE MILESTONES","How you will know this is working.","Concrete signals of progress.");
       succ.slice(0,3).forEach((s,i)=>{
         doc.setFontSize(10);doc.setFont("helvetica","normal");
