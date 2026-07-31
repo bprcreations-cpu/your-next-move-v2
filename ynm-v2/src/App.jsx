@@ -1115,7 +1115,7 @@ function generatePDF(result, meta) {
     const wths=["Foundation","Momentum","Activation","Scale & Review"];
     const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–—]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
     const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim().replace(/^(Foundation|Momentum|Activation|Scale\s*&?\s*Review)\s*:?\s*[-–—]?\s*/i,"");});
-    const colGap=8,colW=(CW-colGap*3)/4,startY=y;
+    const colGap=5,colW=(CW-colGap*3)/4,startY=y;
     const gridBottom=H-38;
     let maxColH=0;
     wd.forEach((w,i)=>{
@@ -1129,11 +1129,11 @@ function generatePDF(result, meta) {
       cy+=8;
       const tasks=w.split(/[\/\n]/).map(t=>cleanStr(t)).filter(Boolean).slice(0,5);
       tasks.forEach(t=>{
-        doc.setDrawColor(...MUTED);doc.setLineWidth(0.4);doc.rect(cx+5,cy-4,5,5,"S");
-        doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
-        const tLines=wrap(t,0,colW-16);
-        tLines.forEach((l,li)=>{doc.text(l,cx+13,cy+li*5.2);});
-        cy+=Math.max(tLines.length*5.2,8)+7;
+        doc.setDrawColor(...MUTED);doc.setLineWidth(0.4);doc.rect(cx+5,cy-3.7,4.4,4.4,"S");
+        doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
+        const tLines=wrap(t,0,colW-12);
+        tLines.forEach((l,li)=>{doc.text(l,cx+12,cy+li*5);});
+        cy+=Math.max(tLines.length*5,8)+7;
       });
       maxColH=Math.max(maxColH,cy-startY);
       // Full-height column rule — the grid claims the whole page, not just where tasks end
@@ -1153,7 +1153,7 @@ function generatePDF(result, meta) {
       if(b){
         ln++;chk(16);
         doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.circle(ML+3.5,y-1.3,3.5,"S");
-        doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(String(ln),ML+3.5,y-0.1,{align:"center"});
+        doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+ln,ML+3.5,y-0.1,{align:"center"});
         doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");doc.text(b[1],ML+11,y);y+=5;
         if(b[2])body(cleanStr(b[2]),11);
       }else if(l.trim())body(cleanStr(l),11);
@@ -1166,7 +1166,7 @@ function generatePDF(result, meta) {
         const lines=wrap(s.trim(),0,CW-16);const rowH=Math.max(lines.length*4.8,9)+6;
         chk(rowH+2);
         doc.setFillColor(...SAGE);doc.circle(ML+3.5,y+3.2,3.5,"F");
-        doc.setFontSize(8);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.text(String(i+1),ML+3.5,y+4.4,{align:"center"});
+        doc.setFontSize(7);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML+3.5,y+4.4,{align:"center"});
         doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
         lines.forEach((l,li)=>doc.text(l,ML+11,y+4.4+li*4.8));
         y+=rowH;
