@@ -5,7 +5,6 @@ import {
   HUB_CATEGORIES, getQuestions
 } from "./data.js";
 const QARunner = lazy(() => import("./qa-runner.jsx"));
-
 // ─── PARSERS ─────────────────────────────────────────────────────────────────
 function clean(s){ return (s||"").replace(/\*\*/g,"").replace(/^[-•*✓✗\d\.]+\s*/,"").trim(); }
 function lines(t){ return (t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/)); }
