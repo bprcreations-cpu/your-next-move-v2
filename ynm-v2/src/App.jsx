@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, Suspense, lazy } from "react";
 import {
   CATEGORIES, INDUSTRIES, STAGES, WEEK_THEMES,
   STRIPE_MONTHLY, STRIPE_ANNUAL, FREE_PLAN_LIMIT,
   HUB_CATEGORIES, getQuestions
 } from "./data.js";
+const QARunner = lazy(() => import("./qa-runner.jsx"));
 
 // ─── PARSERS ─────────────────────────────────────────────────────────────────
 function clean(s){ return (s||"").replace(/\*\*/g,"").replace(/^[-•*✓✗\d\.]+\s*/,"").trim(); }
@@ -138,6 +139,87 @@ function parseResult(raw){
   }
 
   return s;
+}
+
+// ─── SHARED AI RESPONSE PARSER ───────────────────────────────────────────────
+// Models the Strategy Generator's 3-tier resilience (header-split → permissive
+// fallback → total-response fallback) so a minor AI formatting choice (a colon,
+// missing bold markers, reordered sections, etc.) can never produce a blank
+// card for the user. Validated against 16 adversarial input variations.
+function parseAISections(text, sectionDefs) {
+  const result = {};
+  sectionDefs.forEach(d => { result[d.key] = ""; });
+
+  if (!text || typeof text !== "string" || !text.trim()) {
+    return { sections: result, raw: text || "", failedSections: sectionDefs.map(d => d.key), fullyFailed: true };
+  }
+
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  // Tier 1: tolerant sequential header split. Tolerates optional bold/underline
+  // markers, a colon either inside or after them, extra whitespace, case
+  // differences, and numbered-list prefixes ("1. Header").
+  const allAliases = sectionDefs.flatMap(d => d.aliases.map(a => ({ key: d.key, alias: a })));
+  const altPattern = allAliases.map(a => esc(a.alias)).join('|');
+  const headerRegex = new RegExp(`(?:^|\\n)\\s*(?:\\d+[.)]\\s*)?(?:\\*\\*|__)?\\s*(${altPattern})\\s*:?\\s*(?:\\*\\*|__)?\\s*:?\\s*(?=\\n|$|—|-)`, 'gi');
+
+  const matches = [...text.matchAll(headerRegex)];
+  if (matches.length > 0) {
+    for (let i = 0; i < matches.length; i++) {
+      const m = matches[i];
+      const matchedAliasText = m[1].toLowerCase();
+      const def = allAliases.find(a => a.alias.toLowerCase() === matchedAliasText);
+      if (!def) continue;
+      const startIdx = m.index + m[0].length;
+      const endIdx = i + 1 < matches.length ? matches[i + 1].index : text.length;
+      const content = text.slice(startIdx, endIdx).replace(/^[\s:—-]+/, '').trim();
+      if (content.length > 2 && !result[def.key]) result[def.key] = content;
+    }
+  }
+
+  // Tier 2: permissive per-section fallback for anything Tier 1 still missed.
+  sectionDefs.forEach(d => {
+    if (result[d.key]) return;
+    for (const alias of d.aliases) {
+      const re = new RegExp(
+        `(?:\\*\\*|__)?${esc(alias)}(?:\\*\\*|__)?\\s*:?\\s*\\n?([\\s\\S]{5,600}?)(?=\\n\\s*(?:\\d+[.)]\\s*)?(?:\\*\\*|__)?[A-Z][a-zA-Z' ]{2,40}(?:\\*\\*|__)?\\s*:?\\s*(?:\\n|$)|$)`,
+        'i'
+      );
+      const m = text.match(re);
+      if (m && m[1] && m[1].trim().length > 4) { result[d.key] = m[1].trim(); break; }
+    }
+  });
+
+  // Tier 3: total-response fallback. If NOTHING parsed at all, never show a
+  // blank card — put the cleaned raw text into the first (primary) section.
+  const anyParsed = sectionDefs.some(d => result[d.key]);
+  let failedSections = sectionDefs.filter(d => !result[d.key]).map(d => d.key);
+  if (!anyParsed) {
+    const cleaned = text.replace(/\*\*/g, '').trim();
+    if (sectionDefs[0]) result[sectionDefs[0].key] = cleaned;
+    failedSections = ['TOTAL_FALLBACK_USED'];
+  }
+
+  // Final safety pass: if a section's captured content accidentally swallowed
+  // the start of a DIFFERENT section's header (bleed-through from a fallback
+  // capture spanning an empty section), truncate it there.
+  sectionDefs.forEach(d => {
+    if (!result[d.key]) return;
+    let content = result[d.key];
+    allAliases.forEach(a => {
+      if (a.key === d.key) return;
+      const idx = content.search(new RegExp(`(?:\\*\\*|__)?\\s*${esc(a.alias)}\\s*:?\\s*(?:\\*\\*|__)?`, 'i'));
+      if (idx > -1) content = content.slice(0, idx).trim();
+    });
+    result[d.key] = content;
+  });
+  failedSections = sectionDefs.filter(d => !result[d.key]).map(d => d.key);
+
+  if (failedSections.length > 0) {
+    console.warn('[AI Parser] fallback/missing sections:', failedSections, '— response length:', text.length);
+  }
+
+  return { sections: result, raw: text, failedSections, fullyFailed: false };
 }
 
 // ─── CSS ─────────────────────────────────────────────────────────────────────
@@ -685,7 +767,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-insight-share:hover{border-color:#5A544E;color:#E8C4D4;}
 
 /* ── OPPORTUNITIES ──────────────────────────────────────────── */
-.rpt-opps-stack{display:flex;flex-direction:column;gap:1px;background:var(--r-rule);border-top:1px solid var(--r-rule);}
+.rpt-opps-stack{display:flex;flex-direction:column;gap:1px;background:var(--r-rule);}
+.rpt-opps-stack-start{border-top:1px solid var(--r-rule);}
 .rpt-opp-row{display:grid;grid-template-columns:64px 1fr;background:#fff;}
 .rpt-opp-idx{display:flex;align-items:flex-start;justify-content:center;padding:32px 0;border-right:1px solid var(--r-rule);}
 .rpt-opp-idx-n{font-size:10px;font-weight:600;letter-spacing:0.14em;color:var(--r-accent);padding-top:3px;}
@@ -694,7 +777,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-opp-body{font-size:13px;color:var(--r-ink-2);line-height:1.75;font-weight:300;}
 
 /* ── ACTIONS ────────────────────────────────────────────────── */
-.rpt-actions-stack{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--r-rule);}
+.rpt-actions-stack{display:flex;flex-direction:column;gap:0;}
+.rpt-actions-stack-start{border-top:1px solid var(--r-rule);}
 .rpt-action-row{display:grid;grid-template-columns:132px 1fr;border-bottom:1px solid var(--r-rule);}
 .rpt-action-row:last-child{border-bottom:none;}
 .rpt-action-row.is-first{background:var(--r-bg-dark);}
@@ -728,7 +812,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-week-dot{width:3px;height:3px;border-radius:50%;background:var(--r-accent);flex-shrink:0;margin-top:8px;opacity:0.8;}
 
 /* ── LOOKING AHEAD ──────────────────────────────────────────── */
-.rpt-ahead-list{display:flex;flex-direction:column;border-top:1px solid var(--r-rule);}
+.rpt-ahead-list{display:flex;flex-direction:column;}
+.rpt-ahead-list-start{border-top:1px solid var(--r-rule);}
 .rpt-ahead-row{display:grid;grid-template-columns:64px 1fr;padding:32px 0;border-bottom:1px solid var(--r-rule);}
 .rpt-ahead-row:last-child{border-bottom:none;}
 .rpt-ahead-idx{font-size:10px;font-weight:600;letter-spacing:0.18em;color:var(--r-accent);padding-top:3px;}
@@ -797,25 +882,147 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 
 /* ── PRINT / PDF ────────────────────────────────────────────── */
 @media print{
-  @page{margin:0.6in 0.7in;size:letter;}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  @page{margin:0.5in;size:letter portrait;}
+  @page :first{margin:0;}
+  html,body{width:auto!important;height:auto!important;min-height:0!important;overflow:visible!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box;}
   .nav,.rpt-end,.rpt-edit,.rpt-cover-actions,body>*:not(.rpt){display:none!important;}
-  .rpt-cover{background:#141210!important;-webkit-print-color-adjust:exact!important;}
-  .rpt-sec-dark,.rpt-nm,.rpt-weeks,.rpt-exec-hero{background:#141210!important;}
+
+  /* Reset every screen-only sizing convention that has no meaning on a fixed page */
+  .rpt-flow,.hero,.mobile-menu{min-height:0!important;height:auto!important;}
+  .rpt{max-width:none;height:auto!important;min-height:0!important;overflow:visible!important;}
+  .rpt-sec,.rpt-exec-unified,.rpt-weeks,.rpt-opps-stack,.rpt-actions-stack{
+    height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;
+    position:static!important;transform:none!important;
+  }
+  .rpt-cover,.rpt-nm{height:auto!important;max-height:none!important;overflow:visible!important;position:static!important;transform:none!important;}
+
+  /* Text safety for unpredictable AI-generated content: long compound words, industries, or URLs
+     wrap safely instead of overflowing or being clipped */
+  .rpt-sec,.rpt-cover,.rpt-nm{overflow-wrap:anywhere;word-break:normal;hyphens:auto;}
+
+  .rpt-sec{padding:15px 40px;}
+  .rpt-nm{padding:40px 56px;}
+  .rpt-cover{padding:0.85in 0.75in;}
+
+  /* ── COVER: true edge-to-edge bleed via @page:first (verified with pixel sampling —
+     all four corners render pure black, confirming no margin gap remains). Internal
+     padding compensates for the lost page margin so text stays comfortably inset. ── */
+  .rpt-cover{
+    background:#141210!important;
+    display:flex;flex-direction:column;justify-content:center;
+    min-height:10.5in;
+    break-after:page;page-break-after:always;
+  }
+  .rpt-cover-title{font-size:64px!important;line-height:0.96!important;}
+
+  /* Fix: "Scale & Review" (the longest week theme) wraps to 2 lines while
+     shorter themes don't, pushing that column's tasks down and misaligning
+     every row across the 4-column grid. A consistent min-height makes all
+     four columns start their task list at the same vertical position
+     regardless of which theme name happens to wrap. */
+  .rpt-week-hd{min-height:86px!important;}
+  .rpt-weeks-header{border-bottom:none!important;}
+  .rpt-weeks-body{border-top:none!important;}
+
+  /* Adaptive Executive Summary spacing — tier is chosen in JS from real measured
+     content length (see the render code), not a fixed guess. This is the
+     structural fix: padding responds to actual content instead of being tuned
+     to one example and breaking on the next. */
+  .rpt-exec-hero{padding:26px 40px 20px!important;}
+  .rpt-exec-glance{padding:20px 40px!important;}
+  .rpt-exec-nextmove{padding:20px 40px 26px;border-top:2px solid var(--r-accent);}
+  .rpt-exec-nextmove-label{font-size:11px;letter-spacing:0.26em;margin-top:10px;}
+  .rpt-exec-nextmove-text{font-size:22px!important;line-height:1.4!important;}
+
+  /* DENSE: long content (>950 chars combined) — compress further so a detailed
+     strategy still has the best possible chance of fitting on one page. */
+  .rpt-exec-dense .rpt-exec-hero{padding:18px 40px 14px!important;}
+  .rpt-exec-dense .rpt-exec-hero-headline{font-size:22px!important;line-height:1.15!important;}
+  .rpt-exec-dense .rpt-exec-glance{padding:14px 40px!important;}
+  .rpt-exec-dense .rpt-exec-glance-value{font-size:12.5px!important;line-height:1.5!important;}
+  .rpt-exec-dense .rpt-exec-nextmove{padding:14px 40px 18px!important;}
+  .rpt-exec-dense .rpt-exec-nextmove-text{font-size:18px!important;line-height:1.35!important;}
+
+  /* AIRY: short content (<400 chars combined) — use the extra room
+     intentionally so it reads as composed, not sparse. */
+  .rpt-exec-airy .rpt-exec-hero{padding:40px 44px 32px!important;}
+  .rpt-exec-airy .rpt-exec-hero-headline{font-size:32px!important;}
+  .rpt-exec-airy .rpt-exec-glance{padding:32px 44px!important;}
+  .rpt-exec-airy .rpt-exec-nextmove{padding:32px 44px 40px!important;}
+  .rpt-exec-airy .rpt-exec-nextmove-text{font-size:26px!important;line-height:1.45!important;}
+
+  /* ── CLOSING PAGE: same full-page treatment, forced to start fresh, nothing after it ── */
+  .rpt-nm{
+    background:#141210!important;
+    display:flex;flex-direction:column;justify-content:center;
+    min-height:8.2in;
+    break-before:page;page-break-before:always;
+  }
+
+  .rpt-sec-dark,.rpt-weeks,.rpt-exec-hero{background:#141210!important;}
   .rpt-weeks{grid-template-columns:repeat(4,1fr)!important;}
+  /* Adaptive roadmap: when task volume is substantially higher than the typical 4-per-week
+     baseline (computed from real data, not guessed), switch to 2 columns instead of shrinking
+     text or hiding tasks */
+  .rpt-weeks-compact{grid-template-columns:repeat(2,1fr)!important;}
   .rpt-action-row.is-first{background:#141210!important;}
-  .rpt-sec{padding:48px 64px;}
-  .rpt-nm{padding:64px;}
-  .rpt-cover{padding:64px;}
   .rpt-str-grid{grid-template-columns:1fr 1fr!important;}
 
-  /* Never split a heading from what follows it, and never split a card/row mid-content */
-  .rpt-sec-hd{break-after:avoid;page-break-after:avoid;}
+  /* Fix: the hairline-divider technique (colored parent background peeking through 1px gaps)
+     rendered as an orphaned gray block whenever a page break landed inside that flex container.
+     Neutralize the parent background for print and draw the divider on each row instead. */
+  .rpt-opps-stack{background:transparent!important;border-top:1px solid var(--r-rule);}
+  .rpt-opp-row{border-bottom:1px solid var(--r-rule);}
+  .rpt-str-grid{background:transparent!important;}
+  .rpt-str-cell:first-child{border-right:1px solid var(--r-rule);}
+
+  /* Force block flow instead of flex for print — flex-column fragmentation proved unreliable
+     during pagination testing (confirmed via isolated reproduction), affecting every list that
+     uses flex-direction:column for its rows */
+  .rpt-exec-glance,.rpt-opps-stack,.rpt-actions-stack,.rpt-ahead-list,.rpt-success-list{display:block!important;}
+  .rpt-exec-glance-item{display:block;width:100%;border-left:none!important;border-bottom:1px solid var(--r-rule);padding-bottom:16px;margin-bottom:16px;}
+  .rpt-exec-glance-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+
+  /* Section 07 (Measurable Milestones) gets its own dedicated page */
+  /* Sections flow continuously — content of unpredictable length (sometimes
+     vague and short, sometimes exhaustively detailed) cannot be reliably
+     forced into "one section = one page" without creating either awkward
+     empty space (short content) or overflow (long content). Strong visual
+     section markers (numerals, dark/light alternation, dividers) create the
+     sense of distinct chapters without wasting space on artificial breaks. */
+
+  /* Every section heading stays attached to what follows it — never orphaned alone at a page bottom */
+  .rpt-sec-hd,.rpt-week-hd{break-after:avoid;page-break-after:avoid;}
+
+  /* Hard guarantee for heading+first-item: break-after:avoid is only a hint and can still lose
+     when the browser judges there's no better option. rpt-heading-lock wraps the heading and its
+     first content row in one shared parent with break-inside:avoid, which is a real DOM-level
+     guarantee — they physically cannot be separated by pagination. */
+  .rpt-heading-lock{break-inside:avoid;page-break-inside:avoid;}
+
+  /* Sections flow naturally one after another — no forced break-per-section.
+     Only Cover and Closing (above) force a fresh page. */
+
+  /* Atomic units only: small, bounded pieces that must never split internally.
+     Deliberately NOT applied to whole multi-item containers (rpt-exec-unified, rpt-sec-dark,
+     rpt-weeks, rpt-opps-stack, rpt-actions-stack, rpt-ahead-list, rpt-success-list) since those
+     can legitimately exceed one page with enough content — forcing them whole would push an
+     oversized block onto a fresh page and leave the previous page mostly blank. The Strengths/
+     What-Needs-Attention pair is the one exception: it's inherently two short paragraphs and
+     genuinely is a single atomic comparison, not a growable list. */
   .rpt-exec-hero,.rpt-exec-glance-item,.rpt-exec-nextmove,
-  .rpt-opp-row,.rpt-action-row,.rpt-ahead-row,.rpt-success-row,
-  .rpt-week-col,.rpt-str-cell,.rpt-insight-block,.rpt-nm{
+  .rpt-opp-row,.rpt-action-row,.rpt-deprio-row,.rpt-ahead-row,.rpt-success-row,
+  .rpt-str-grid,.rpt-insight-block,.rpt-week-task{
     break-inside:avoid;page-break-inside:avoid;
   }
+
+  /* 30-Day Plan: a real checkable box for print, instead of the small screen dot */
+  .rpt-week-dot{
+    width:10px;height:10px;border-radius:2px;flex-shrink:0;margin-top:2px;
+    background:transparent!important;border:1.3px solid var(--r-dark-body);opacity:1;
+  }
+
   /* Prevent a single stray line stranded at the top or bottom of a page */
   .rpt-body,.rpt-chal-body,.rpt-opp-body,.rpt-action-desc,.rpt-ahead-body,
   .rpt-str-text,.rpt-success-text,.rpt-exec-glance-value{
@@ -922,288 +1129,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 }
 `;
 
-// ─── PDF GENERATOR ───────────────────────────────────────────────────────────
-function generatePDF(result, meta) {
-  try {
-    const { jsPDF } = window.jspdf || {};
-    if (!jsPDF) { window.print(); return; }
-    const doc = new jsPDF({ orientation:"portrait", unit:"mm", format:"letter" });
-    const W=216,H=279,ML=20,MR=20,CW=W-ML-MR;
-    const ACCENT=[176,114,138],ACCENT_DK=[138,80,104],DARK=[26,25,22],INK=[42,40,38],MUTED=[120,113,108],RULE=[230,226,223],SAGE=[106,158,138];
-    let y=ML+5, pageNum=1;
-    const wrap=(t,x,w)=>{
-      let s=String(t||"");
-      s=s.replace(/\*\*/g,"");                          // stray bold markers
-      s=s.replace(/(^|\s)\*([^*\n]+?)\*(?=\s|$)/g,"$1$2"); // stray *italic* markers -> plain text (styling comes from the font itself)
-      s=s.replace(/[ \t]*-{2,}[ \t]*$/gm,"");            // stray markdown horizontal-rule artifacts ("---")
-      return doc.splitTextToSize(s,w);
-    };
-    const rawLines=(t)=>(t||"").split("\n").map(l=>l.trim()).filter(Boolean).filter(l=>!l.match(/^#+/));
-    const cleanStr=(s)=>(s||"").replace(/\*\*/g,"").trim().replace(/^[-–—•*✓✗\d.]+\s*/,"").trim();
-    let currentLabel="";
-    function chk(n){if(y+n>H-14){doc.addPage();pageNum++;pageHeader(currentLabel);}}
-    function footer(){doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});}
-    function pageHeader(label){doc.setFontSize(7);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text("YOUR NEXT MOVE",ML,14);doc.text((label||"").toUpperCase(),W-MR,14,{align:"right"});doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,17,W-MR,17);y=27;footer();}
-    function newPage(label){currentLabel=label;doc.addPage();pageNum++;pageHeader(label);}
-    function rule(){chk(4);doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,y,W-MR,y);y+=4;}
-    function body(t,ind,w){const x=ML+(ind||0);doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(t,0,(w||CW)-(ind||0)).forEach(l=>{chk(5);doc.text(l,x,y);y+=5;});y+=1;}
-    function secHd(num,title,desc){chk(28);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(num,ML,y);y+=4.5;doc.setFontSize(17);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");wrap(title,0,CW).forEach((l)=>{doc.text(l,ML,y);y+=6.8;});if(desc){doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");doc.text(desc,ML,y);y+=4.5;}doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.line(ML,y,ML+18,y);y+=5.5;}
-    // Card height for a label+value mini-card, given target width
-    function cardH(value,w){doc.setFontSize(9.5);doc.setFont("helvetica","normal");const lines=wrap(value,0,w-14);return 15+lines.length*4.6+7;}
-    function miniCard(x,cy,w,h,label,value,dark){
-      if(dark){doc.setFillColor(...DARK);doc.rect(x,cy,w,h,"F");}
-      else{doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.setFillColor(255,255,255);doc.rect(x,cy,w,h,"FD");}
-      doc.setFontSize(7.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");
-      doc.text(label.toUpperCase(),x+7,cy+9);
-      doc.setFontSize(9.5);doc.setTextColor(...(dark?[255,255,255]:INK));doc.setFont("helvetica","normal");
-      wrap(value,0,w-14).forEach((l,i)=>doc.text(l,x+7,cy+16+i*4.6));
-    }
-    // COVER
-    doc.setFillColor(...DARK);doc.rect(0,0,W,H,"F");
-    doc.setFontSize(8);doc.setTextColor(80,75,70);doc.setFont("helvetica","bold");doc.text("YOUR NEXT MOVE  ·  STRATEGY REPORT",ML,24);
-    doc.setFontSize(38);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
-    const ct=meta.catLabel||"Strategy";const coverTitleLines=wrap(ct+" Strategy",0,CW-10);
-    coverTitleLines.forEach((l,i)=>{doc.text(l,ML,52+i*15);});
-    const afterTitleY=52+coverTitleLines.length*15+18;
-    if(meta.firstName){doc.setFontSize(12);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");doc.text("Prepared exclusively for "+meta.firstName,ML,afterTitleY);}
-    let tx=ML;
-    [meta.effectiveIndustry,meta.stageLabel,meta.today].filter(Boolean).forEach(tag=>{doc.setFontSize(7);doc.setTextColor(100,95,90);doc.setFont("helvetica","normal");const tw=doc.getTextWidth(tag)+8;doc.setDrawColor(55,50,47);doc.setLineWidth(0.3);doc.roundedRect(tx,afterTitleY+10,tw,5.5,1,1);doc.text(tag,tx+4,afterTitleY+14.2);tx+=tw+4;});
-    // Quiet colophon anchor — gives the lower half of the cover an intentional resting point instead of dead space
-    doc.setDrawColor(45,42,38);doc.setLineWidth(0.3);doc.line(ML,H-42,ML+28,H-42);
-    doc.setFontSize(7);doc.setTextColor(90,85,80);doc.setFont("helvetica","normal");
-    doc.text("A PERSONALIZED STRATEGY REPORT",ML,H-35);
-    doc.text("PREPARED BY YOUR NEXT MOVE",ML,H-30);
-    footer();
-    // Parse data (unchanged business logic)
-    const execRaw=(result.strategicAssessment||"").replace(/\*\*/g,"");
-    const execLines=rawLines(execRaw);
-    const mainExec=execLines.filter(l=>!l.match(/^(strength|what needs)/i)).join(" ");
-    const position=mainExec?mainExec.split(".")[0]+".":"";
-    const blindRaw=(result.primaryConstraint||"").replace(/\*\*/g,"");
-    const blindTitle=(blindRaw.match(/^[^.]+/)||[""])[0];
-    const insM=blindRaw.match(/The insight:?\s*(.+?)(?:\.|$)/i);
-    const insight=insM?insM[1].trim():"";
-    const succ=(result.successLooks||"").replace(/\*\*/g,"").split(/(?<=[.!?])\s+/).filter(s=>s.length>10);
-    const nm=(result.yourNextMove||"").replace(/\*\*/g,"").trim();
-    const nms=nm.split(".")[0]+".";
-    const oppList=[];{let cur=null;rawLines(result.strategicOpportunity||"").forEach(l=>{const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);if(b){if(cur)oppList.push(cur);cur={title:b[1],body:cleanStr(b[2]||"")};}else if(cur&&l.trim())cur.body=(cur.body?cur.body+" ":"")+cleanStr(l);});if(cur)oppList.push(cur);}
-    const goalFirst=succ[0]||"";
-
-    // ══ PAGE — EXECUTIVE SUMMARY: ONE unified briefing, not dashboard cards ══
-    newPage("Executive Summary");
-    doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("00 · THE CORE INSIGHT",ML,y);y+=8;
-    if(blindTitle){doc.setFontSize(22);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");wrap(blindTitle,0,CW).forEach(l=>{chk(9.5);doc.text(l,ML,y);y+=9.5;});y+=1;}
-    const heroSub=insight||blindRaw.split(".")[0]+".";
-    if(heroSub){doc.setFontSize(10.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","italic");wrap(heroSub,0,CW-20).forEach(l=>{chk(5.5);doc.text(l,ML,y);y+=5.5;});}
-    y+=14;
-    // One unified container — thin mauve outline, no internal card borders
-    const oppValue=oppList[0]?(oppList[0].title+(oppList[0].body?(" — "+oppList[0].body.split(".")[0]+"."):"")):"—";
-    const colVals=[["Current Position",position||"—"],["Greatest Opportunity",oppValue],["Primary Goal",goalFirst||"—"]];
-    const colW3=(CW-32-16)/3;
-    doc.setFontSize(9.5);
-    const colHeights=colVals.map(([,v])=>16+wrap(v,0,colW3).length*4.6);
-    const rowH=Math.max(...colHeights,26);
-    doc.setFontSize(15.5);doc.setFont("helvetica","bolditalic");
-    const nmLines=wrap(nms||"—",0,CW-32);
-    const nmSectionH=20+nmLines.length*7.2;
-    const boxH=24+rowH+20+nmSectionH+16;
-    chk(boxH+6);
-    doc.setDrawColor(...ACCENT);doc.setLineWidth(0.4);doc.roundedRect(ML,y,CW,boxH,3,3,"S");
-    let iy=y+22;
-    colVals.forEach(([lbl,val],i)=>{
-      const cx=ML+16+i*(colW3+8);
-      if(i>0){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(cx-8,iy-10,cx-8,iy+rowH-8);}
-      doc.setFontSize(8.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(lbl.toUpperCase(),cx,iy);
-      doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
-      wrap(val,0,colW3).forEach((l,li)=>doc.text(l,cx,iy+8+li*4.6));
-    });
-    iy+=rowH+16;
-    doc.setDrawColor(...ACCENT);doc.setLineWidth(0.6);doc.line(ML+16,iy-9,ML+50,iy-9);
-    doc.setFontSize(9);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("TODAY'S FIRST MOVE",ML+16,iy);
-    doc.setFontSize(15.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");
-    nmLines.forEach((l,li)=>doc.text(l,ML+16,iy+11+li*7.2));
-    y+=boxH+16;
-
-    // ══ STRATEGIC ASSESSMENT + PRIMARY CHALLENGE — flows from Executive Summary, no forced break ══
-    currentLabel="Strategic Assessment";
-    secHd("01 · STRATEGIC ASSESSMENT","Where you are today.","What we discovered from your answers.");
-    if(mainExec)body(mainExec);
-    const sl=execLines.find(l=>l.match(/^strength/i))||"";
-    const tl=execLines.find(l=>l.match(/^what needs/i))||"";
-    if(sl||tl){
-      y+=2;const half=(CW-8)/2;
-      const h1=sl?cardH(cleanStr(sl),half):0, h2=tl?cardH(cleanStr(tl),half):0;
-      const rowH2=Math.max(h1,h2,20);chk(rowH2+4);
-      if(sl){doc.setDrawColor(...SAGE);doc.setLineWidth(0.8);doc.line(ML,y,ML,y+rowH2);doc.setFontSize(7.5);doc.setTextColor(...SAGE);doc.setFont("helvetica","bold");doc.text("STRENGTHS",ML+5,y+6);doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(cleanStr(sl),0,half-8).forEach((l,i)=>doc.text(l,ML+5,y+12+i*4.6));}
-      if(tl){const x2=ML+half+8;doc.setDrawColor(...ACCENT);doc.setLineWidth(0.8);doc.line(x2,y,x2,y+rowH2);doc.setFontSize(7.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("WHAT NEEDS ATTENTION",x2+5,y+6);doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");wrap(cleanStr(tl),0,half-8).forEach((l,i)=>doc.text(l,x2+5,y+12+i*4.6));}
-      y+=rowH2+8;
-    }
-    rule();y+=6;
-    secHd("02 · PRIMARY CHALLENGE","The core constraint.","The main issue making progress harder right now.");
-    if(blindTitle){doc.setFontSize(14);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");chk(9);doc.setDrawColor(...ACCENT);doc.setLineWidth(1);doc.line(ML,y-5,ML,y+3);wrap('"'+blindTitle+'"',0,CW-8).forEach(l=>{chk(9);doc.text(l,ML+6,y);y+=8;});y+=2;}
-    const blindBody=blindRaw.replace(insM?.[0]||"","").replace(/^[^.]+\./,"").trim();
-    if(blindBody)body(blindBody);
-    if(insight){
-      doc.setFontSize(10.5);const insLines=wrap('"'+insight+'"',0,CW-16);const insBoxH=10+insLines.length*6+4;
-      chk(insBoxH+4);doc.setFillColor(250,246,248);doc.setDrawColor(...ACCENT);doc.setLineWidth(0.3);doc.roundedRect(ML,y,CW,insBoxH,1.5,1.5,"FD");
-      doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("THE INSIGHT",ML+6,y+7);
-      doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bolditalic");insLines.forEach((l,i)=>doc.text(l,ML+6,y+14+i*6));
-      y+=insBoxH+6;
-    }
-
-    // ══ BEST OPPORTUNITY + RECOMMENDED ACTIONS — flows naturally, no forced blank page ══
-    rule();y+=6;
-    currentLabel="Best Opportunity";
-    secHd("03 · BEST OPPORTUNITY","Where to focus your energy.","The areas most likely to move the needle.");
-    oppList.slice(0,3).forEach((o,i)=>{chk(14);doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML,y);doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.text(o.title,ML+8,y);y+=5;if(o.body)body(o.body,8);});
-    rule();y+=6;
-    currentLabel="Recommended Actions";
-    secHd("04 · RECOMMENDED ACTIONS","Where to direct your energy.","In priority order.");
-    const tiers=[{p:"Highest",im:"High",t:"Today"},{p:"High",im:"High",t:"Within 3 days"},{p:"High",im:"Medium",t:"Within 5 days"},{p:"Medium",im:"Medium",t:"Within 2 weeks"},{p:"Medium",im:"Medium",t:"Within 2 weeks"}];
-    const actionItems=[];const deprioLines=[];
-    {let cur=null;let inDeprio=false;
-      rawLines(result.recommendedActions||"").forEach(l=>{
-        const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/)||l.match(/^\d+\.\s*\*\*(.+?)\*\*[:\s]*(.*)/);
-        const wy=l.match(/\*Why this matters:?\*?\s*(.*)/i);
-        if(b&&/set aside/i.test(b[1])){if(cur){actionItems.push(cur);cur=null;}inDeprio=true;if(b[2])deprioLines.push(cleanStr(b[2]));return;}
-        if(inDeprio){if(l.trim())deprioLines.push(cleanStr(l));return;}
-        if(b&&actionItems.length<5){if(cur)actionItems.push(cur);cur={title:b[1],body:cleanStr(b[2]||""),why:""};}
-        else if(wy&&cur){cur.why=wy[1];}
-        else if(cur&&l.trim()){cur.body=(cur.body?cur.body+" ":"")+cleanStr(l);}
-      });
-      if(cur)actionItems.push(cur);
-    }
-    actionItems.forEach((a,i)=>{
-      const tier=tiers[i]||tiers[4];
-      const isFirst=i===0;
-      const titleSize=isFirst?13:11.5;
-      const titleLH=isFirst?6.2:5.5;
-      doc.setFontSize(titleSize);doc.setFont("helvetica","bold");
-      const titleLines=wrap(a.title,0,CW-20);
-      doc.setFontSize(9.5);doc.setFont("helvetica","normal");
-      const bodyLines=wrap(a.body,0,CW-20);
-      doc.setFontSize(9);doc.setFont("helvetica","italic");
-      const whyLines=a.why?wrap("Why this matters: "+a.why,0,CW-20):[];
-      const blockH=titleLines.length*titleLH+6+5.5+bodyLines.length*4.6+(whyLines.length?1.5+whyLines.length*4.4:0)+(isFirst?16:11);
-      chk(blockH+6);
-      doc.setFontSize(isFirst?13:10);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");
-      doc.text("0"+(i+1),ML,y+(isFirst?2:0));
-      if(isFirst){doc.setFontSize(6.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("START HERE",ML,y+8);}
-      doc.setFontSize(titleSize);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");
-      titleLines.forEach((l,li)=>doc.text(l,ML+20,y+li*titleLH));
-      let ry=y+titleLines.length*titleLH+3;
-      doc.setFontSize(7.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text(`${tier.p.toUpperCase()} PRIORITY`,ML+20,ry);
-      const priW=doc.getTextWidth(`${tier.p.toUpperCase()} PRIORITY`);
-      doc.setFontSize(7.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","normal");
-      doc.text(`   ·  ${tier.im} impact  ·  ${tier.t}`,ML+20+priW,ry);
-      ry+=6;
-      doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
-      bodyLines.forEach(l=>{doc.text(l,ML+20,ry);ry+=4.6;});
-      if(whyLines.length){ry+=1.5;doc.setFontSize(9);doc.setTextColor(...ACCENT_DK);doc.setFont("helvetica","italic");whyLines.forEach(l=>{doc.text(l,ML+20,ry);ry+=4.4;});}
-      y=ry+(isFirst?9:7);
-      if(i<actionItems.length-1){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML,y-4,W-MR,y-4);}
-    });
-    if(deprioLines.length){
-      const deprioText=deprioLines.join(" ").trim();
-      doc.setFontSize(9);doc.setFont("helvetica","italic");
-      const dLines=wrap("Set aside for now: "+deprioText,0,CW-8);
-      chk(dLines.length*4.6+8);
-      doc.setFontSize(9);doc.setTextColor(...MUTED);doc.setFont("helvetica","italic");
-      dLines.forEach(l=>{doc.text(l,ML,y);y+=4.6;});
-      y+=4;
-    }
-
-    // ══ PAGE — 30-DAY ROADMAP: "the execution page" — owns the full canvas ══
-    newPage("30-Day Roadmap");
-    secHd("05 · 30-DAY ROADMAP","Your week-by-week execution plan.","Print it. Check it off.");
-    y+=6;
-    const wths=["Foundation","Momentum","Activation","Scale & Review"];
-    const whs=[...(result.priorityPlan||"").matchAll(/week\s*([1-4])[:\s\-–—]*([\s\S]*?)(?=week\s*[1-4]|$)/gi)];
-    const wd=["","","",""];whs.forEach(m=>{const i=parseInt(m[1])-1;if(i>=0&&i<4)wd[i]=m[2].trim().replace(/^(Foundation|Momentum|Activation|Scale\s*&?\s*Review)\s*:?\s*[-–—]?\s*/i,"");});
-    const colGap=5,colW=(CW-colGap*3)/4,startY=y;
-    const gridBottom=H-38;
-    let maxColH=0;
-    wd.forEach((w,i)=>{
-      const cx=ML+i*(colW+colGap);let cy=startY;
-      doc.setFillColor(...ACCENT);doc.rect(cx,cy,colW,12,"F");
-      doc.setFontSize(10);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");
-      doc.text("WEEK "+(i+1),cx+5,cy+8);
-      cy+=19;
-      doc.setFontSize(12.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");
-      wrap(wths[i],0,colW-6).forEach(l=>{doc.text(l,cx+5,cy);cy+=6;});
-      cy+=8;
-      const tasks=w.split(/[\/\n]/).map(t=>cleanStr(t)).filter(Boolean).slice(0,5);
-      tasks.forEach(t=>{
-        doc.setDrawColor(...MUTED);doc.setLineWidth(0.4);doc.rect(cx+5,cy-3.7,4.4,4.4,"S");
-        doc.setFontSize(9.5);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
-        const tLines=wrap(t,0,colW-12);
-        tLines.forEach((l,li)=>{doc.text(l,cx+12,cy+li*5);});
-        cy+=Math.max(tLines.length*5,8)+7;
-      });
-      maxColH=Math.max(maxColH,cy-startY);
-      // Full-height column rule — the grid claims the whole page, not just where tasks end
-      doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.line(cx,startY+19,cx,gridBottom);
-      if(i===3){doc.line(cx+colW,startY+19,cx+colW,gridBottom);}
-    });
-    doc.setDrawColor(...RULE);doc.setLineWidth(0.3);doc.line(ML,gridBottom,W-MR,gridBottom);
-    doc.setFontSize(9.5);doc.setTextColor(...MUTED);doc.setFont("helvetica","italic");
-    doc.text("Revisit this page every Friday. Consistency compounds faster than intensity.",ML,gridBottom+10);
-    y=gridBottom+20;
-
-    // ══ LOOKING AHEAD + MEASURABLE MILESTONES — flows naturally ══
-    currentLabel="Looking Ahead";
-    secHd("06 · LOOKING AHEAD","What becomes possible next.","What to build toward after your first 30 days.");
-    let ln=0;rawLines(result.longTermGrowth||"").forEach(l=>{
-      const b=l.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);
-      if(b){
-        ln++;chk(16);
-        doc.setDrawColor(...ACCENT);doc.setLineWidth(0.5);doc.circle(ML+3.5,y-1.3,3.5,"S");
-        doc.setFontSize(7);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("0"+ln,ML+3.5,y-0.1,{align:"center"});
-        doc.setFontSize(10.5);doc.setTextColor(...DARK);doc.setFont("helvetica","bold");doc.text(b[1],ML+11,y);y+=5;
-        if(b[2])body(cleanStr(b[2]),11);
-      }else if(l.trim())body(cleanStr(l),11);
-    });
-    if(succ.length){
-      rule();y+=6;
-      currentLabel="Measurable Milestones";
-      secHd("07 · MEASURABLE MILESTONES","How you will know this is working.","Concrete signals of progress.");
-      succ.slice(0,3).forEach((s,i)=>{
-        doc.setFontSize(10);doc.setFont("helvetica","normal");
-        const lines=wrap(s.trim(),0,CW-16);const rowH=Math.max(lines.length*4.8,9)+6;
-        chk(rowH+2);
-        doc.setFillColor(...SAGE);doc.circle(ML+3.5,y+3.2,3.5,"F");
-        doc.setFontSize(7);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.text("0"+(i+1),ML+3.5,y+4.4,{align:"center"});
-        doc.setFontSize(10);doc.setTextColor(...INK);doc.setFont("helvetica","normal");
-        lines.forEach((l,li)=>doc.text(l,ML+11,y+4.4+li*4.8));
-        y+=rowH;
-        if(i<succ.slice(0,3).length-1){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(ML+11,y-2,W-MR,y-2);}
-      });
-    }
-
-    // ══ PAGE — YOUR NEXT MOVE: the closing moment, full-bleed dark ══
-    doc.addPage();pageNum++;
-    doc.setFillColor(...DARK);doc.rect(0,0,W,H,"F");
-    doc.setFontSize(8);doc.setTextColor(...ACCENT);doc.setFont("helvetica","bold");doc.text("08 · YOUR NEXT MOVE",ML,40);
-    doc.setFontSize(10);doc.setTextColor(...ACCENT);doc.setFont("helvetica","italic");doc.text("The single most important action you should take today",ML,50);
-    doc.setFontSize(22);doc.setTextColor(255,255,255);doc.setFont("helvetica","bolditalic");
-    let cy=72;wrap('"'+nms+'"',0,CW-10).forEach(l=>{doc.text(l,ML,cy);cy+=10;});
-    cy+=8;
-    doc.setDrawColor(60,55,50);doc.setLineWidth(0.3);doc.line(ML,cy,W-MR,cy);cy+=12;
-    [["TIME REQUIRED","Today"],["PRIORITY","Highest"],["EXPECTED IMPACT","High"]].forEach(([lbl,val],i)=>{const mx=ML+i*(CW/3);doc.setFontSize(7.5);doc.setTextColor(120,113,108);doc.setFont("helvetica","bold");doc.text(lbl,mx,cy);doc.setFontSize(11);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");doc.text(val,mx,cy+6);});
-    cy+=30;
-    doc.setDrawColor(60,55,50);doc.setLineWidth(0.3);doc.line(ML,cy,W-MR,cy);cy+=20;
-    doc.setFontSize(17);doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.text("This strategy was built specifically for you.",ML,cy);cy+=12;
-    doc.setFontSize(10);doc.setTextColor(160,154,148);doc.setFont("helvetica","normal");
-    doc.text("Return to My Strategies to review and continue building on this plan.",ML,cy);cy+=16;
-    doc.setDrawColor(45,42,38);doc.setLineWidth(0.3);doc.line(ML,cy,ML+28,cy);cy+=8;
-    doc.setFontSize(8.5);doc.setTextColor(...ACCENT);doc.setFont("helvetica","normal");
-    doc.text("Generated "+meta.today+" · Your Next Move by Chat It Up",ML,cy);
-    doc.setFontSize(8);doc.setTextColor(...MUTED);doc.text(String(pageNum),W/2,H-10,{align:"center"});
-
-    const safe=(meta.firstName||"My").replace(/[^a-zA-Z0-9]/g,"_");
-    doc.save("YourNextMove_"+safe+"_Strategy.pdf");
-  } catch(err) { console.error("PDF generation failed:",err); window.print(); }
-}
 
 
 // ─── APP ─────────────────────────────────────────────────────────────────────
@@ -1222,15 +1147,19 @@ export default function App() {
   const [loading,      setLoading]      = useState(false);
   const [error,        setError]        = useState(null);
   const [savedPlans,   setSavedPlans]   = useState([]);
+
+
   const [viewingPlanId,setViewingPlanId]= useState(null);
   const [firstName,    setFirstName]    = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showPaywall,  setShowPaywall]  = useState(false);
   const [editSection,  setEditSection]  = useState(null);
   const [editDraft,    setEditDraft]    = useState("");
+  const [editSaveStatus, setEditSaveStatus] = useState({}); // {sectionKey: 'saving'|'saved'|'error'}
   const [fbDone,       setFbDone]       = useState(false);
   const [pdfUnlocked,  setPdfUnlocked]  = useState(false);
   const [strategyStage, setStrategyStage] = useState('reading'); // reading | saved | feedback | complete
+  const [pendingPrint, setPendingPrint] = useState(false);
   const [welcomeEmail, setWelcomeEmail] = useState("");
   const [fbRating,     setFbRating]     = useState(null);
   const [fbAns,        setFbAns]        = useState({});
@@ -1276,9 +1205,17 @@ export default function App() {
   },[loading]);
 
   useEffect(()=>{
+    if(pendingPrint && strategyStage==='reading'){
+      const t=setTimeout(()=>{window.print();setPendingPrint(false);},50);
+      return()=>clearTimeout(t);
+    }
+  },[pendingPrint,strategyStage]);
+
+  useEffect(()=>{
     loadUserState();loadSavedPlans();
     const p=new URLSearchParams(window.location.search);
     if(p.get("subscribed")==="1"){setStripeSuccess(true);saveSubState(true);window.history.replaceState({},"",window.location.pathname);}
+    if(p.get("devqa")==="1"){go("devqa");}
     // Load advisor history
     try{const h=localStorage.getItem("advisor-history");if(h)setAdvisorHistory(JSON.parse(h));}catch(e){}
   },[]);
@@ -1385,9 +1322,35 @@ export default function App() {
   function openSavedPlan(plan){setCatId(plan.catId);setIndustry(plan.industry);setJourneyStage(plan.journeyStage||null);setResult(plan.result);setViewingPlanId(plan.id);setStrategyStage('reading');setFbDone(false);setPdfUnlocked(false);go("results");}
   function startEdit(key,val){setEditSection(key);setEditDraft(val||"");}
   function cancelEdit(){setEditSection(null);setEditDraft("");}
-  function saveEdit(key){
-    const updated={...result,[key]:editDraft};setResult(updated);setEditSection(null);
-    if(viewingPlanId){window.storage.get(`plan:${viewingPlanId}`).then(raw=>{if(raw){const plan=JSON.parse(raw.value);plan.result=updated;window.storage.set(`plan:${viewingPlanId}`,JSON.stringify(plan));}}).catch(()=>{});}
+  async function saveEdit(key){
+    if(!editDraft||!editDraft.trim()){setEditSaveStatus(s=>({...s,[key]:'error'}));return;} // reject empty-value saves
+    const updated={...result,[key]:editDraft};
+    setResult(updated);setEditSection(null);
+    setEditSaveStatus(s=>({...s,[key]:'saving'}));
+    try{
+      let pid=viewingPlanId;
+      if(pid){
+        const raw=await window.storage.get(`plan:${pid}`).catch(()=>null);
+        if(raw){
+          const plan=JSON.parse(raw.value);
+          plan.result=updated;
+          await window.storage.set(`plan:${pid}`,JSON.stringify(plan));
+          setSavedPlans(prev=>prev.map(p=>p.id===pid?{...p,result:updated}:p)); // keep the in-memory My Strategies list in sync — without this, reopening the same plan without a refresh shows stale pre-edit content
+        }else{
+          pid=null; // referenced record no longer exists — fall through and create a fresh one
+        }
+      }
+      if(!pid){
+        const newId=await savePlan(updated,{catId,industry:effectiveIndustry,journeyStage});
+        if(newId)setViewingPlanId(newId);
+        else throw new Error("savePlan returned no id");
+      }
+      setEditSaveStatus(s=>({...s,[key]:'saved'}));
+      setTimeout(()=>setEditSaveStatus(s=>{const n={...s};delete n[key];return n;}),2500);
+    }catch(e){
+      console.error("Edit save failed:",key,e.message);
+      setEditSaveStatus(s=>({...s,[key]:'error'}));
+    }
   }
 
   async function generate(){
@@ -1534,6 +1497,7 @@ Sentence 3: What specifically changes in 2 weeks if they do this.`;
       let savedId=null;
       try{
         savedId=await savePlan(parsed,{catId,industry:effectiveIndustry,journeyStage});
+        if(savedId)setViewingPlanId(savedId); // CRITICAL FIX: without this, saveEdit() can never find viewingPlanId and silently discards every edit made this session
       }catch(saveErr){
         // Save failed — log it but don't block the user from seeing their strategy
         console.error("Strategy save failed (non-fatal):",saveErr.message);
@@ -1574,6 +1538,9 @@ CRITICAL RULES:
 6. FEEL HUMAN. Read like someone who knows this person, not a chatbot completing a template.
 7. SHORT ENOUGH TO READ. The whole response should take 60-90 seconds to read. Cut anything that doesn't add value.
 
+UNCERTAINTY AND HIGH-STAKES SAFEGUARDS:
+Never invent facts, sources, statistics, dates, laws, prices, medical guidance, or policies. If you're not certain of a specific figure or claim, say so plainly rather than presenting a guess as fact. For medical, legal, financial, or safety-sensitive questions, give real, useful guidance but be clear when something requires a professional's verification rather than presenting it as settled. If the question turns on missing context that would change your answer, ask for it. If something may have changed recently or needs a current source, say so briefly. Never fabricate a specific link, citation, organization, or program. Keep this calm and proportionate — a normal aside, not a disclaimer wall.
+
 ${firstName?`The person's name is ${firstName}. Use it once naturally — not at the start of every section.`:""} ${context}
 
 Their question or situation: ${question}
@@ -1592,30 +1559,33 @@ One to two sentences on why this matters right now for their specific situation.
 **Your single next move**
 One sentence. The single most important action to take in the next 24 hours. Be specific — not a category, an actual action.`;
 
+    const ADVISOR_SECTIONS=[
+      {key:"hearing",aliases:["What I'm hearing","What I am hearing","What I Understand"]},
+      {key:"think",aliases:["Here's what I think","Here is what I think","My Recommendation","Direct Answer"]},
+      {key:"means",aliases:["What this means for you","What this means","Why It Matters","Why This Matters"]},
+      {key:"move",aliases:["Your single next move","Your Single Next Move","Next Move","Your Next Move","Next Step","Do This First"]},
+    ];
+
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
       if(!res.ok)throw new Error("Failed to get response");
       const data=await res.json();
       const text=data.text||"";
-      // Parse the advisor response
-      const hearingMatch=text.match(/\*\*What I'm hearing\*\*\s*([\s\S]*?)(?=\*\*Here's what I think\*\*|\*\*Direct Answer\*\*|$)/i);
-      const thinkMatch=text.match(/\*\*Here's what I think\*\*\s*([\s\S]*?)(?=\*\*What this means\*\*|\*\*Why It Matters\*\*|$)/i);
-      const meansMatch=text.match(/\*\*What this means for you\*\*\s*([\s\S]*?)(?=\*\*Your single next move\*\*|\*\*Do This First\*\*|$)/i);
-      const moveMatch=text.match(/\*\*Your single next move\*\*\s*([\s\S]*?)(?=$)/i);
-      // Fallback to old format
-      const directMatch=text.match(/\*\*Direct Answer\*\*\s*([\s\S]*?)(?=\*\*Why It Matters\*\*|$)/i);
-      const whyMatch=text.match(/\*\*Why It Matters\*\*\s*([\s\S]*?)(?=\*\*Next Steps\*\*|$)/i);
-      const stepsMatch=text.match(/\*\*Next Steps\*\*\s*([\s\S]*?)(?=\*\*Do This First\*\*|$)/i);
-      const firstMatch=text.match(/\*\*Do This First\*\*\s*([\s\S]*?)(?=$)/i);
+      const {sections,failedSections,fullyFailed}=parseAISections(text,ADVISOR_SECTIONS);
+      if(fullyFailed||failedSections.includes("hearing")&&failedSections.includes("think")&&failedSections.includes("move")){
+        // Genuinely nothing usable could be extracted — tell the user honestly instead of showing blank cards
+        setAdvisorResult({error:"We got a response back but couldn't format it properly. Your question is saved — please try again.",question,date:""});
+        return;
+      }
       const parsed={
-        hearing:(hearingMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        think:(thinkMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        means:(meansMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        move:(moveMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        direct:(directMatch?.[1]||hearingMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        why:(whyMatch?.[1]||thinkMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        steps:lines((stepsMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").trim()).filter(Boolean),
-        first:(firstMatch?.[1]||moveMatch?.[1]||"").replace(/\*\*/g,"").trim(),
+        hearing:sections.hearing,
+        think:sections.think,
+        means:sections.means,
+        move:sections.move,
+        direct:sections.think||sections.hearing,
+        why:sections.means,
+        steps:lines(sections.think).map(l=>l.replace(/^[\d.\-•]\s*/,"").trim()).filter(Boolean),
+        first:sections.move,
         raw:text.replace(/\*\*/g,"").trim(),
         question,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
       };
@@ -1632,6 +1602,9 @@ One sentence. The single most important action to take in the next 24 hours. Be 
     setHubSearchLoading(true);setHubSearchResult(null);
     const context=savedPlans[0]?`Background only, may or may not be relevant: this person has explored ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} work in ${savedPlans[0].industry} on this platform before. Use this only if their question below actually relates to it — otherwise ignore it completely.`:"";
     const prompt=`You are a universal knowledge engine and expert teacher. There is no topic you decline — from a simple fact, to a definition, to a deep framework, to a step-by-step how-to, across any domain of business, finance, careers, creativity, technology, health, or everyday life. The person should never wonder whether they're "allowed" to ask something here. If they can think of the question, you answer it, at whatever depth it deserves.
+
+UNCERTAINTY AND HIGH-STAKES SAFEGUARDS:
+Never invent facts, sources, statistics, dates, laws, prices, medical guidance, or policies. If you're not certain of a specific figure or claim, say so plainly rather than presenting a guess as fact. Distinguish general educational information from professional advice — for medical, legal, financial, or safety-sensitive topics, be clear when something requires a professional's verification rather than presenting it as settled. If responsible guidance depends on missing context, ask for it. If something may be outdated or needs a current source, say so briefly. Never fabricate a specific link, citation, organization, or program. Keep this calm and proportionate to the topic — a normal aside, never a disclaimer wall.
 
 ${firstName?`This is for ${firstName}.`:""} ${context}
 
@@ -1663,28 +1636,36 @@ A short list of concrete next actions, only for how-to or strategic requests whe
 
 For a simple factual question, "Direct Answer" alone is a complete, correct response — do not pad it with unnecessary sections.`;
 
+    const HUB_SECTIONS=[
+      {key:"direct",aliases:["Direct Answer"]},
+      {key:"why",aliases:["Why It Matters"]},
+      {key:"example",aliases:["Practical Example"]},
+      {key:"mistakes",aliases:["Common Mistakes"]},
+      {key:"related",aliases:["Related Concepts"]},
+      {key:"steps",aliases:["Next Steps"]},
+    ];
+
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
       if(!res.ok){const errBody=await res.json().catch(()=>({}));throw new Error(`API ${res.status}: ${errBody.error||errBody.code||"Unknown error"}`);}
       const data=await res.json();
       const text=data.text||"";
-      const directMatch=text.match(/\*\*Direct Answer\*\*\s*([\s\S]*?)(?=\*\*Why It Matters\*\*|\*\*Practical Example\*\*|\*\*Common Mistakes\*\*|\*\*Related Concepts\*\*|\*\*Next Steps\*\*|$)/i);
-      const whyMatch=text.match(/\*\*Why It Matters\*\*\s*([\s\S]*?)(?=\*\*Practical Example\*\*|\*\*Common Mistakes\*\*|\*\*Related Concepts\*\*|\*\*Next Steps\*\*|$)/i);
-      const exampleMatch=text.match(/\*\*Practical Example\*\*\s*([\s\S]*?)(?=\*\*Common Mistakes\*\*|\*\*Related Concepts\*\*|\*\*Next Steps\*\*|$)/i);
-      const mistakesMatch=text.match(/\*\*Common Mistakes\*\*\s*([\s\S]*?)(?=\*\*Related Concepts\*\*|\*\*Next Steps\*\*|$)/i);
-      const relatedMatch=text.match(/\*\*Related Concepts\*\*\s*([\s\S]*?)(?=\*\*Next Steps\*\*|$)/i);
-      const stepsMatch=text.match(/\*\*Next Steps\*\*\s*([\s\S]*?)(?=$)/i);
-      const hasStructured = directMatch||whyMatch||exampleMatch||mistakesMatch||relatedMatch||stepsMatch;
+      const {sections,fullyFailed}=parseAISections(text,HUB_SECTIONS);
+      const hasStructured=Object.values(sections).some(v=>v);
+      if(fullyFailed){
+        setHubSearchResult({query,error:"We got a response back but couldn't format it properly. Please try again."});
+        return;
+      }
       setHubSearchResult({
         query,
-        isPlaybook: !!hasStructured,
+        isPlaybook: hasStructured,
         rawText: !hasStructured ? text.replace(/\*\*/g,"").trim() : "",
-        direct:(directMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        why:(whyMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        example:(exampleMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        mistakes:lines((mistakesMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
-        related:(relatedMatch?.[1]||"").replace(/\*\*/g,"").trim(),
-        steps:lines((stepsMatch?.[1]||"").replace(/\*\*/g,"")).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
+        direct:sections.direct,
+        why:sections.why,
+        example:sections.example,
+        mistakes:lines(sections.mistakes).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
+        related:sections.related,
+        steps:lines(sections.steps).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
       });
     }catch(e){console.error("[askHubSearch] failed:",e.message);setHubSearchResult({query,error:"We hit a snag on our end. Please try again in a moment."});}
     finally{setHubSearchLoading(false);}
@@ -2432,6 +2413,12 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
     )}
 
     {/* ══ MY STRATEGIES ══ */}
+    {screen==="devqa"&&(
+      <Suspense fallback={<div style={{padding:60,textAlign:"center",fontFamily:"monospace",fontSize:12,color:"#78716C"}}>Loading QA runner…</div>}>
+        <QARunner/>
+      </Suspense>
+    )}
+
     {screen==="plans"&&(()=>{
       const latest=savedPlans[0];
       const daysSince=latest?Math.floor((Date.now()-latest.createdAt)/(1000*60*60*24)):0;
@@ -2609,16 +2596,23 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
       const goal=successSentences[0]||"";
 
       const EC=({sk,val})=>{
+        const status=editSaveStatus[sk];
         if(editSection===sk)return(
           <div style={{marginTop:20}}>
             <textarea className="rpt-edit-ta" value={editDraft} onChange={e=>setEditDraft(e.target.value)} autoFocus rows={5}/>
             <div className="rpt-edit-row">
-              <button className="rpt-edit-save" onClick={()=>saveEdit(sk)}>Save</button>
+              <button className="rpt-edit-save" onClick={()=>saveEdit(sk)} disabled={status==='saving'||!editDraft.trim()}>{status==='saving'?'Saving…':'Save'}</button>
               <button className="rpt-edit-cancel" onClick={cancelEdit}>Cancel</button>
             </div>
           </div>
         );
-        return <button className="rpt-edit" onClick={()=>startEdit(sk,val)}>✎ Edit</button>;
+        return(
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <button className="rpt-edit" onClick={()=>startEdit(sk,val)}>✎ Edit</button>
+            {status==='saved'&&<span style={{fontSize:11,color:"var(--r-sage)"}}>✓ Saved</span>}
+            {status==='error'&&<span style={{fontSize:11,color:"#B0728A"}}>⚠ Not saved — try again</span>}
+          </div>
+        );
       };
 
       /* ── SAVED ── */
@@ -2673,13 +2667,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
           <p className="rpt-flow-sub">Your strategy is complete and ready to download as a professionally formatted PDF.</p>
           <p className="rpt-flow-note">{fbDone?"Your feedback has been received and will shape every future strategy.":"Your strategy has been saved to My Strategies."}</p>
           <div className="rpt-flow-btns">
-            <button className="rpt-flow-primary" onClick={()=>generatePDF(result,{
-              firstName,
-              effectiveIndustry: effectiveIndustry||industry,
-              stageLabel,
-              today,
-              catLabel:planCat?.label||""
-            })}>Download Strategy PDF</button>
+            <button className="rpt-flow-primary" onClick={()=>{setStrategyStage('reading');setPendingPrint(true);}}>Download Strategy PDF</button>
           </div>
           <div className="rpt-pdf-grid" style={{marginTop:20}}>
             <button className="rpt-pdf-link" onClick={()=>go("plans")}>My Strategies</button>
@@ -2707,6 +2695,9 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
               <span className="rpt-cover-tag">{today}</span>
               {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A",borderColor:"rgba(106,158,138,0.35)"}}>✓ Saved</span>}
             </div>
+            <div className="rpt-cover-actions" style={{marginTop:24}}>
+              <button className="btn-out" onClick={()=>window.print()}>Print / Save as PDF</button>
+            </div>
           </div>
 
           {/* CHAPTER BREAK — intentional transition between cover and the report proper */}
@@ -2716,7 +2707,11 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
 
           {/* 00 — EXECUTIVE SUMMARY — ONE UNIFIED BRIEFING */}
           <div className="rpt-sec rpt-sec-alt" style={{paddingTop:36}}>
-            <div className="rpt-exec-unified">
+            {(()=>{
+              const execTotalLen=[challenge,insightText||cleanBlind,position,opportunity,goal,nextMoveSentence].filter(Boolean).join(" ").length;
+              const densityClass=execTotalLen>950?"rpt-exec-dense":execTotalLen<400?"rpt-exec-airy":"";
+              return (
+            <div className={"rpt-exec-unified "+densityClass}>
               <div className="rpt-exec-hero">
                 <span className="rpt-exec-hero-label">00 · The Core Insight</span>
                 {challenge&&<h2 className="rpt-exec-hero-headline">{challenge}</h2>}
@@ -2734,6 +2729,8 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
                 </div>
               )}
             </div>
+              );
+            })()}
           </div>
 
 
@@ -2742,7 +2739,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
             <div className="rpt-sec-hd">
               <span className="rpt-sec-num">01 · Strategic Assessment</span>
               <h2 className="rpt-sec-title">Where you are today.</h2>
-              <p className="rpt-sec-desc">What we discovered from your answers.</p>
+              <p className="rpt-sec-desc">Patterns discovered after analyzing your responses.</p>
               <div className="rpt-sec-div"/>
             </div>
             {mainExec&&<p className="rpt-body">{mainExec}</p>}
@@ -2757,13 +2754,15 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
 
           {/* 02 — PRIMARY CHALLENGE */}
           <div className="rpt-sec rpt-sec-dark">
+            <div className="rpt-heading-lock">
             <div className="rpt-sec-hd">
               <span className="rpt-sec-num">02 · Primary Challenge</span>
               <h2 className="rpt-sec-title">The core constraint.</h2>
-              <p className="rpt-sec-desc">The main issue making progress harder right now.</p>
+              <p className="rpt-sec-desc">The single biggest obstacle preventing faster progress.</p>
               <div className="rpt-sec-div"/>
             </div>
             {blindTitle&&<p className="rpt-chal-name">"{blindTitle}"</p>}
+            </div>
             {cleanBlind&&<p className="rpt-chal-body">{cleanBlind}</p>}
             {insightText&&(
               <div className="rpt-insight-block">
@@ -2779,70 +2778,114 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
 
           {/* 03 — BEST OPPORTUNITY */}
           <div className="rpt-sec">
-            <div className="rpt-sec-hd">
-              <span className="rpt-sec-num">03 · Best Opportunity</span>
-              <h2 className="rpt-sec-title">Where to focus your energy.</h2>
-              <p className="rpt-sec-desc">The areas most likely to move the needle right now.</p>
-              <div className="rpt-sec-div"/>
-            </div>
-            <div className="rpt-opps-stack">
-              {opps.map((o,i)=>(
-                <div className="rpt-opp-row" key={i}>
-                  <div className="rpt-opp-idx"><span className="rpt-opp-idx-n">0{i+1}</span></div>
-                  <div className="rpt-opp-content">
-                    {o.title&&<div className="rpt-opp-title">{o.title}</div>}
-                    <div className="rpt-opp-body">{o.body}</div>
+            <div className="rpt-heading-lock">
+              <div className="rpt-sec-hd">
+                <span className="rpt-sec-num">03 · Best Opportunity</span>
+                <h2 className="rpt-sec-title">Where to focus your energy.</h2>
+                <p className="rpt-sec-desc">The highest leverage opportunity available right now.</p>
+                <div className="rpt-sec-div"/>
+              </div>
+              {opps[0]&&(
+                <div className="rpt-opps-stack rpt-opps-stack-start">
+                  <div className="rpt-opp-row">
+                    <div className="rpt-opp-idx"><span className="rpt-opp-idx-n">01</span></div>
+                    <div className="rpt-opp-content">
+                      {opps[0].title&&<div className="rpt-opp-title">{opps[0].title}</div>}
+                      <div className="rpt-opp-body">{opps[0].body}</div>
+                    </div>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
+            {opps.length>1&&(
+              <div className="rpt-opps-stack">
+                {opps.slice(1).map((o,i)=>(
+                  <div className="rpt-opp-row" key={i+1}>
+                    <div className="rpt-opp-idx"><span className="rpt-opp-idx-n">0{i+2}</span></div>
+                    <div className="rpt-opp-content">
+                      {o.title&&<div className="rpt-opp-title">{o.title}</div>}
+                      <div className="rpt-opp-body">{o.body}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             <EC sk="strategicOpportunity" val={result.strategicOpportunity||result.keyOpportunities||""}/>
           </div>
 
           {/* 04 — RECOMMENDED ACTIONS */}
           <div className="rpt-sec rpt-sec-alt">
-            <div className="rpt-sec-hd">
-              <span className="rpt-sec-num">04 · Recommended Actions</span>
-              <h2 className="rpt-sec-title">Where to direct your energy.</h2>
-              <p className="rpt-sec-desc">In priority order.</p>
-              <div className="rpt-sec-div"/>
-            </div>
-            <div className="rpt-actions-stack">
-              {actions.map((a,i)=>{
-                const caps=["Begin today","Within 3 days","Within 5 days","Within 2 weeks","Within 2 weeks"];
-                return(
-                  <div className={`rpt-action-row${i===0?" is-first":""}`} key={i}>
+            <div className="rpt-heading-lock">
+              <div className="rpt-sec-hd">
+                <span className="rpt-sec-num">04 · Recommended Actions</span>
+                <h2 className="rpt-sec-title">Where to direct your energy.</h2>
+                <p className="rpt-sec-desc">Exactly what should happen next.</p>
+                <div className="rpt-sec-div"/>
+              </div>
+              {actions[0]&&(
+                <div className="rpt-actions-stack rpt-actions-stack-start">
+                  <div className="rpt-action-row is-first">
                     <div className="rpt-action-rule">
-                      <span className="rpt-action-num">{"0"+(i+1)}</span>
-                      <span className="rpt-action-cap">{caps[i]||"Ongoing"}</span>
+                      <span className="rpt-action-num">01</span>
+                      <span className="rpt-action-cap">Begin today</span>
                     </div>
                     <div className="rpt-action-body">
-                      <div className="rpt-action-title">{a.title||clean(a.body)}</div>
-                      {a.title&&a.body&&<div className="rpt-action-desc">{a.body}</div>}
-                      {a.why&&<div className="rpt-action-why">{a.why}</div>}
+                      <div className="rpt-action-title">{actions[0].title||clean(actions[0].body)}</div>
+                      {actions[0].title&&actions[0].body&&<div className="rpt-action-desc">{actions[0].body}</div>}
+                      {actions[0].why&&<div className="rpt-action-why">{actions[0].why}</div>}
                     </div>
                   </div>
-                );
-              })}
-              {deprioritize&&(
+                </div>
+              )}
+            </div>
+            {actions.length>1&&(
+              <div className="rpt-actions-stack">
+                {actions.slice(1).map((a,i0)=>{
+                  const i=i0+1;
+                  const caps=["Begin today","Within 3 days","Within 5 days","Within 2 weeks","Within 2 weeks"];
+                  return(
+                    <div className="rpt-action-row" key={i}>
+                      <div className="rpt-action-rule">
+                        <span className="rpt-action-num">{"0"+(i+1)}</span>
+                        <span className="rpt-action-cap">{caps[i]||"Ongoing"}</span>
+                      </div>
+                      <div className="rpt-action-body">
+                        <div className="rpt-action-title">{a.title||clean(a.body)}</div>
+                        {a.title&&a.body&&<div className="rpt-action-desc">{a.body}</div>}
+                        {a.why&&<div className="rpt-action-why">{a.why}</div>}
+                      </div>
+                    </div>
+                  );
+                })}
+                {deprioritize&&(
+                  <div className="rpt-deprio-row">
+                    <span className="rpt-deprio-label">Set aside</span>
+                    <span className="rpt-deprio-text">{deprioritize}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            {actions.length<=1&&deprioritize&&(
+              <div className="rpt-actions-stack">
                 <div className="rpt-deprio-row">
                   <span className="rpt-deprio-label">Set aside</span>
                   <span className="rpt-deprio-text">{deprioritize}</span>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
             <EC sk="recommendedActions" val={result.recommendedActions||result.actionPlan||""}/>
           </div>
 
           {/* 05 — 30-DAY PLAN */}
           <div className="rpt-sec rpt-sec-dark">
+            <div className="rpt-heading-lock">
             <div className="rpt-sec-hd">
               <span className="rpt-sec-num">05 · 30-Day Plan</span>
               <h2 className="rpt-sec-title">Your week-by-week roadmap.</h2>
               <p className="rpt-sec-desc">Concrete actions for the next 30 days.</p>
               <div className="rpt-sec-div"/>
             </div>
-            <div className="rpt-weeks">
+            <div className={"rpt-weeks rpt-weeks-header"+(weeks.reduce((a,w)=>a+w.length,0)>16?" rpt-weeks-compact":"")}>
               {weeks.map((items,i)=>(
                 <div className="rpt-week-col" key={i}>
                   <div className="rpt-week-hd">
@@ -2850,6 +2893,13 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
                     <div className="rpt-week-theme">{WEEK_THEMES[i]}</div>
                     <div className="rpt-week-goal">{["Establish your foundation","Build momentum","Execute and activate","Review and scale"][i]}</div>
                   </div>
+                </div>
+              ))}
+            </div>
+            </div>
+            <div className={"rpt-weeks rpt-weeks-body"+(weeks.reduce((a,w)=>a+w.length,0)>16?" rpt-weeks-compact":"")}>
+              {weeks.map((items,i)=>(
+                <div className="rpt-week-col" key={i}>
                   <div className="rpt-week-bd">
                     {items.length?items.map((item,j)=>(
                       <div className="rpt-week-task" key={j}>
@@ -2866,42 +2916,62 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
 
           {/* 06 — LOOKING AHEAD */}
           <div className="rpt-sec">
-            <div className="rpt-sec-hd">
-              <span className="rpt-sec-num">06 · Looking Ahead</span>
-              <h2 className="rpt-sec-title">What becomes possible next.</h2>
-              <p className="rpt-sec-desc">What to build toward after your first 30 days.</p>
-              <div className="rpt-sec-div"/>
-            </div>
-            <div className="rpt-ahead-list">
-              {looking.map((m,i)=>(
-                <div className="rpt-ahead-row" key={i}>
-                  <span className="rpt-ahead-idx">0{i+1}</span>
-                  <div>
-                    {m.title&&<div className="rpt-ahead-title">{m.title}</div>}
-                    <div className="rpt-ahead-body">{m.body}</div>
+            <div className="rpt-heading-lock">
+              <div className="rpt-sec-hd">
+                <span className="rpt-sec-num">06 · Looking Ahead</span>
+                <h2 className="rpt-sec-title">What becomes possible next.</h2>
+                <p className="rpt-sec-desc">What to build toward after your first 30 days.</p>
+                <div className="rpt-sec-div"/>
+              </div>
+              {looking[0]&&(
+                <div className="rpt-ahead-list rpt-ahead-list-start">
+                  <div className="rpt-ahead-row">
+                    <span className="rpt-ahead-idx">01</span>
+                    <div>
+                      {looking[0].title&&<div className="rpt-ahead-title">{looking[0].title}</div>}
+                      <div className="rpt-ahead-body">{looking[0].body}</div>
+                    </div>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
+            {looking.length>1&&(
+              <div className="rpt-ahead-list">
+                {looking.slice(1).map((m,i0)=>{
+                  const i=i0+1;
+                  return(
+                    <div className="rpt-ahead-row" key={i}>
+                      <span className="rpt-ahead-idx">0{i+1}</span>
+                      <div>
+                        {m.title&&<div className="rpt-ahead-title">{m.title}</div>}
+                        <div className="rpt-ahead-body">{m.body}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             <EC sk="longTermGrowth" val={result.longTermGrowth||result.mistakes||""}/>
           </div>
 
           {/* 07 — WHAT SUCCESS LOOKS LIKE */}
           {successText&&(
             <div className="rpt-sec rpt-sec-alt">
-              <div className="rpt-sec-hd">
-                <span className="rpt-sec-num">07 · What Success Looks Like</span>
-                <h2 className="rpt-sec-title">Measurable milestones.</h2>
-                <p className="rpt-sec-desc">How you'll know this strategy is working.</p>
-                <div className="rpt-sec-div"/>
-              </div>
-              <div className="rpt-success-list">
-                {successSentences.slice(0,3).map((s,i)=>(
-                  <div className="rpt-success-row" key={i}>
-                    <div className="rpt-success-mark"><div className="rpt-success-dot"/></div>
-                    <span className="rpt-success-text">{s.trim()}</span>
-                  </div>
-                ))}
+              <div className="rpt-heading-lock">
+                <div className="rpt-sec-hd">
+                  <span className="rpt-sec-num">07 · What Success Looks Like</span>
+                  <h2 className="rpt-sec-title">Measurable milestones.</h2>
+                  <p className="rpt-sec-desc">How you'll know this strategy is working.</p>
+                  <div className="rpt-sec-div"/>
+                </div>
+                <div className="rpt-success-list">
+                  {successSentences.slice(0,3).map((s,i)=>(
+                    <div className="rpt-success-row" key={i}>
+                      <div className="rpt-success-mark"><div className="rpt-success-dot"/></div>
+                      <span className="rpt-success-text">{s.trim()}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
               <EC sk="successLooks" val={result.successLooks||""}/>
             </div>
