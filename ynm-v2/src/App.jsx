@@ -1803,22 +1803,25 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
         {savedPlans.length===0&&(
           <div style={{background:"#1A1916",borderRadius:8,padding:"32px 36px",marginBottom:44,position:"relative",overflow:"hidden"}}>
             <p style={{fontSize:10,fontWeight:600,letterSpacing:"0.32em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:12}}>Sample Strategy Output</p>
-            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3vw,28px)",fontWeight:600,color:"#fff",marginBottom:16,letterSpacing:"-0.01em",lineHeight:1.2}}>Here's what your personalized strategy looks like</h3>
+            <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3vw,28px)",fontWeight:600,color:"#fff",marginBottom:10,letterSpacing:"-0.01em",lineHeight:1.2}}>See what your personalized strategy reveals.</h3>
+            <p style={{fontSize:13,color:"#8A7E78",fontWeight:300,lineHeight:1.7,marginBottom:24,maxWidth:520}}>Your answers become a personalized strategy designed to help you understand your situation, identify what matters most, and confidently move forward.</p>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:2,marginBottom:20}}>
               {[
-                {num:"01",label:"Strategic Assessment",preview:"Where you are today and the most important pattern in your answers."},
-                {num:"02",label:"Primary Challenge",preview:"'The real issue isn't your offer — it's that you've been optimizing for the wrong client entirely.'"},
-                {num:"03",label:"Best Opportunity",preview:"The highest-leverage move available to you right now given your industry and stage."},
-                {num:"05",label:"30-Day Plan",preview:"Week 1: Foundation → Week 2: Momentum → Week 3: Activation → Week 4: Scale"},
+                {num:"01",label:"Strategic Assessment",preview:"Understand where you stand today. Gain a clear picture of your current situation, what's working, and what deserves your attention first."},
+                {num:"02",label:"Primary Challenge",preview:"Reveal what's standing in your way. Identify the underlying challenge creating the most friction, so every next decision becomes clearer."},
+                {num:"03",label:"Best Opportunity",preview:"Discover your strongest opportunity. See where your time, energy, and attention are most likely to create meaningful progress."},
+                {num:"04",label:"Recommended Actions",preview:"Know what to focus on first. Receive thoughtful priorities that help you move forward with confidence instead of uncertainty."},
+                {num:"05",label:"30-Day Plan",preview:"Turn your strategy into progress. Follow a practical week-by-week roadmap designed to help you build momentum one step at a time."},
+                {num:"06",label:"Your Next Move",preview:"Leave knowing where to begin. Walk away with one clear next step that brings your entire strategy into focus."},
               ].map((s,i)=>(
                 <div key={i} style={{background:"#201918",padding:"16px 18px",border:"1px solid #2A2522"}}>
                   <p style={{fontSize:10,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#5A4A42",marginBottom:6}}>{s.num}</p>
-                  <p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:600,color:i===1?"#E8C4D4":"#C4A0B0",marginBottom:6,lineHeight:1.2}}>{s.label}</p>
-                  <p style={{fontSize:12,color:"#6A6060",lineHeight:1.6,fontWeight:300,fontStyle:i===1?"italic":"normal"}}>{s.preview}</p>
+                  <p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:600,color:"#C4A0B0",marginBottom:6,lineHeight:1.2}}>{s.label}</p>
+                  <p style={{fontSize:12,color:"#6A6060",lineHeight:1.6,fontWeight:300}}>{s.preview}</p>
                 </div>
               ))}
             </div>
-            <p style={{fontSize:12,color:"#5A5350",fontStyle:"italic"}}>Your strategy will be built around your specific industry, goals, and situation — not a template.</p>
+            <p style={{fontSize:12,color:"#5A5350",fontStyle:"italic"}}>Every strategy is built around your unique goals, circumstances, and next move — not generated from a generic template.</p>
           </div>
         )}
         <div className="cats-top">
