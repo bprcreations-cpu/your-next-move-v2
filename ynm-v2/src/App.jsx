@@ -4,6 +4,7 @@ import {
   STRIPE_MONTHLY, STRIPE_ANNUAL, FREE_PLAN_LIMIT,
   HUB_CATEGORIES, getQuestions
 } from "./data.js";
+import { LEARNING_HUB, findLearningTopic } from "./learningHub.js";
 const QARunner = lazy(() => import("./qa-runner.jsx"));
 // ─── PARSERS ─────────────────────────────────────────────────────────────────
 function clean(s){ return (s||"").replace(/\*\*/g,"").replace(/^[-•*✓✗\d\.]+\s*/,"").trim(); }
@@ -1172,8 +1173,9 @@ export default function App() {
   const [hubSearchLoading, setHubSearchLoading] = useState(false);
   const [hubSearchQuery, setHubSearchQuery] = useState("");
   const [hubSearch,    setHubSearch]    = useState("");
-  const [hubQuestion,  setHubQuestion]  = useState(null);
-  const [hubContext,   setHubContext]   = useState("");
+  const [hubTopicId,   setHubTopicId]   = useState(null);
+  const [hubGuide,     setHubGuide]     = useState(null);
+  const [hubGuideLoading, setHubGuideLoading] = useState(false);
 
   // Ask Your Advisor state
   const [advisorQ,     setAdvisorQ]     = useState("");
@@ -1670,11 +1672,112 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
     finally{setHubSearchLoading(false);}
   }
 
+  // ─── INDUSTRY RESOURCE HUB — LEARNING GUIDE GENERATION ────────────────────
+  // Dedicated educational engine, separate from Create My Strategy and Ask
+  // Your Advisor. No questionnaire — the topic's own curated metadata is
+  // enough context. Never produces a personalized strategy or single-opinion
+  // advice; it teaches.
+  const LEARNING_SECTIONS=[
+    {key:"overview",aliases:["Overview"]},
+    {key:"why",aliases:["Why This Matters"]},
+    {key:"core",aliases:["Core Concepts"]},
+    {key:"how",aliases:["How It Works"]},
+    {key:"terms",aliases:["Key Terms"]},
+    {key:"example",aliases:["Example"]},
+    {key:"mistakes",aliases:["Common Mistakes or Misconceptions","Common Mistakes","Common Misconceptions"]},
+    {key:"takeaways",aliases:["Practical Takeaways"]},
+    {key:"deeper",aliases:["Go Deeper"]},
+  ];
+
+  async function askLearningGuide(topic, category){
+    setHubGuideLoading(true);setHubGuide(null);
+    const prompt=`You are the educational engine for the Your Next Move Industry Resource Hub. Your role is to teach users about professional and industry topics clearly, accurately, and practically. You are not creating a personalized strategy and you are not a conversational advisor — you are providing structured professional education based on the learning topic selected below.
+
+Category: ${category.label}
+Learning Topic: ${topic.title}
+Level: ${topic.level}
+What this topic covers: ${topic.shortDescription}
+Learning objective: ${topic.learningObjective}
+
+GUARDRAILS:
+- Distinguish general education from regulated or professional advice.
+- Never fabricate statistics, laws, regulations, certifications, or requirements.
+- Never invent citations or sources.
+- Acknowledge when requirements vary by state, country, employer, regulator, or institution.
+- Don't present time-sensitive information as permanently current.
+- Clearly mark examples as examples, not universal fact.
+- Never promise financial, health, legal, career, or business outcomes.
+- For finance, wellness, real estate regulation, education requirements, or legal topics, include brief contextual notes on verification without turning the guide into a wall of disclaimers.
+
+TONE: Educational, structured, practical, intelligent, professional, substantive. Avoid generic AI filler and excessive motivational language. Do not tell the reader to "create a plan" — this is about understanding, not planning.
+
+DEPTH: Match the ${topic.level} level. Foundational topics should be accessible without talking down to the reader. Growth topics should include frameworks, tradeoffs, and practical application. Advanced topics should use sophisticated professional language and address strategy, economics, operations, leadership, risk, or innovation as relevant.
+
+Write the guide using as many of these sections as genuinely fit this topic — skip any that don't apply, and adapt content to the subject rather than forcing a rigid template. Use the section header text exactly as shown.
+
+**Overview**
+A clear explanation of what this topic is.
+
+**Why This Matters**
+Why someone working in or entering this field should understand it.
+
+**Core Concepts**
+The most important ideas, principles, frameworks, or mechanics.
+
+**How It Works**
+A practical explanation of how this operates in the real world.
+
+**Key Terms**
+Important vocabulary, if relevant.
+
+**Example**
+A realistic example or short scenario that makes the concept concrete. Clearly frame it as an illustrative example.
+
+**Common Mistakes or Misconceptions**
+What people often get wrong about this topic.
+
+**Practical Takeaways**
+What the reader should remember and be able to apply.
+
+**Go Deeper**
+3-5 related concepts, search terms, or types of authoritative resources (not invented specific books, citations, or named sources) the reader could study next.`;
+
+    try{
+      const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
+      if(!res.ok){const errBody=await res.json().catch(()=>({}));throw new Error(`API ${res.status}: ${errBody.error||errBody.code||"Unknown error"}`);}
+      const data=await res.json();
+      const text=data.text||"";
+      const {sections,fullyFailed}=parseAISections(text,LEARNING_SECTIONS);
+      if(fullyFailed){
+        setHubGuide({topic,category,error:"We got a response back but couldn't format it properly. Please try again."});
+        return;
+      }
+      setHubGuide({
+        topic,category,
+        overview:sections.overview,
+        why:sections.why,
+        core:sections.core,
+        how:sections.how,
+        terms:sections.terms,
+        example:sections.example,
+        mistakes:lines(sections.mistakes).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
+        takeaways:lines(sections.takeaways).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
+        deeper:lines(sections.deeper).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
+        raw:!sections.overview&&!sections.core&&!sections.how?text.replace(/\*\*/g,"").trim():"",
+      });
+    }catch(e){
+      console.error("[askLearningGuide] failed:",e.message);
+      setHubGuide({topic,category,error:"We hit a snag generating this guide. Please try again in a moment."});
+    }finally{setHubGuideLoading(false);}
+  }
+
   // ─── RENDER ──────────────────────────────────────────────────────────────
-  const hubCat = HUB_CATEGORIES.find(c=>c.id===hubCatId);
-  const filteredQuestions = hubCat?.questions.filter(q=>
-    !hubSearch||q.title.toLowerCase().includes(hubSearch.toLowerCase())||q.description.toLowerCase().includes(hubSearch.toLowerCase())
+  const hubCat = LEARNING_HUB.find(c=>c.id===hubCatId);
+  const filteredTopics = hubCat?.topics.filter(t=>
+    !hubSearch||t.title.toLowerCase().includes(hubSearch.toLowerCase())||t.shortDescription.toLowerCase().includes(hubSearch.toLowerCase())
   )||[];
+  const topicsByLevel = level => filteredTopics.filter(t=>t.level===level);
+  const activeHubTopic = hubTopicId ? findLearningTopic(hubTopicId) : null;
 
   return(<>
     <style>{CSS}</style>
@@ -1787,7 +1890,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
               onMouseEnter={e=>{e.currentTarget.style.background=c.accent?"#2A2420":"#fff";}}
               onMouseLeave={e=>{e.currentTarget.style.background=c.accent?"#1A1916":"#FAFAF8";}}
               >
-                <div style={{fontSize:10,fontWeight:600,letterSpacing:"0.22em",textTransform:"uppercase",color:c.accent?"#5A5350":"#C4B5AD",marginBottom:16}}>{c.num==="01"?"PLAN":c.num==="02"?"DECIDE":"LEARN"}</div>
+                <div style={{fontSize:10,fontWeight:600,letterSpacing:"0.22em",textTransform:"uppercase",color:c.accent?"#5A5350":"#C4B5AD",marginBottom:16}}>{c.num==="01"?"PLAN":c.num==="02"?"GUIDE":"LEARN"}</div>
                 <div style={{fontFamily:"'Cormorant',serif",fontSize:26,fontWeight:600,color:c.accent?"#fff":"#1C1917",marginBottom:12,lineHeight:1.2,letterSpacing:"-0.01em"}}>{c.title}</div>
                 <div style={{fontSize:13,color:c.accent?"#8A7E78":"#78716C",fontWeight:300,lineHeight:1.7,flex:1,marginBottom:24}}>{c.desc}</div>
                 <div style={{fontSize:11,fontWeight:600,letterSpacing:"0.12em",textTransform:"uppercase",color:c.accent?"#C4A0B0":"#B0728A"}}>{c.cta}</div>
@@ -1805,7 +1908,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
             <p style={{fontSize:10,fontWeight:600,letterSpacing:"0.32em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:12}}>Sample Strategy Output</p>
             <h3 style={{fontFamily:"'Cormorant',serif",fontSize:"clamp(20px,3vw,28px)",fontWeight:600,color:"#fff",marginBottom:10,letterSpacing:"-0.01em",lineHeight:1.2}}>See what your personalized strategy reveals.</h3>
             <p style={{fontSize:13,color:"#8A7E78",fontWeight:300,lineHeight:1.7,marginBottom:24,maxWidth:520}}>Your answers become a personalized strategy designed to help you understand your situation, identify what matters most, and confidently move forward.</p>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:2,marginBottom:20}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:2,marginBottom:20}}>
               {[
                 {num:"01",label:"Strategic Assessment",preview:"Understand where you stand today. Gain a clear picture of your current situation, what's working, and what deserves your attention first."},
                 {num:"02",label:"Primary Challenge",preview:"Reveal what's standing in your way. Identify the underlying challenge creating the most friction, so every next decision becomes clearer."},
@@ -2034,7 +2137,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
             <input
               className="hub-search"
               style={{marginBottom:0,paddingLeft:44,paddingRight:120,borderRadius:"6px 0 0 6px",flex:1}}
-              placeholder="Search prompts or ask any business question…"
+              placeholder="Search learning topics or ask any question…"
               value={hubSearchQuery}
               onChange={e=>{setHubSearchQuery(e.target.value);setHubSearchResult(null);}}
               onKeyDown={e=>{if(e.key==="Enter"&&hubSearchQuery.trim())askHubSearch(hubSearchQuery);}}
@@ -2045,7 +2148,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
               style={{padding:"0 20px",background:"#1A1916",color:"#fff",border:"none",borderRadius:"0 6px 6px 0",fontSize:11,fontWeight:500,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"'Plus Jakarta Sans',sans-serif"}}
             >{hubSearchLoading?"Searching…":"Ask →"}</button>
           </div>
-          <p style={{fontSize:12,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Search 164 professional prompts, or press Ask → for an intelligent answer to any question</p>
+          <p style={{fontSize:12,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Browse the learning library below, or press Ask → for an instant answer to any question</p>
         </div>
         {hubSearchLoading&&<div style={{textAlign:"center",padding:"32px 0"}}><div className="load-ring" style={{margin:"0 auto 14px"}}/><p style={{fontSize:13,color:"#78716C"}}>Finding your answer…</p></div>}
         {hubSearchResult&&!hubSearchResult.error&&(
@@ -2066,100 +2169,134 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
 
         <h2 style={{fontFamily:"'Cormorant',serif",fontSize:20,fontWeight:600,color:"#1C1917",marginBottom:16,letterSpacing:"-0.01em"}}>Browse by Industry</h2>
         <div className="hub-grid">
-          {HUB_CATEGORIES.map(c=>(
-            <div key={c.id} className="hub-card" onClick={()=>{setHubCatId(c.id);setHubSearch("");setHubSearchQuery("");setHubSearchResult(null);setHubQuestion(null);setHubContext("");}}>
-              <div style={{fontFamily:"'Cormorant',serif",fontSize:13,fontWeight:600,color:"#C4B5AD",letterSpacing:"0.06em",marginBottom:10}}>{c.icon}</div>
+          {LEARNING_HUB.map(c=>(
+            <div key={c.id} className="hub-card" onClick={()=>{setHubCatId(c.id);setHubSearch("");setHubSearchQuery("");setHubSearchResult(null);setHubTopicId(null);setHubGuide(null);}}>
+              <div style={{fontFamily:"'Cormorant',serif",fontSize:13,fontWeight:600,color:"#C4B5AD",letterSpacing:"0.06em",marginBottom:10}}>{c.num}</div>
               <div className="hub-card-label">{c.label}</div>
-              <div className="hub-card-desc">{c.description}</div>
-              <div className="hub-card-cta">Explore prompts →</div>
+              <div className="hub-card-desc">{c.tagline}</div>
+              <div className="hub-card-cta">Explore Resources →</div>
             </div>
           ))}
         </div>
       </div>
     )}
 
-    {/* ══ HUB — QUESTION LIST ══ */}
-    {screen==="hub"&&hubCatId&&!hubQuestion&&(
+    {/* ══ HUB — LEARNING TOPICS ══ */}
+    {screen==="hub"&&hubCatId&&!hubTopicId&&(
       <div className="hub-q-page">
         <div className="bc"><span onClick={restart}>Home</span><span className="bc-sep">›</span><span onClick={()=>setHubCatId(null)}>Industry Hub</span></div>
         <button className="btn-out" style={{marginBottom:20,fontSize:10,padding:"8px 18px"}} onClick={()=>setHubCatId(null)}>← Back to Industry Hub</button>
         <h1 className="hub-q-h1">{hubCat?.label}</h1>
-        <p className="hub-q-sub">{
-          hubCat?.id==="entrepreneurship"?"Explore professionally curated prompts designed to help you launch, grow, and scale your business — from your first business plan to building systems, finding clients, and creating long-term value.":
-          hubCat?.id==="corporate"?"Explore professionally curated prompts designed to strengthen your leadership, accelerate your career, improve communication, manage teams, and build lasting professional influence.":
-          hubCat?.id==="creative"?"Explore professionally curated prompts designed to help you grow your brand, attract your audience, create compelling content, land partnerships, and build a sustainable creative career.":
-          hubCat?.id==="realestate"?"Explore professionally curated prompts designed to help you buy, sell, invest, negotiate, analyze properties, build your client base, and make more confident real estate decisions.":
-          hubCat?.id==="finance"?"Explore professionally curated prompts designed to help you build wealth, manage debt, budget smarter, invest wisely, and make better financial decisions for your life and business.":
-          hubCat?.id==="education"?"Explore professionally curated prompts designed to help you design better learning experiences, master new subjects, advance your teaching career, and build programs that create real impact.":
-          hubCat?.id==="nonprofit"?"Explore professionally curated prompts designed to help you grow your organization, secure funding, engage donors, measure impact, and create lasting community change.":
-          hubCat?.id==="wellness"?"Explore professionally curated prompts designed to help you build sustainable health habits, improve nutrition, manage stress, optimize energy, and create a whole-life wellness practice.":
-          hubCat?.id==="healthcare"?"Explore professionally curated prompts designed to help you advance your healthcare career, build your practice, improve patient outcomes, and make confident professional decisions.":
-          "Select a prompt below. Add your context and get a professional, actionable response tailored to your situation."
-        }</p>
-        {/* AI-POWERED SEARCH BAR */}
-        <div style={{marginBottom:28}}>
+        <p className="hub-q-sub">Learn the industry, strengthen your knowledge, and explore concepts from foundational skills to advanced strategy.</p>
+
+        <div style={{marginBottom:32}}>
           <div style={{position:"relative",display:"flex",gap:0}}>
             <div style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",color:"#C4B5AD",fontSize:15,zIndex:1}}>⌕</div>
             <input
               className="hub-search"
-              style={{marginBottom:0,paddingLeft:44,paddingRight:120,borderRadius:"6px 0 0 6px",flex:1}}
-              placeholder="Search our prompt library — or ask any question…"
-              value={hubSearchQuery||hubSearch}
-              onChange={e=>{const v=e.target.value;setHubSearchQuery(v);setHubSearch(v);setHubSearchResult(null);}}
-              onKeyDown={e=>{if(e.key==="Enter"&&(hubSearchQuery||hubSearch).trim()){askHubSearch(hubSearchQuery||hubSearch);}}}
+              style={{marginBottom:0,paddingLeft:44,borderRadius:6,flex:1}}
+              placeholder="Filter learning topics…"
+              value={hubSearch}
+              onChange={e=>setHubSearch(e.target.value)}
             />
-            <button
-              onClick={()=>{const q=hubSearchQuery||hubSearch;if(q.trim())askHubSearch(q);}}
-              disabled={hubSearchLoading||!(hubSearchQuery||hubSearch).trim()}
-              style={{padding:"0 20px",background:"#1A1916",color:"#fff",border:"none",borderRadius:"0 6px 6px 0",fontSize:11,fontWeight:500,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"'Plus Jakarta Sans',sans-serif",transition:"background 0.2s"}}
-              onMouseEnter={e=>e.target.style.background="#B0728A"}
-              onMouseLeave={e=>e.target.style.background="#1A1916"}
-            >
-              {hubSearchLoading?"Searching…":"Ask →"}
-            </button>
           </div>
-          <p style={{fontSize:11,color:"#A8A29E",marginTop:7,fontStyle:"italic"}}>Press Enter or click Ask → to get a full expert answer to any question</p>
         </div>
 
-        {/* AI SEARCH RESULT */}
-        {hubSearchLoading&&(
-          <div style={{textAlign:"center",padding:"32px 0",marginBottom:24}}>
-            <div className="load-ring" style={{margin:"0 auto 14px"}}/>
-            <p style={{fontSize:13,color:"#78716C"}}>Finding your answer…</p>
+        {[
+          {level:"foundational",label:"Foundational"},
+          {level:"growth",label:"Growth"},
+          {level:"advanced",label:"Advanced"},
+        ].map(({level,label})=>{
+          const topics=topicsByLevel(level);
+          if(!topics.length)return null;
+          return(
+            <div key={level} style={{marginBottom:36}}>
+              <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#B0728A",marginBottom:14}}>{label}</p>
+              <div className="hub-q-grid">
+                {topics.map(t=>(
+                  <div key={t.id} className="hub-q-card" onClick={()=>{setHubTopicId(t.id);setHubGuide(null);askLearningGuide(t,hubCat);}}>
+                    <div className="hub-q-card-tag">{label}</div>
+                    <div className="hub-q-card-title">{t.title}</div>
+                    <div className="hub-q-card-desc">{t.shortDescription}</div>
+                    <div className="hub-q-card-cta">Learn →</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+        {filteredTopics.length===0&&<p style={{color:"#A8A29E",fontSize:13,padding:"20px 0"}}>No topics match your search.</p>}
+      </div>
+    )}
+
+    {/* ══ HUB — LEARNING GUIDE ══ */}
+    {screen==="hub"&&hubCatId&&hubTopicId&&(
+      <div className="advisor-page">
+        <div className="bc">
+          <span onClick={restart}>Home</span><span className="bc-sep">›</span>
+          <span onClick={()=>{setHubTopicId(null);setHubGuide(null);}}>Industry Hub</span><span className="bc-sep">›</span>
+          <span onClick={()=>{setHubTopicId(null);setHubGuide(null);}}>{hubCat?.label}</span>
+        </div>
+        {activeHubTopic&&(
+          <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#B0728A",marginBottom:12}}>
+            {activeHubTopic.topic.level.charAt(0).toUpperCase()+activeHubTopic.topic.level.slice(1)} · {activeHubTopic.category.label}
+          </p>
+        )}
+        <h1 className="advisor-h1"><em>{activeHubTopic?.topic.title}</em></h1>
+
+        {hubGuideLoading&&(
+          <div style={{textAlign:"center",padding:"48px 0"}}>
+            <div className="load-ring" style={{margin:"0 auto 16px"}}/>
+            <p style={{fontSize:13,color:"#78716C"}}>Building your learning guide…</p>
           </div>
         )}
-        {hubSearchResult&&!hubSearchResult.error&&(
-          <div style={{marginBottom:28,border:"1px solid #EEEAE7",borderRadius:6,overflow:"hidden"}}>
-            <div style={{background:"#1A1916",padding:"16px 22px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.28em",textTransform:"uppercase",color:"#C4A0B0",marginBottom:4}}>Expert Response</p>
-                <p style={{fontFamily:"'Cormorant',serif",fontSize:16,fontWeight:500,color:"#fff",lineHeight:1.3}}>"{hubSearchResult.query}"</p>
-              </div>
-              <button onClick={()=>{setHubSearchResult(null);setHubSearchQuery("");setHubSearch("");}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:100,padding:"5px 14px",color:"#A8A29E",fontSize:10,cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",letterSpacing:"0.08em",textTransform:"uppercase"}}>Clear</button>
+
+        {hubGuide&&!hubGuide.error&&(
+          <div className="advisor-result">
+            <div className="advisor-result-header">
+              <div className="advisor-result-eye">Learning Guide</div>
             </div>
-            {hubSearchResult.direct&&(
-              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Direct Answer</p>
-                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.direct}</p>
+            {hubGuide.overview&&(
+              <div className="advisor-result-section">
+                <div className="advisor-result-label" style={{color:"#1A1916"}}>Overview</div>
+                <div className="advisor-result-text">{hubGuide.overview}</div>
               </div>
             )}
-            {hubSearchResult.why&&(
-              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Why It Matters</p>
-                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.why}</p>
+            {hubGuide.why&&(
+              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
+                <div className="advisor-result-label" style={{color:"#A8A29E"}}>Why This Matters</div>
+                <div className="advisor-result-text">{hubGuide.why}</div>
               </div>
             )}
-            {hubSearchResult.example&&(
-              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FAFAF8"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Practical Example</p>
-                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.example}</p>
+            {hubGuide.core&&(
+              <div className="advisor-result-section">
+                <div className="advisor-result-label" style={{color:"#1A1916"}}>Core Concepts</div>
+                <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{hubGuide.core}</div>
               </div>
             )}
-            {hubSearchResult.mistakes?.length>0&&(
-              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7",background:"#FEF9F6"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#B8936A",marginBottom:12}}>Common Mistakes</p>
+            {hubGuide.how&&(
+              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
+                <div className="advisor-result-label" style={{color:"#A8A29E"}}>How It Works</div>
+                <div className="advisor-result-text">{hubGuide.how}</div>
+              </div>
+            )}
+            {hubGuide.terms&&(
+              <div className="advisor-result-section">
+                <div className="advisor-result-label" style={{color:"#1A1916"}}>Key Terms</div>
+                <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{hubGuide.terms}</div>
+              </div>
+            )}
+            {hubGuide.example&&(
+              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
+                <div className="advisor-result-label" style={{color:"#A8A29E"}}>Example</div>
+                <div className="advisor-result-text" style={{fontStyle:"italic"}}>{hubGuide.example}</div>
+              </div>
+            )}
+            {hubGuide.mistakes?.length>0&&(
+              <div className="advisor-result-section">
+                <div className="advisor-result-label" style={{color:"#B8936A"}}>Common Mistakes or Misconceptions</div>
                 <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  {hubSearchResult.mistakes.map((m,i)=>(
+                  {hubGuide.mistakes.map((m,i)=>(
                     <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
                       <span style={{color:"#B8936A",fontSize:14,fontWeight:700,flexShrink:0}}>!</span>
                       <p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{m}</p>
@@ -2168,121 +2305,58 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
                 </div>
               </div>
             )}
-            {hubSearchResult.related&&(
-              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:8}}>Related Concepts</p>
-                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300}}>{hubSearchResult.related}</p>
-              </div>
-            )}
-            {hubSearchResult.steps?.length>0&&(
-              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
-                <p style={{fontSize:9,fontWeight:600,letterSpacing:"0.18em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:12}}>Next Steps</p>
+            {hubGuide.takeaways?.length>0&&(
+              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
+                <div className="advisor-result-label" style={{color:"#A8A29E"}}>Practical Takeaways</div>
                 <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                  {hubSearchResult.steps.map((s,i)=>(
+                  {hubGuide.takeaways.map((s,i)=>(
                     <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-                      <div style={{width:22,height:22,borderRadius:"50%",background:"#B0728A",color:"#fff",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div>
+                      <div style={{width:22,height:22,borderRadius:"50%",background:"#1A1916",color:"#fff",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div>
                       <p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-            {!hubSearchResult.isPlaybook&&hubSearchResult.rawText&&(
-              <div style={{padding:"18px 22px",borderBottom:"1px solid #EEEAE7"}}>
-                <p style={{fontSize:14,color:"#3A3530",lineHeight:1.78,fontWeight:300,whiteSpace:"pre-wrap"}}>{hubSearchResult.rawText}</p>
-              </div>
-            )}
-          </div>
-        )}
-        {hubSearchResult?.error&&<div className="err" style={{marginBottom:20}}>⚠ {hubSearchResult.error}</div>}
-        <div className="hub-q-grid">
-          {filteredQuestions.map(q=>(
-            <div key={q.id} className="hub-q-card" onClick={()=>{setHubQuestion(q);setHubContext("");setAdvisorResult(null);}}>
-              <div className="hub-q-card-tag">{hubCat?.label}</div>
-              <div className="hub-q-card-title">{q.question.length > 80 ? q.question.substring(0,78)+"…" : q.question}</div>
-
-              <div className="hub-q-card-cta">Use this prompt →</div>
-            </div>
-          ))}
-          {filteredQuestions.length===0&&<p style={{color:"#A8A29E",fontSize:13,padding:"20px 0"}}>No questions match your search.</p>}
-        </div>
-      </div>
-    )}
-
-    {/* ══ HUB — QUESTION DETAIL ══ */}
-    {screen==="hub"&&hubCatId&&hubQuestion&&(
-      <div className="advisor-page">
-        <div className="bc">
-          <span onClick={restart}>Home</span><span className="bc-sep">›</span>
-          <span onClick={()=>setHubQuestion(null)}>Industry Hub</span><span className="bc-sep">›</span>
-          <span onClick={()=>setHubQuestion(null)}>{hubCat?.label}</span>
-        </div>
-        <h1 className="advisor-h1"><em>{hubQuestion.title}</em></h1>
-        <p className="advisor-sub">Add your personal context below — then get your guidance.</p>
-        <textarea
-          className="advisor-ta"
-          rows={5}
-          placeholder={hubQuestion.question.replace("{context}","tell us about your specific situation — your industry, where you are, and what you are dealing with")}
-          value={hubContext}
-          onChange={e=>setHubContext(e.target.value)}
-        />
-        <p className="advisor-hint">The more context you add, the more specific your answer will be.</p>
-        <div style={{display:"flex",gap:8,marginBottom:24,flexWrap:"wrap"}}>
-          <button className="btn" disabled={advisorLoading||!hubContext.trim()} onClick={()=>askAdvisor(hubQuestion.question + (hubContext.trim() ? " Here is my specific context: " + hubContext.trim() : ""))}>
-            {advisorLoading?"Generating your answer…":"Build My Playbook →"}
-          </button>
-          <button className="btn-out" onClick={()=>setHubQuestion(null)}>← Back to questions</button>
-        </div>
-        {advisorLoading&&(
-          <div style={{textAlign:"center",padding:"32px 0"}}>
-            <div className="load-ring" style={{margin:"0 auto 16px"}}/>
-            <p style={{fontSize:13,color:"#78716C"}}>{firstName?firstName+", your":"Your"} advisor is thinking…</p>
-          </div>
-        )}
-        {advisorResult&&!advisorResult.error&&(
-          <div className="advisor-result">
-            <div className="advisor-result-header" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div>
-                <div className="advisor-result-eye" style={{marginBottom:6}}>Your Advisor</div>
-                <p style={{fontFamily:"'Cormorant',serif",fontSize:15,fontStyle:"italic",color:"#8A7E78",lineHeight:1.4}}>"{advisorResult.question.length>60?advisorResult.question.substring(0,58)+"…":advisorResult.question}"</p>
-              </div>
-            </div>
-            {advisorResult.hearing&&(
-              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label" style={{color:"#A8A29E"}}>What I'm Hearing</div>
-                <div className="advisor-result-text" style={{fontStyle:"italic",color:"#57534E"}}>{advisorResult.hearing}</div>
-              </div>
-            )}
-            {advisorResult.think&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label" style={{color:"#1A1916"}}>Here's What I Think</div>
-                <div className="advisor-result-text">{advisorResult.think}</div>
-              </div>
-            )}
-            {advisorResult.means&&(
-              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label" style={{color:"#A8A29E"}}>What This Means For You</div>
-                <div className="advisor-result-text">{advisorResult.means}</div>
-              </div>
-            )}
-            {(advisorResult.move||advisorResult.first)&&(
+            {hubGuide.deeper?.length>0&&(
               <div className="advisor-result-section" style={{borderTop:"2px solid #B0728A"}}>
-                <div className="advisor-result-label" style={{color:"#B0728A"}}>Your Single Next Move</div>
-                <div className="advisor-result-text" style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1A1916",lineHeight:1.4}}>{advisorResult.move||advisorResult.first}</div>
+                <div className="advisor-result-label" style={{color:"#B0728A"}}>Go Deeper</div>
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  {hubGuide.deeper.map((s,i)=>(
+                    <p key={i} style={{fontSize:13,color:"#57534E",lineHeight:1.6,fontWeight:300}}>· {s}</p>
+                  ))}
+                </div>
               </div>
             )}
-            {!advisorResult.hearing&&!advisorResult.think&&!advisorResult.means&&!advisorResult.move&&!advisorResult.first&&advisorResult.raw&&(
+            {hubGuide.raw&&(
               <div className="advisor-result-section">
-                <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{advisorResult.raw}</div>
+                <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{hubGuide.raw}</div>
               </div>
             )}
-            {/* Follow-up prompt */}
-            <div style={{padding:"16px 24px",background:"#FAFAF8",borderTop:"1px solid #EEEAE7"}}>
-              <p style={{fontSize:13,color:"#A8A29E",fontStyle:"italic"}}>Does this resonate? Ask a follow-up or try a different question above.</p>
-            </div>
+
+            {/* RELATED LEARNING */}
+            {activeHubTopic?.topic.relatedTopicIds?.length>0&&(
+              <div style={{padding:"20px 26px",background:"#FAFAF8",borderTop:"1px solid #EEEAE7"}}>
+                <p style={{fontSize:10,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:10}}>Related Learning</p>
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  {activeHubTopic.topic.relatedTopicIds.map(rid=>{
+                    const rel=findLearningTopic(rid);
+                    if(!rel)return null;
+                    return(
+                      <button key={rid} onClick={()=>{setHubTopicId(rel.topic.id);setHubGuide(null);askLearningGuide(rel.topic,rel.category);window.scrollTo(0,0);}}
+                        style={{background:"none",border:"none",textAlign:"left",cursor:"pointer",padding:0,fontSize:13,color:"#B0728A",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+                        → {rel.topic.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
-        {advisorResult?.error&&<div className="err">⚠ {advisorResult.error}</div>}
+        {hubGuide?.error&&<div className="err">⚠ {hubGuide.error}</div>}
+
+        <button className="advisor-ask-again" onClick={()=>{setHubTopicId(null);setHubGuide(null);}}>← Back to {hubCat?.label} Topics</button>
       </div>
     )}
 
