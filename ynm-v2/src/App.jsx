@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense, lazy } from "react";
+import { useState, useEffect, useRef, Suspense, lazy, Fragment } from "react";
 import {
   CATEGORIES, INDUSTRIES, STAGES, WEEK_THEMES,
   STRIPE_MONTHLY, STRIPE_ANNUAL, FREE_PLAN_LIMIT,
@@ -642,6 +642,63 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .advisor-guidance-label{font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:10px;}
 .advisor-guidance-item{font-size:12.5px;color:#78716C;font-weight:300;line-height:1.65;padding-left:12px;margin-bottom:7px;}
 
+/* ── LEARNING GUIDE — 5-STEP MICROLESSON ─────────────────────────────── */
+.lesson-progress{display:flex;align-items:center;gap:6px;margin-bottom:36px;}
+.lesson-dot{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;border:1.5px solid #EEEAE7;background:#fff;font-family:'Cormorant',serif;font-size:13px;font-weight:600;color:#C4B5AD;cursor:pointer;flex-shrink:0;transition:all 0.15s;}
+.lesson-dot:hover{border-color:#E8C4D4;}
+.lesson-dot.active{border-color:#B0728A;background:#B0728A;color:#fff;}
+.lesson-dot.done{border-color:#B0728A;color:#B0728A;background:#FAF0F4;}
+.lesson-dot-line{flex:1;height:1px;background:#EEEAE7;min-width:8px;}
+.lesson-step-label{font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#B0728A;margin-bottom:10px;display:block;}
+.lesson-step-count{font-size:11px;color:#C4B5AD;margin-bottom:2px;display:block;}
+.lesson-body{min-height:280px;animation:rise 0.32s cubic-bezier(0.22,0.61,0.36,1) both;}
+.lesson-explain{font-size:16px;color:#3A3530;line-height:1.75;font-weight:300;margin-bottom:20px;}
+.lesson-analogy{background:#FAFAF8;border-left:2px solid #B0728A;padding:14px 18px;margin-bottom:20px;font-family:'Cormorant',serif;font-style:italic;font-size:16px;color:#57534E;line-height:1.5;}
+.lesson-why{font-size:14px;color:#78716C;line-height:1.7;font-weight:300;margin-bottom:24px;}
+.lesson-takeaway-box{background:#1A1916;padding:20px 24px;border-radius:6px;}
+.lesson-takeaway-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#C4A0B0;margin-bottom:8px;}
+.lesson-takeaway-text{font-family:'Cormorant',serif;font-size:19px;font-style:italic;color:#fff;line-height:1.4;}
+.lesson-how-list{display:flex;flex-direction:column;gap:0;}
+.lesson-how-row{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #F5F4F2;align-items:flex-start;}
+.lesson-how-row:last-child{border-bottom:none;}
+.lesson-how-num{font-family:'Cormorant',serif;font-size:22px;font-weight:600;color:#B0728A;flex-shrink:0;width:28px;}
+.lesson-how-title{font-size:14px;font-weight:600;color:#1A1916;margin-bottom:3px;}
+.lesson-how-text{font-size:13px;color:#57534E;line-height:1.6;font-weight:300;}
+.lesson-example-box{background:#FAFAF8;border:1px solid #EEEAE7;border-radius:6px;padding:24px;margin-bottom:18px;}
+.lesson-example-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#C4B5AD;margin-bottom:12px;}
+.lesson-example-text{font-size:14px;color:#3A3530;line-height:1.75;font-weight:300;}
+.lesson-example-lesson{font-size:13px;color:#B0728A;font-style:italic;line-height:1.6;}
+.lesson-takeaways-list{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.lesson-takeaway-row{display:flex;gap:14px;align-items:flex-start;}
+.lesson-takeaway-n{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:#C4B5AD;flex-shrink:0;}
+.lesson-takeaway-line{font-size:14px;color:#1A1916;line-height:1.6;}
+.lesson-terms-label{font-size:10px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#C4B5AD;margin-bottom:10px;}
+.lesson-terms{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.lesson-term-chip{padding:8px 16px;border-radius:100px;border:1px solid rgba(176,114,138,0.32);background:#fff;font-size:12.5px;color:#8A5068;cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.lesson-term-chip:hover{background:#FDF4F7;}
+.lesson-term-chip.open{background:#1A1916;border-color:#1A1916;color:#fff;}
+.lesson-term-def{font-size:13px;color:#57534E;line-height:1.6;font-weight:300;background:#FAFAF8;border-radius:6px;padding:12px 16px;margin-top:8px;}
+.lesson-deeper-label{font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#A8A29E;margin-bottom:10px;margin-top:28px;}
+.lesson-deeper-list{display:flex;flex-wrap:wrap;gap:8px;}
+.lesson-deeper-chip{padding:6px 14px;border-radius:100px;background:#F5F4F2;font-size:12px;color:#78716C;}
+.lesson-check-q{font-family:'Cormorant',serif;font-size:20px;font-weight:600;color:#1A1916;line-height:1.4;margin-bottom:22px;}
+.lesson-check-opt{width:100%;text-align:left;padding:14px 18px;border:1.5px solid #EEEAE7;border-radius:6px;background:#fff;cursor:pointer;font-size:14px;color:#3A3530;margin-bottom:8px;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.lesson-check-opt:hover{border-color:#E8C4D4;background:#FDF7F9;}
+.lesson-check-opt.picked{border-color:#B0728A;background:#FAF0F4;}
+.lesson-check-opt.correct{border-color:#6A9E8A;background:#EFF7F3;}
+.lesson-check-opt.incorrect{border-color:#D4A8B0;background:#FDF2F2;}
+.lesson-check-opt:disabled{cursor:default;}
+.lesson-check-feedback{margin-top:18px;padding:16px 20px;border-radius:6px;background:#FAFAF8;}
+.lesson-check-feedback-label{font-family:'Cormorant',serif;font-size:17px;font-weight:600;margin-bottom:6px;}
+.lesson-check-feedback-text{font-size:13px;color:#57534E;line-height:1.6;font-weight:300;}
+.lesson-nav{display:flex;align-items:center;justify-content:space-between;margin-top:32px;gap:12px;}
+.lesson-nav-back{background:none;border:none;cursor:pointer;font-size:12px;color:#A8A29E;font-family:'Plus Jakarta Sans',sans-serif;}
+.lesson-nav-back:hover{color:#1C1917;}
+.lesson-end-actions{display:flex;flex-direction:column;gap:8px;margin-top:24px;}
+.lesson-skeleton{padding:20px 0;}
+.lesson-skeleton-line{height:14px;border-radius:4px;background:linear-gradient(90deg,#F5F4F2 25%,#EEEAE7 37%,#F5F4F2 63%);background-size:400% 100%;animation:lessonShimmer 1.4s ease infinite;margin-bottom:12px;}
+@keyframes lessonShimmer{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+
 
 /* HAMBURGER + MOBILE MENU */
 .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:300;}
@@ -1176,6 +1233,10 @@ export default function App() {
   const [hubTopicId,   setHubTopicId]   = useState(null);
   const [hubGuide,     setHubGuide]     = useState(null);
   const [hubGuideLoading, setHubGuideLoading] = useState(false);
+  const [hubStep,      setHubStep]      = useState(0);
+  const [hubQuickAnswer, setHubQuickAnswer] = useState(null);
+  const [hubQuickSubmitted, setHubQuickSubmitted] = useState(false);
+  const [hubExpandedTerm, setHubExpandedTerm] = useState(null);
 
   // Ask Your Advisor state
   const [advisorQ,     setAdvisorQ]     = useState("");
@@ -1675,23 +1736,29 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
   // ─── INDUSTRY RESOURCE HUB — LEARNING GUIDE GENERATION ────────────────────
   // Dedicated educational engine, separate from Create My Strategy and Ask
   // Your Advisor. No questionnaire — the topic's own curated metadata is
-  // enough context. Never produces a personalized strategy or single-opinion
-  // advice; it teaches.
-  const LEARNING_SECTIONS=[
-    {key:"overview",aliases:["Overview"]},
-    {key:"why",aliases:["Why This Matters"]},
-    {key:"core",aliases:["Core Concepts"]},
-    {key:"how",aliases:["How It Works"]},
-    {key:"terms",aliases:["Key Terms"]},
-    {key:"example",aliases:["Example"]},
-    {key:"mistakes",aliases:["Common Mistakes or Misconceptions","Common Mistakes","Common Misconceptions"]},
-    {key:"takeaways",aliases:["Practical Takeaways"]},
-    {key:"deeper",aliases:["Go Deeper"]},
-  ];
-
+  // enough context. Requests ONE structured JSON object (never free prose),
+  // which is what actually fixes the raw-markdown-leak bug at the root: there
+  // is no markdown in a JSON string field, so there's nothing to leak.
+  // Cached per topic (via window.storage) since these are predetermined,
+  // identical-for-everyone lessons — a repeat visit to the same topic, or
+  // clicking a Related Learning link back to something already opened this
+  // session, loads instantly instead of re-generating.
   async function askLearningGuide(topic, category){
     setHubGuideLoading(true);setHubGuide(null);
-    const prompt=`You are the educational engine for the Your Next Move Industry Resource Hub. Your role is to teach users about professional and industry topics clearly, accurately, and practically. You are not creating a personalized strategy and you are not a conversational advisor — you are providing structured professional education based on the learning topic selected below.
+    setHubStep(0);setHubQuickAnswer(null);setHubQuickSubmitted(false);setHubExpandedTerm(null);
+
+    const cacheKey=`learning-guide:${topic.id}`;
+    try{
+      const cached=await window.storage.get(cacheKey,true).catch(()=>window.storage.get(cacheKey,false));
+      if(cached&&cached.value){
+        const parsed=JSON.parse(cached.value);
+        setHubGuide({topic,category,...parsed});
+        setHubGuideLoading(false);
+        return;
+      }
+    }catch(e){/* no cached lesson yet — fall through to generation */}
+
+    const prompt=`You are the educational engine for the Your Next Move Industry Resource Hub. Your role is to teach people about professional and industry topics clearly, accurately, and practically — never a personalized strategy, never single-opinion advice. Just teach.
 
 Category: ${category.label}
 Learning Topic: ${topic.title}
@@ -1702,72 +1769,61 @@ Learning objective: ${topic.learningObjective}
 GUARDRAILS:
 - Distinguish general education from regulated or professional advice.
 - Never fabricate statistics, laws, regulations, certifications, or requirements.
-- Never invent citations or sources.
-- Acknowledge when requirements vary by state, country, employer, regulator, or institution.
-- Don't present time-sensitive information as permanently current.
-- Clearly mark examples as examples, not universal fact.
+- Never invent citations, sources, or named books.
+- Acknowledge when requirements vary by state, country, employer, regulator, or institution — briefly, not as a wall of disclaimers.
+- Clearly frame examples as illustrative, not universal fact.
 - Never promise financial, health, legal, career, or business outcomes.
-- For finance, wellness, real estate regulation, education requirements, or legal topics, include brief contextual notes on verification without turning the guide into a wall of disclaimers.
 
-TONE: Educational, structured, practical, intelligent, professional, substantive. Avoid generic AI filler and excessive motivational language. Do not tell the reader to "create a plan" — this is about understanding, not planning.
+WRITING STYLE: Plain English. Short sentences. No jargon unless you define it. No academic tone, no essay voice, no AI-sounding filler ("It's important to note that..."). Write like a smart, approachable teacher explaining something to a curious adult who has five minutes, not a textbook. Match depth to the ${topic.level} level — foundational stays accessible, advanced can use real professional vocabulary.
 
-DEPTH: Match the ${topic.level} level. Foundational topics should be accessible without talking down to the reader. Growth topics should include frameworks, tradeoffs, and practical application. Advanced topics should use sophisticated professional language and address strategy, economics, operations, leadership, risk, or innovation as relevant.
+Respond with ONLY a single valid JSON object. No markdown code fences, no commentary before or after, no text outside the JSON. Use exactly this shape:
 
-Write the guide using as many of these sections as genuinely fit this topic — skip any that don't apply, and adapt content to the subject rather than forcing a rigid template. Use the section header text exactly as shown.
+{
+  "basics": {
+    "explanation": "2-3 plain-English sentences on what this is",
+    "whyItMatters": "1-2 sentences on why it matters",
+    "analogy": "one short memorable analogy or plain comparison, or empty string if none fits naturally",
+    "keyTakeaway": "one short memorable sentence"
+  },
+  "howItWorks": [
+    {"title": "short step or component name", "explanation": "1-2 sentences"}
+  ],
+  "example": {
+    "scenario": "a short, concrete, realistic example or mini scenario, clearly illustrative",
+    "lesson": "1 sentence connecting the example back to the concept"
+  },
+  "rememberThis": {
+    "takeaways": ["short memorable sentence", "short memorable sentence", "short memorable sentence"],
+    "terms": [{"term": "word or phrase", "definition": "one plain-English sentence"}]
+  },
+  "goDeeper": ["related concept or search term", "related concept or search term", "related concept or search term"],
+  "quickCheck": {
+    "question": "one scenario-based multiple choice question testing what was just taught",
+    "options": ["option A", "option B", "option C", "option D"],
+    "correctIndex": 0,
+    "explanation": "one sentence explaining why the correct answer is right"
+  }
+}
 
-**Overview**
-A clear explanation of what this topic is.
-
-**Why This Matters**
-Why someone working in or entering this field should understand it.
-
-**Core Concepts**
-The most important ideas, principles, frameworks, or mechanics.
-
-**How It Works**
-A practical explanation of how this operates in the real world.
-
-**Key Terms**
-Important vocabulary, if relevant.
-
-**Example**
-A realistic example or short scenario that makes the concept concrete. Clearly frame it as an illustrative example.
-
-**Common Mistakes or Misconceptions**
-What people often get wrong about this topic.
-
-**Practical Takeaways**
-What the reader should remember and be able to apply.
-
-**Go Deeper**
-3-5 related concepts, search terms, or types of authoritative resources (not invented specific books, citations, or named sources) the reader could study next.`;
+"howItWorks" should have 3-6 items. "rememberThis.takeaways" should have 3-5 items. "rememberThis.terms" should have 2-5 items if the topic has real vocabulary worth naming, or an empty array if not. "goDeeper" should have 3-5 items. "quickCheck.correctIndex" is a 0-based index into "options".`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
       if(!res.ok){const errBody=await res.json().catch(()=>({}));throw new Error(`API ${res.status}: ${errBody.error||errBody.code||"Unknown error"}`);}
       const data=await res.json();
-      const text=data.text||"";
-      const {sections,fullyFailed}=parseAISections(text,LEARNING_SECTIONS);
-      if(fullyFailed){
-        setHubGuide({topic,category,error:"We got a response back but couldn't format it properly. Please try again."});
-        return;
-      }
-      setHubGuide({
-        topic,category,
-        overview:sections.overview,
-        why:sections.why,
-        core:sections.core,
-        how:sections.how,
-        terms:sections.terms,
-        example:sections.example,
-        mistakes:lines(sections.mistakes).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
-        takeaways:lines(sections.takeaways).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
-        deeper:lines(sections.deeper).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
-        raw:!sections.overview&&!sections.core&&!sections.how?text.replace(/\*\*/g,"").trim():"",
-      });
+      const raw=(data.text||"").trim();
+      const jsonMatch=raw.match(/\{[\s\S]*\}/); // tolerate stray text/fences around the object
+      if(!jsonMatch)throw new Error("No JSON object found in response");
+      const lesson=JSON.parse(jsonMatch[0]);
+      if(!lesson.basics||!lesson.howItWorks||!lesson.quickCheck)throw new Error("Response missing required lesson fields");
+
+      setHubGuide({topic,category,...lesson});
+      try{await window.storage.set(cacheKey,JSON.stringify(lesson),true);}
+      catch(e){try{await window.storage.set(cacheKey,JSON.stringify(lesson),false);}catch(e2){/* caching is a nice-to-have, never block the lesson on it */}}
     }catch(e){
       console.error("[askLearningGuide] failed:",e.message);
-      setHubGuide({topic,category,error:`We hit a snag: ${e.message}`});
+      // Per product spec: never expose technical errors here — polished, generic, recoverable.
+      setHubGuide({topic,category,error:"We couldn't load this lesson. Please try again."});
     }finally{setHubGuideLoading(false);}
   }
 
@@ -1778,6 +1834,7 @@ What the reader should remember and be able to apply.
   )||[];
   const topicsByLevel = level => filteredTopics.filter(t=>t.level===level);
   const activeHubTopic = hubTopicId ? findLearningTopic(hubTopicId) : null;
+  const HUB_LESSON_STEPS=["The Basics","How It Works","See It In Real Life","Remember This","Quick Check"];
 
   return(<>
     <style>{CSS}</style>
@@ -2229,7 +2286,7 @@ What the reader should remember and be able to apply.
       </div>
     )}
 
-    {/* ══ HUB — LEARNING GUIDE ══ */}
+    {/* ══ HUB — LEARNING GUIDE (5-step microlesson) ══ */}
     {screen==="hub"&&hubCatId&&hubTopicId&&(
       <div className="advisor-page">
         <div className="bc">
@@ -2242,121 +2299,173 @@ What the reader should remember and be able to apply.
             {activeHubTopic.topic.level.charAt(0).toUpperCase()+activeHubTopic.topic.level.slice(1)} · {activeHubTopic.category.label}
           </p>
         )}
-        <h1 className="advisor-h1"><em>{activeHubTopic?.topic.title}</em></h1>
+        <h1 className="advisor-h1" style={{marginBottom:28}}><em>{activeHubTopic?.topic.title}</em></h1>
 
         {hubGuideLoading&&(
-          <div style={{textAlign:"center",padding:"48px 0"}}>
-            <div className="load-ring" style={{margin:"0 auto 16px"}}/>
-            <p style={{fontSize:13,color:"#78716C"}}>Building your learning guide…</p>
+          <div className="lesson-skeleton">
+            <div className="lesson-skeleton-line" style={{width:"40%"}}/>
+            <div className="lesson-skeleton-line" style={{width:"92%"}}/>
+            <div className="lesson-skeleton-line" style={{width:"85%"}}/>
+            <div className="lesson-skeleton-line" style={{width:"60%"}}/>
+            <p style={{fontSize:12,color:"#B8AFA8",marginTop:18,fontStyle:"italic"}}>Building your lesson…</p>
           </div>
         )}
 
-        {hubGuide&&!hubGuide.error&&(
-          <div className="advisor-result">
-            <div className="advisor-result-header">
-              <div className="advisor-result-eye">Learning Guide</div>
+        {hubGuide?.error&&(
+          <div>
+            <div className="err">⚠ {hubGuide.error}</div>
+            <div style={{display:"flex",gap:8}}>
+              <button className="btn" style={{padding:"10px 20px",fontSize:11}} onClick={()=>askLearningGuide(activeHubTopic.topic,activeHubTopic.category)}>Try Again</button>
+              <button className="btn-out" style={{padding:"10px 20px",fontSize:11}} onClick={()=>{setHubTopicId(null);setHubGuide(null);}}>Back to Topics</button>
             </div>
-            {hubGuide.overview&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label" style={{color:"#1A1916"}}>Overview</div>
-                <div className="advisor-result-text">{hubGuide.overview}</div>
-              </div>
-            )}
-            {hubGuide.why&&(
-              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label" style={{color:"#A8A29E"}}>Why This Matters</div>
-                <div className="advisor-result-text">{hubGuide.why}</div>
-              </div>
-            )}
-            {hubGuide.core&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label" style={{color:"#1A1916"}}>Core Concepts</div>
-                <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{hubGuide.core}</div>
-              </div>
-            )}
-            {hubGuide.how&&(
-              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label" style={{color:"#A8A29E"}}>How It Works</div>
-                <div className="advisor-result-text">{hubGuide.how}</div>
-              </div>
-            )}
-            {hubGuide.terms&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label" style={{color:"#1A1916"}}>Key Terms</div>
-                <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{hubGuide.terms}</div>
-              </div>
-            )}
-            {hubGuide.example&&(
-              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label" style={{color:"#A8A29E"}}>Example</div>
-                <div className="advisor-result-text" style={{fontStyle:"italic"}}>{hubGuide.example}</div>
-              </div>
-            )}
-            {hubGuide.mistakes?.length>0&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-label" style={{color:"#B8936A"}}>Common Mistakes or Misconceptions</div>
-                <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  {hubGuide.mistakes.map((m,i)=>(
-                    <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
-                      <span style={{color:"#B8936A",fontSize:14,fontWeight:700,flexShrink:0}}>!</span>
-                      <p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{m}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {hubGuide.takeaways?.length>0&&(
-              <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
-                <div className="advisor-result-label" style={{color:"#A8A29E"}}>Practical Takeaways</div>
-                <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                  {hubGuide.takeaways.map((s,i)=>(
-                    <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-                      <div style={{width:22,height:22,borderRadius:"50%",background:"#1A1916",color:"#fff",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div>
-                      <p style={{fontSize:13,color:"#57534E",lineHeight:1.65,fontWeight:300}}>{s}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {hubGuide.deeper?.length>0&&(
-              <div className="advisor-result-section" style={{borderTop:"2px solid #B0728A"}}>
-                <div className="advisor-result-label" style={{color:"#B0728A"}}>Go Deeper</div>
-                <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  {hubGuide.deeper.map((s,i)=>(
-                    <p key={i} style={{fontSize:13,color:"#57534E",lineHeight:1.6,fontWeight:300}}>· {s}</p>
-                  ))}
-                </div>
-              </div>
-            )}
-            {hubGuide.raw&&(
-              <div className="advisor-result-section">
-                <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{hubGuide.raw}</div>
-              </div>
-            )}
-
-            {/* RELATED LEARNING */}
-            {activeHubTopic?.topic.relatedTopicIds?.length>0&&(
-              <div style={{padding:"20px 26px",background:"#FAFAF8",borderTop:"1px solid #EEEAE7"}}>
-                <p style={{fontSize:10,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:10}}>Related Learning</p>
-                <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  {activeHubTopic.topic.relatedTopicIds.map(rid=>{
-                    const rel=findLearningTopic(rid);
-                    if(!rel)return null;
-                    return(
-                      <button key={rid} onClick={()=>{setHubTopicId(rel.topic.id);setHubGuide(null);askLearningGuide(rel.topic,rel.category);window.scrollTo(0,0);}}
-                        style={{background:"none",border:"none",textAlign:"left",cursor:"pointer",padding:0,fontSize:13,color:"#B0728A",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
-                        → {rel.topic.title}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         )}
-        {hubGuide?.error&&<div className="err">⚠ {hubGuide.error}</div>}
 
-        <button className="advisor-ask-again" onClick={()=>{setHubTopicId(null);setHubGuide(null);}}>← Back to {hubCat?.label} Topics</button>
+        {hubGuide&&!hubGuide.error&&(<>
+          <div className="lesson-progress">
+            {HUB_LESSON_STEPS.map((label,i)=>(
+              <Fragment key={i}>
+                <div className={`lesson-dot${i===hubStep?" active":i<hubStep?" done":""}`} onClick={()=>setHubStep(i)} title={label}>
+                  {i<hubStep?"✓":i+1}
+                </div>
+                {i<HUB_LESSON_STEPS.length-1&&<div className="lesson-dot-line"/>}
+              </Fragment>
+            ))}
+          </div>
+
+          <div className="lesson-body" key={hubStep}>
+            <span className="lesson-step-count">Step {hubStep+1} of 5</span>
+            <span className="lesson-step-label">{HUB_LESSON_STEPS[hubStep]}</span>
+
+            {/* STEP 1 — THE BASICS */}
+            {hubStep===0&&(<>
+              <p className="lesson-explain">{hubGuide.basics?.explanation}</p>
+              {hubGuide.basics?.analogy&&<div className="lesson-analogy">{hubGuide.basics.analogy}</div>}
+              {hubGuide.basics?.whyItMatters&&<p className="lesson-why">{hubGuide.basics.whyItMatters}</p>}
+              {hubGuide.basics?.keyTakeaway&&(
+                <div className="lesson-takeaway-box">
+                  <div className="lesson-takeaway-label">Key Takeaway</div>
+                  <div className="lesson-takeaway-text">{hubGuide.basics.keyTakeaway}</div>
+                </div>
+              )}
+            </>)}
+
+            {/* STEP 2 — HOW IT WORKS */}
+            {hubStep===1&&(
+              <div className="lesson-how-list">
+                {(hubGuide.howItWorks||[]).map((h,i)=>(
+                  <div className="lesson-how-row" key={i}>
+                    <div className="lesson-how-num">{i+1}</div>
+                    <div>
+                      {h.title&&<div className="lesson-how-title">{h.title}</div>}
+                      <div className="lesson-how-text">{h.explanation}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* STEP 3 — SEE IT IN REAL LIFE */}
+            {hubStep===2&&(
+              <div className="lesson-example-box">
+                <div className="lesson-example-label">Example</div>
+                <p className="lesson-example-text">{hubGuide.example?.scenario}</p>
+                {hubGuide.example?.lesson&&<p className="lesson-example-lesson">{hubGuide.example.lesson}</p>}
+              </div>
+            )}
+
+            {/* STEP 4 — REMEMBER THIS */}
+            {hubStep===3&&(<>
+              <div className="lesson-takeaways-list">
+                {(hubGuide.rememberThis?.takeaways||[]).map((t,i)=>(
+                  <div className="lesson-takeaway-row" key={i}>
+                    <span className="lesson-takeaway-n">0{i+1}</span>
+                    <span className="lesson-takeaway-line">{t}</span>
+                  </div>
+                ))}
+              </div>
+              {hubGuide.rememberThis?.terms?.length>0&&(<>
+                <div className="lesson-terms-label">Words to Know</div>
+                <div className="lesson-terms">
+                  {hubGuide.rememberThis.terms.map((t,i)=>(
+                    <button key={i} className={`lesson-term-chip${hubExpandedTerm===i?" open":""}`} onClick={()=>setHubExpandedTerm(hubExpandedTerm===i?null:i)}>
+                      {t.term}
+                    </button>
+                  ))}
+                </div>
+                {hubExpandedTerm!==null&&hubGuide.rememberThis.terms[hubExpandedTerm]&&(
+                  <div className="lesson-term-def">{hubGuide.rememberThis.terms[hubExpandedTerm].definition}</div>
+                )}
+              </>)}
+              {hubGuide.goDeeper?.length>0&&(<>
+                <div className="lesson-deeper-label">Want to go deeper? (optional)</div>
+                <div className="lesson-deeper-list">
+                  {hubGuide.goDeeper.map((g,i)=><span key={i} className="lesson-deeper-chip">{g}</span>)}
+                </div>
+              </>)}
+            </>)}
+
+            {/* STEP 5 — QUICK CHECK */}
+            {hubStep===4&&(<>
+              <p className="lesson-check-q">{hubGuide.quickCheck?.question}</p>
+              {(hubGuide.quickCheck?.options||[]).map((opt,i)=>{
+                const isCorrect=i===hubGuide.quickCheck.correctIndex;
+                const isPicked=i===hubQuickAnswer;
+                let cls="lesson-check-opt";
+                if(hubQuickSubmitted&&isCorrect)cls+=" correct";
+                else if(hubQuickSubmitted&&isPicked&&!isCorrect)cls+=" incorrect";
+                else if(isPicked)cls+=" picked";
+                return(
+                  <button key={i} className={cls} disabled={hubQuickSubmitted}
+                    onClick={()=>{setHubQuickAnswer(i);setHubQuickSubmitted(true);}}>
+                    {opt}
+                  </button>
+                );
+              })}
+              {hubQuickSubmitted&&(
+                <div className="lesson-check-feedback">
+                  <div className="lesson-check-feedback-label" style={{color:hubQuickAnswer===hubGuide.quickCheck.correctIndex?"#6A9E8A":"#B0728A"}}>
+                    {hubQuickAnswer===hubGuide.quickCheck.correctIndex?"You got it.":"Almost."}
+                  </div>
+                  <div className="lesson-check-feedback-text">{hubGuide.quickCheck?.explanation}</div>
+                </div>
+              )}
+
+              {hubQuickSubmitted&&(
+                <div className="lesson-end-actions">
+                  {activeHubTopic?.topic.relatedTopicIds?.length>0&&(
+                    <div style={{marginBottom:8}}>
+                      <p style={{fontSize:10,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#C4B5AD",marginBottom:10}}>Related Learning</p>
+                      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                        {activeHubTopic.topic.relatedTopicIds.map(rid=>{
+                          const rel=findLearningTopic(rid);
+                          if(!rel)return null;
+                          return(
+                            <button key={rid} onClick={()=>{setHubTopicId(rel.topic.id);setHubGuide(null);askLearningGuide(rel.topic,rel.category);window.scrollTo(0,0);}}
+                              style={{background:"none",border:"none",textAlign:"left",cursor:"pointer",padding:0,fontSize:13,color:"#B0728A",fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+                              → {rel.topic.title}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  <button className="btn" onClick={()=>{setHubTopicId(null);setHubGuide(null);}}>Explore Another Topic →</button>
+                  <button className="btn-out" onClick={()=>setHubCatId(hubCat?.id||null)}>Back to {hubCat?.label}</button>
+                </div>
+              )}
+            </>)}
+          </div>
+
+          {hubStep<4&&(
+            <div className="lesson-nav">
+              <button className="lesson-nav-back" onClick={()=>hubStep===0?(setHubTopicId(null),setHubGuide(null)):setHubStep(s=>s-1)}>
+                ← {hubStep===0?"Back to Topics":"Previous"}
+              </button>
+              <button className="btn" onClick={()=>setHubStep(s=>s+1)}>Next →</button>
+            </div>
+          )}
+        </>)}
       </div>
     )}
 
