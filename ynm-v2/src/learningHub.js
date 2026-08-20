@@ -195,6 +195,29 @@ export const LEARNING_HUB = [
       { id:"creative-15", title:"Building a Creative Team", level:"advanced", shortDescription:"How creative professionals build and lead a team around their work.", learningObjective:"Understand the fundamentals of building a creative team.", relatedTopicIds:["creative-12","creative-14"] },
     ],
   },
+  {
+    id: "healthcare",
+    num: "09",
+    label: "Healthcare",
+    tagline: "Learn how healthcare careers and practices work, from patient care fundamentals to leadership and policy.",
+    topics: [
+      { id:"healthcare-01", title:"How the Healthcare Industry Works", level:"foundational", shortDescription:"The major sectors, roles, and settings that make up the healthcare industry.", learningObjective:"Understand the structure of the healthcare industry.", relatedTopicIds:["healthcare-02","healthcare-04"] },
+      { id:"healthcare-02", title:"Understanding Healthcare Career Paths", level:"foundational", shortDescription:"The range of clinical and non-clinical roles within healthcare.", learningObjective:"Understand common healthcare career paths.", relatedTopicIds:["healthcare-01","healthcare-04"] },
+      { id:"healthcare-03", title:"Foundations of Patient Communication", level:"foundational", shortDescription:"Core principles for communicating clearly and compassionately with patients.", learningObjective:"Understand foundational patient communication skills.", relatedTopicIds:["healthcare-06","healthcare-09"] },
+      { id:"healthcare-04", title:"Understanding Healthcare Licensing and Certification", level:"foundational", shortDescription:"How licensing and certification generally work across healthcare roles.", learningObjective:"Understand the basics of healthcare licensing pathways.", relatedTopicIds:["healthcare-01","healthcare-02"] },
+      { id:"healthcare-05", title:"Essential Healthcare Terminology", level:"foundational", shortDescription:"The vocabulary used every day across clinical and administrative healthcare work.", learningObjective:"Build familiarity with core healthcare terminology.", relatedTopicIds:["healthcare-01","healthcare-07"] },
+      { id:"healthcare-06", title:"Building Patient Trust and Rapport", level:"growth", shortDescription:"How healthcare professionals build trust with the people they care for.", learningObjective:"Understand principles of building patient trust and rapport.", relatedTopicIds:["healthcare-03","healthcare-09"] },
+      { id:"healthcare-07", title:"Understanding Healthcare Documentation", level:"growth", shortDescription:"How clinical documentation generally works and why it matters.", learningObjective:"Understand the basics of healthcare documentation practices.", relatedTopicIds:["healthcare-05","healthcare-10"] },
+      { id:"healthcare-08", title:"Navigating Insurance and Billing Basics", level:"growth", shortDescription:"How healthcare insurance and billing generally function.", learningObjective:"Understand foundational insurance and billing concepts.", relatedTopicIds:["healthcare-12","healthcare-07"] },
+      { id:"healthcare-09", title:"Care Coordination Fundamentals", level:"growth", shortDescription:"How care is coordinated across providers and settings.", learningObjective:"Understand the basics of care coordination.", relatedTopicIds:["healthcare-03","healthcare-06"] },
+      { id:"healthcare-10", title:"Understanding Healthcare Compliance Basics", level:"growth", shortDescription:"Foundational concepts in healthcare privacy and regulatory compliance.", learningObjective:"Understand core healthcare compliance concepts.", relatedTopicIds:["healthcare-07","healthcare-13"] },
+      { id:"healthcare-11", title:"Healthcare Quality and Patient Outcomes", level:"advanced", shortDescription:"How healthcare organizations measure and improve quality of care.", learningObjective:"Understand approaches to measuring healthcare quality and outcomes.", relatedTopicIds:["healthcare-09","healthcare-12"] },
+      { id:"healthcare-12", title:"Healthcare Operations and Practice Management", level:"advanced", shortDescription:"How healthcare practices and facilities are run as organizations.", learningObjective:"Understand fundamentals of healthcare operations and practice management.", relatedTopicIds:["healthcare-08","healthcare-14"] },
+      { id:"healthcare-13", title:"Healthcare Policy and Regulation", level:"advanced", shortDescription:"How policy and regulation shape the healthcare system.", learningObjective:"Understand the basics of healthcare policy and regulation.", relatedTopicIds:["healthcare-10","healthcare-15"] },
+      { id:"healthcare-14", title:"Leadership in Healthcare Settings", level:"advanced", shortDescription:"How leadership functions in clinical and healthcare organizational settings.", learningObjective:"Understand core concepts in healthcare leadership.", relatedTopicIds:["healthcare-12","healthcare-11"] },
+      { id:"healthcare-15", title:"Healthcare Innovation and Technology Trends", level:"advanced", shortDescription:"How new technology and innovation are shaping healthcare delivery.", learningObjective:"Understand current trends shaping healthcare innovation.", relatedTopicIds:["healthcare-13","healthcare-11"] },
+    ],
+  },
 ];
 
 export function findLearningTopic(topicId) {
