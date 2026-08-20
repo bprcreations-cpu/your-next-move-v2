@@ -1516,7 +1516,7 @@ Sentence 3: What specifically changes in 2 weeks if they do this.`;
       else if(msg.includes("AUTH:"))userMsg="There was a connection issue. Please check your internet and try again.";
       else if(msg.includes("API:"))userMsg="We couldn't reach the strategy service. Your answers are saved — please try again.";
       else if(msg.includes("EMPTY:")||msg.includes("PARSE:"))userMsg="Your strategy was generated but couldn't be displayed. Please try again — this usually resolves immediately.";
-      setError(userMsg);
+      setError(userMsg+" [Debug: "+msg+"]");
       go("questions");
     }finally{setLoading(false);}
   }
@@ -1569,7 +1569,7 @@ One sentence. The single most important action to take in the next 24 hours. Be 
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
-      if(!res.ok)throw new Error("Failed to get response");
+      if(!res.ok){const errBody=await res.json().catch(()=>({}));throw new Error(`API ${res.status}: ${errBody.error||errBody.code||"Unknown error"}`);}
       const data=await res.json();
       const text=data.text||"";
       const {sections,failedSections,fullyFailed}=parseAISections(text,ADVISOR_SECTIONS);
@@ -1594,7 +1594,7 @@ One sentence. The single most important action to take in the next 24 hours. Be 
       const newHistory=[parsed,...advisorHistory].slice(0,10);
       setAdvisorHistory(newHistory);
       try{localStorage.setItem("advisor-history",JSON.stringify(newHistory));}catch(e){}
-    }catch(e){setAdvisorResult({error:"We hit a snag on our end. Your question is saved — try again when you're ready.",question,date:""});}
+    }catch(e){console.error("[askAdvisor] failed:",e.message);setAdvisorResult({error:`We hit a snag: ${e.message}. Your question is saved — try again when you're ready.`,question,date:""});}
     finally{setAdvisorLoading(false);}
   }
 
@@ -1668,7 +1668,7 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
         related:sections.related,
         steps:lines(sections.steps).map(l=>l.replace(/^\d+\.\s*/,"").replace(/^[-•]\s*/,"").trim()).filter(Boolean),
       });
-    }catch(e){console.error("[askHubSearch] failed:",e.message);setHubSearchResult({query,error:"We hit a snag on our end. Please try again in a moment."});}
+    }catch(e){console.error("[askHubSearch] failed:",e.message);setHubSearchResult({query,error:`We hit a snag: ${e.message}`});}
     finally{setHubSearchLoading(false);}
   }
 
@@ -1767,7 +1767,7 @@ What the reader should remember and be able to apply.
       });
     }catch(e){
       console.error("[askLearningGuide] failed:",e.message);
-      setHubGuide({topic,category,error:"We hit a snag generating this guide. Please try again in a moment."});
+      setHubGuide({topic,category,error:`We hit a snag: ${e.message}`});
     }finally{setHubGuideLoading(false);}
   }
 
