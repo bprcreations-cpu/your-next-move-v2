@@ -875,10 +875,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 
 /* ── 30-DAY PLAN PROGRESS RING — clean, no gamification ── */
 .plan-progress-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:36px;}
-.plan-progress-ring{width:88px;height:88px;transform:rotate(-90deg);}
+.plan-progress-ring-box{position:relative;width:88px;height:88px;}
+.plan-progress-ring{width:88px;height:88px;transform:rotate(-90deg);display:block;}
 .plan-progress-track{fill:none;stroke:#2A2522;stroke-width:6;}
 .plan-progress-fill{fill:none;stroke:var(--r-accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 0.4s ease;}
-.plan-progress-text{margin-top:-58px;display:flex;align-items:center;justify-content:center;height:88px;}
+.plan-progress-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
 .plan-progress-pct{font-family:'Cormorant',serif;font-size:22px;font-weight:600;color:#fff;letter-spacing:-0.01em;}
 .plan-progress-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--r-dark-meta);margin-top:14px;}
 .plan-week-check{width:22px;height:22px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--r-rule-dark);background:transparent;color:var(--r-accent);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
@@ -3300,13 +3301,15 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
               const offset=circ*(1-pct/100);
               return(
                 <div className="plan-progress-wrap">
-                  <svg className="plan-progress-ring" viewBox="0 0 80 80">
-                    <circle className="plan-progress-track" cx="40" cy="40" r={r}/>
-                    <circle className="plan-progress-fill" cx="40" cy="40" r={r}
-                      style={{strokeDasharray:circ,strokeDashoffset:offset}}/>
-                  </svg>
-                  <div className="plan-progress-text">
-                    <span className="plan-progress-pct">{pct}%</span>
+                  <div className="plan-progress-ring-box">
+                    <svg className="plan-progress-ring" viewBox="0 0 80 80">
+                      <circle className="plan-progress-track" cx="40" cy="40" r={r}/>
+                      <circle className="plan-progress-fill" cx="40" cy="40" r={r}
+                        style={{strokeDasharray:circ,strokeDashoffset:offset}}/>
+                    </svg>
+                    <div className="plan-progress-text">
+                      <span className="plan-progress-pct">{pct}%</span>
+                    </div>
                   </div>
                   <p className="plan-progress-label">30-Day Plan Progress</p>
                 </div>
