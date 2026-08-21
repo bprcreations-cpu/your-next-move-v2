@@ -615,6 +615,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .advisor-result-section:last-child{border-bottom:none;}
 .advisor-result-label{font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#C4B5AD;margin-bottom:11px;}
 .advisor-result-text{font-size:14px;color:#3A3530;line-height:1.8;font-weight:300;}
+
+/* ── ADVISOR RECOMMENDATION BLOCKS — premium report, not a chatbot dump ── */
+.advisor-reco-list{display:flex;flex-direction:column;gap:0;margin-top:4px;}
+.advisor-reco{display:flex;gap:18px;padding:20px 0;border-bottom:1px solid #F0EDEB;}
+.advisor-reco:last-child{border-bottom:none;padding-bottom:0;}
+.advisor-reco:first-child{padding-top:0;}
+.advisor-reco-num{font-family:'Cormorant',serif;font-size:20px;font-weight:600;color:#B0728A;flex-shrink:0;width:28px;line-height:1.4;}
+.advisor-reco-title{font-family:'Cormorant',serif;font-size:18px;font-weight:600;color:#1A1916;margin-bottom:6px;line-height:1.3;letter-spacing:-0.005em;}
+.advisor-reco-text{font-size:14px;color:#57534E;line-height:1.75;font-weight:300;}
 .advisor-result-steps{display:flex;flex-direction:column;gap:8px;}
 .advisor-result-step{display:flex;gap:10px;align-items:flex-start;}
 .advisor-result-step-num{width:22px;height:22px;border-radius:50%;background:#B0728A;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
@@ -863,6 +872,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .rpt-week-n{font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--r-accent);margin-bottom:8px;}
 .rpt-week-theme{font-family:'Cormorant',serif;font-size:21px;font-weight:600;color:#fff;line-height:1.15;margin-bottom:5px;letter-spacing:-0.01em;}
 .rpt-week-goal{font-size:11px;color:var(--r-dark-meta);font-weight:300;line-height:1.55;}
+
+/* ── 30-DAY PLAN PROGRESS RING — clean, no gamification ── */
+.plan-progress-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:36px;}
+.plan-progress-ring{width:88px;height:88px;transform:rotate(-90deg);}
+.plan-progress-track{fill:none;stroke:#2A2522;stroke-width:6;}
+.plan-progress-fill{fill:none;stroke:var(--r-accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 0.4s ease;}
+.plan-progress-text{margin-top:-58px;display:flex;align-items:center;justify-content:center;height:88px;}
+.plan-progress-pct{font-family:'Cormorant',serif;font-size:22px;font-weight:600;color:#fff;letter-spacing:-0.01em;}
+.plan-progress-label{font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--r-dark-meta);margin-top:14px;}
+.plan-week-check{width:22px;height:22px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--r-rule-dark);background:transparent;color:var(--r-accent);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.plan-week-check:hover{border-color:var(--r-accent);}
+.plan-week-check.done{background:var(--r-accent);border-color:var(--r-accent);color:#fff;}
 .rpt-week-bd{padding:16px 20px 22px;}
 .rpt-week-task{font-size:11.5px;color:var(--r-dark-body);line-height:1.7;padding:6px 0;border-bottom:1px solid var(--r-rule-dark);display:flex;gap:8px;align-items:flex-start;}
 .rpt-week-task:last-child{border-bottom:none;}
@@ -1212,6 +1233,7 @@ export default function App() {
   const [showPaywall,  setShowPaywall]  = useState(false);
   const [paywallContext, setPaywallContext] = useState('strategy'); // strategy | advisor | hub — which free entitlement was hit
   const [notesText,    setNotesText]    = useState("");
+  const [completedWeeks, setCompletedWeeks] = useState([false,false,false,false]); // 30-Day Plan week-level completion, per saved strategy
   const [notesSaveStatus, setNotesSaveStatus] = useState(null); // 'saving'|'saved'|'error'|null
   const [fbDone,       setFbDone]       = useState(false);
   const [pdfUnlocked,  setPdfUnlocked]  = useState(false);
@@ -1406,6 +1428,7 @@ export default function App() {
     setAnswers({});setQIdx(0);setResult(null);setError(null);
     setViewingPlanId(null);setShowPaywall(false);setNotesText("");setNotesSaveStatus(null);
     setFbDone(false);setFbRating(null);setFbAns({});setShortWarn(false);setStrategyStage('reading');
+    setCompletedWeeks([false,false,false,false]);
     go("home");
   }
   async function completeOnboarding(name){
@@ -1439,7 +1462,35 @@ export default function App() {
     setShortWarn(false);
     if(qIdx<qs.length-1){setQIdx(q=>q+1);window.scrollTo(0,0);}else generate();
   }
-  function openSavedPlan(plan){setCatId(plan.catId);setIndustry(plan.industry);setJourneyStage(plan.journeyStage||null);setResult(plan.result);setViewingPlanId(plan.id);setStrategyStage('reading');setFbDone(!!plan.feedbackSubmitted);setPdfUnlocked(!!plan.pdfUnlocked);setNotesText(plan.notes||"");setNotesSaveStatus(null);go("results");}
+  function openSavedPlan(plan){setCatId(plan.catId);setIndustry(plan.industry);setJourneyStage(plan.journeyStage||null);setResult(plan.result);setViewingPlanId(plan.id);setStrategyStage('reading');setFbDone(!!plan.feedbackSubmitted);setPdfUnlocked(!!plan.pdfUnlocked);setNotesText(plan.notes||"");setNotesSaveStatus(null);setCompletedWeeks(plan.completedWeeks||[false,false,false,false]);go("results");}
+
+  // Persists 30-Day Plan week completion onto this specific saved strategy —
+  // reuses the exact same read-modify-write pattern as Notes and the feedback
+  // unlock, on the same plan record, so it survives leaving and returning.
+  async function toggleWeekComplete(weekIndex){
+    const next=completedWeeks.map((v,i)=>i===weekIndex?!v:v);
+    setCompletedWeeks(next);
+    try{
+      let pid=viewingPlanId;
+      if(pid){
+        const raw=await window.storage.get(`plan:${pid}`).catch(()=>null);
+        if(raw){
+          const plan=JSON.parse(raw.value);
+          plan.completedWeeks=next;
+          await window.storage.set(`plan:${pid}`,JSON.stringify(plan));
+          setSavedPlans(prev=>prev.map(p=>p.id===pid?{...p,completedWeeks:next}:p));
+        }else{
+          pid=null;
+        }
+      }
+      if(!pid){
+        const newId=await savePlan(result,{catId,industry:effectiveIndustry,journeyStage,notes:notesText,completedWeeks:next});
+        if(newId)setViewingPlanId(newId);
+      }
+    }catch(e){
+      console.error("Failed to persist week completion (non-fatal — session state still updated):",e.message);
+    }
+  }
 
   // Persists the mandatory-feedback unlock onto this specific saved strategy
   // record, so reopening it later restores PDF access instead of re-demanding
@@ -1698,59 +1749,42 @@ CRITICAL RULES:
 2. ONE CLEAR OPINION. Do not present multiple options and let them choose. Pick the best path and advocate for it.
 3. NEVER ASSUME. Respond only to what they actually said about their actual situation.
 4. BE DIRECT. Say what you think. "I think you should..." not "You might want to consider..."
-5. FORM FOLLOWS FUNCTION. Default to flowing prose for your recommendation — but if the answer is genuinely clearer as a short checklist, a few numbered steps, or a quick comparison, use that instead. Choose whatever format actually serves this specific answer.
-6. FEEL HUMAN. Read like someone who knows this person, not a chatbot completing a template.
-7. SHORT ENOUGH TO READ. The whole response should take 60-90 seconds to read. Cut anything that doesn't add value.
+5. FEEL HUMAN. Read like someone who knows this person, not a chatbot completing a template. No "expert advice" language, no claiming credentials you don't have.
+6. SHORT ENOUGH TO READ. The whole response should take 60-90 seconds to read. Cut anything that doesn't add value.
+7. NEVER CLAIM CERTAINTY YOU DON'T HAVE. Never invent facts, sources, statistics, dates, laws, prices, medical guidance, or policies. If not certain of a figure or claim, say so plainly. For medical, legal, financial, or safety-sensitive questions, give real, useful guidance but be clear when something needs professional verification.
 
-UNCERTAINTY AND HIGH-STAKES SAFEGUARDS:
-Never invent facts, sources, statistics, dates, laws, prices, medical guidance, or policies. If you're not certain of a specific figure or claim, say so plainly rather than presenting a guess as fact. For medical, legal, financial, or safety-sensitive questions, give real, useful guidance but be clear when something requires a professional's verification rather than presenting it as settled. If the question turns on missing context that would change your answer, ask for it. If something may have changed recently or needs a current source, say so briefly. Never fabricate a specific link, citation, organization, or program. Keep this calm and proportionate — a normal aside, not a disclaimer wall.
-
-${firstName?`The person's name is ${firstName}. Use it once naturally — not at the start of every section.`:""} ${context}
+${firstName?`The person's name is ${firstName}. Use it once naturally.`:""} ${context}
 
 Their question or situation: ${question}
 
-Respond with exactly these four sections. Use the section header text exactly as shown.
+Respond with ONLY a single valid JSON object. No markdown code fences, no commentary before or after, no text outside the JSON, and no markdown syntax (no **, no #, no numbered-list dots) anywhere inside the string values — write plain sentences. Use exactly this shape:
 
-**What I'm hearing**
-One to two sentences reflecting what they said back to them. Make them feel understood before you give any advice.
+{
+  "hearing": "1-3 sentences reflecting their situation back to them, so they feel understood before any advice",
+  "recommendations": [
+    {"title": "short, specific recommendation title, a few words", "explanation": "1-3 short sentences explaining this recommendation and why it's right for their situation"}
+  ],
+  "meaning": "1-3 short sentences translating the recommendations into what this specifically means for THEIR situation right now — do not repeat the recommendations, connect them to something the person mentioned",
+  "nextMove": "one concrete, specific action they can take in the next 24 hours — not a category, an actual action"
+}
 
-**Here's what I think**
-Your direct recommendation, in whatever format best serves it — prose, a short list, or a brief comparison. Be specific to their exact situation, drawing on whichever expertise it actually requires.
-
-**What this means for you**
-One to two sentences on why this matters right now for their specific situation. Connect it to something they mentioned.
-
-**Your single next move**
-One sentence. The single most important action to take in the next 24 hours. Be specific — not a category, an actual action.`;
-
-    const ADVISOR_SECTIONS=[
-      {key:"hearing",aliases:["What I'm hearing","What I am hearing","What I Understand"]},
-      {key:"think",aliases:["Here's what I think","Here is what I think","My Recommendation","Direct Answer"]},
-      {key:"means",aliases:["What this means for you","What this means","Why It Matters","Why This Matters"]},
-      {key:"move",aliases:["Your single next move","Your Single Next Move","Next Move","Your Next Move","Next Step","Do This First"]},
-    ];
+"recommendations" should have between 1 and 5 items depending on what the question actually calls for — a simple tactical question may only need 1-2, a complex strategic question may need 3-5. Never pad with filler recommendations just to fill the array.`;
 
     try{
       const res=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
       if(!res.ok){const errBody=await res.json().catch(()=>({}));throw new Error(`API ${res.status}: ${errBody.error||errBody.code||"Unknown error"}`);}
       const data=await res.json();
-      const text=data.text||"";
-      const {sections,failedSections,fullyFailed}=parseAISections(text,ADVISOR_SECTIONS);
-      if(fullyFailed||failedSections.includes("hearing")&&failedSections.includes("think")&&failedSections.includes("move")){
-        // Genuinely nothing usable could be extracted — tell the user honestly instead of showing blank cards
-        setAdvisorResult({error:"We got a response back but couldn't format it properly. Your question is saved — please try again.",question,date:""});
-        return;
-      }
+      const raw=(data.text||"").trim();
+      const jsonMatch=raw.match(/\{[\s\S]*\}/); // tolerate stray text/fences around the object
+      if(!jsonMatch)throw new Error("No JSON object found in response");
+      const advice=JSON.parse(jsonMatch[0]);
+      if(!advice.hearing||!Array.isArray(advice.recommendations)||!advice.recommendations.length)throw new Error("Response missing required advisor fields");
+
       const parsed={
-        hearing:sections.hearing,
-        think:sections.think,
-        means:sections.means,
-        move:sections.move,
-        direct:sections.think||sections.hearing,
-        why:sections.means,
-        steps:lines(sections.think).map(l=>l.replace(/^[\d.\-•]\s*/,"").trim()).filter(Boolean),
-        first:sections.move,
-        raw:text.replace(/\*\*/g,"").trim(),
+        hearing:advice.hearing,
+        recommendations:advice.recommendations,
+        meaning:advice.meaning,
+        nextMove:advice.nextMove,
         question,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
       };
       setAdvisorResult(parsed);
@@ -2694,27 +2728,32 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                   <div className="advisor-result-text" style={{fontStyle:"italic",color:"#57534E"}}>{advisorResult.hearing}</div>
                 </div>
               )}
-              {advisorResult.think&&(
+              {advisorResult.recommendations?.length>0&&(
                 <div className="advisor-result-section">
                   <div className="advisor-result-label" style={{color:"#1A1916"}}>Here's What I Think</div>
-                  <div className="advisor-result-text">{advisorResult.think}</div>
+                  <div className="advisor-reco-list">
+                    {advisorResult.recommendations.map((r,i)=>(
+                      <div className="advisor-reco" key={i}>
+                        <div className="advisor-reco-num">{String(i+1).padStart(2,"0")}</div>
+                        <div>
+                          {r.title&&<div className="advisor-reco-title">{r.title}</div>}
+                          <div className="advisor-reco-text">{r.explanation}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
-              {advisorResult.means&&(
+              {advisorResult.meaning&&(
                 <div className="advisor-result-section" style={{background:"#FAFAF8"}}>
                   <div className="advisor-result-label" style={{color:"#A8A29E"}}>What This Means For You</div>
-                  <div className="advisor-result-text">{advisorResult.means}</div>
+                  <div className="advisor-result-text">{advisorResult.meaning}</div>
                 </div>
               )}
-              {(advisorResult.move||advisorResult.first)&&(
+              {advisorResult.nextMove&&(
                 <div className="advisor-result-section" style={{borderTop:"2px solid #B0728A"}}>
-                  <div className="advisor-result-label" style={{color:"#B0728A"}}>Your Single Next Move</div>
-                  <div className="advisor-result-text" style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1A1916",lineHeight:1.4}}>{advisorResult.move||advisorResult.first}</div>
-                </div>
-              )}
-              {!advisorResult.hearing&&!advisorResult.think&&!advisorResult.means&&!advisorResult.move&&!advisorResult.first&&advisorResult.raw&&(
-                <div className="advisor-result-section">
-                  <div className="advisor-result-text" style={{whiteSpace:"pre-wrap"}}>{advisorResult.raw}</div>
+                  <div className="advisor-result-label" style={{color:"#B0728A"}}>Your Next Move</div>
+                  <div className="advisor-result-text" style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:600,color:"#1A1916",lineHeight:1.4}}>{advisorResult.nextMove}</div>
                 </div>
               )}
             </div>
@@ -3223,11 +3262,39 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
               <p className="rpt-sec-desc">Concrete actions for the next 30 days.</p>
               <div className="rpt-sec-div"/>
             </div>
+
+            {(()=>{
+              const completedCount=completedWeeks.filter(Boolean).length;
+              const pct=Math.round((completedCount/4)*100);
+              const r=34,circ=2*Math.PI*r;
+              const offset=circ*(1-pct/100);
+              return(
+                <div className="plan-progress-wrap">
+                  <svg className="plan-progress-ring" viewBox="0 0 80 80">
+                    <circle className="plan-progress-track" cx="40" cy="40" r={r}/>
+                    <circle className="plan-progress-fill" cx="40" cy="40" r={r}
+                      style={{strokeDasharray:circ,strokeDashoffset:offset}}/>
+                  </svg>
+                  <div className="plan-progress-text">
+                    <span className="plan-progress-pct">{pct}%</span>
+                  </div>
+                  <p className="plan-progress-label">30-Day Plan Progress</p>
+                </div>
+              );
+            })()}
+
             <div className={"rpt-weeks rpt-weeks-header"+(weeks.reduce((a,w)=>a+w.length,0)>16?" rpt-weeks-compact":"")}>
               {weeks.map((items,i)=>(
                 <div className="rpt-week-col" key={i}>
                   <div className="rpt-week-hd">
-                    <div className="rpt-week-n">Week {i+1}</div>
+                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                      <div className="rpt-week-n">Week {i+1}</div>
+                      <button
+                        className={`plan-week-check${completedWeeks[i]?" done":""}`}
+                        onClick={()=>toggleWeekComplete(i)}
+                        aria-label={completedWeeks[i]?`Mark Week ${i+1} incomplete`:`Mark Week ${i+1} complete`}
+                      >{completedWeeks[i]?"✓":""}</button>
+                    </div>
                     <div className="rpt-week-theme">{WEEK_THEMES[i]}</div>
                     <div className="rpt-week-goal">{["Establish your foundation","Build momentum","Execute and activate","Review and scale"][i]}</div>
                   </div>
