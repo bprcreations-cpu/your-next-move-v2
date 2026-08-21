@@ -1111,35 +1111,65 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 /* Screen fallback for browsers that don't fully support break-inside in flex/grid contexts */
 .rpt-sec-hd,.rpt-exec-hero,.rpt-opp-row,.rpt-action-row,.rpt-ahead-row{break-inside:avoid;}
 
-/* RESPONSIVE */
+/* RESPONSIVE — STRATEGY REPORT (.rpt-*), real on-screen mobile coverage.
+   The rules that previously lived here targeted an older class scheme
+   (.rpt-action, .rpt-nextmove, .rpt-conclusion, etc.) that no longer exists
+   in the component — dead CSS that did nothing on-screen. Replaced with
+   rules against the classes actually rendered today, using the same
+   reduced-padding values already proven in the @media print block above. */
 @media(max-width:860px){
-  :root{--r-col-pad:32px;--r-section-pad:56px 0;}
-  .rpt-action{grid-template-columns:110px 1fr;}
-  .rpt-deprio{grid-template-columns:110px 1fr;}
-  .rpt-roadmap{grid-template-columns:1fr 1fr;}
-  .rpt-exec{grid-template-columns:1fr;}
-  .rpt-exec-item.span2{grid-column:span 1;}
-  .rpt-exec-tl{grid-template-columns:1fr;}
-  .rpt-str-ten{grid-template-columns:1fr;}
-  .rpt-sec-header{grid-template-columns:36px 1fr;gap:0 16px;}
-  .rpt-nextmove-meta{flex-direction:column;gap:20px;align-items:center;}
-  .rpt-nextmove-meta-item{border-right:none;padding:0;}
+  .rpt-sec{padding:56px 32px;}
+  .rpt-nm{padding:72px 32px;}
+  .rpt-end{padding:64px 32px;}
+  .rpt-exec-hero{padding:36px 32px 30px;}
+  .rpt-exec-glance{padding:26px 32px;}
+  .rpt-exec-nextmove{padding:28px 32px 32px;}
+  .rpt-weeks{grid-template-columns:repeat(2,1fr);}
+  .rpt-week-hd{padding:20px 16px 14px;}
+  .rpt-week-bd{padding:12px 16px 16px;}
 }
 @media(max-width:640px){
-  :root{--r-col-pad:16px;--r-section-pad:44px 0;}
   .rpt-cover{padding:48px 16px 40px;}
-  .rpt-action{grid-template-columns:1fr;}
-  .rpt-action-meta{border-right:none;border-bottom:1px solid var(--r-rule);flex-direction:row;align-items:center;gap:12px;}
-  .rpt-action.priority-1 .rpt-action-meta{border-bottom-color:var(--r-rule-dark);}
-  .rpt-action-num{display:none;}
-  .rpt-deprio{grid-template-columns:1fr;}
-  .rpt-roadmap{grid-template-columns:1fr;}
-  .rpt-nextmove{padding:56px 16px;}
-  .rpt-nextmove-text{font-size:clamp(20px,5.5vw,28px);}
-  .rpt-conclusion{padding:56px 16px;}
-  .rpt-conclusion-btns{flex-direction:column;align-items:center;}
-  .rpt-conclusion-btns .btn,.rpt-conclusion-btns .btn-out{width:100%;max-width:300px;justify-content:center;}
-  .rpt-next-grid{grid-template-columns:1fr;}
+  .rpt-sec{padding:44px 20px;}
+  .rpt-nm{padding:52px 20px;}
+  .rpt-nm-text{font-size:clamp(20px,5.5vw,28px);}
+  .rpt-end{padding:48px 20px;}
+  .rpt-end-h{font-size:clamp(24px,7vw,32px);}
+  .rpt-exec-hero{padding:26px 20px 22px;}
+  .rpt-exec-hero-headline{font-size:clamp(24px,6.5vw,32px);}
+  .rpt-exec-glance{padding:20px 20px;flex-direction:column;gap:18px;}
+  .rpt-exec-glance-item{border-left:none!important;padding-left:0!important;}
+  .rpt-exec-nextmove{padding:20px 20px 26px;}
+
+  /* Recommended Actions — stack the numeral/label column above the content
+     instead of squeezing a 132px-wide desktop rail into a 375px screen. */
+  .rpt-action-row{grid-template-columns:1fr;}
+  .rpt-action-rule{border-right:none;border-bottom:1px solid var(--r-rule);flex-direction:row;align-items:center;gap:10px;padding:14px 20px;}
+  .rpt-action-row.is-first .rpt-action-rule{border-bottom-color:var(--r-rule-dark);}
+  .rpt-action-body{padding:18px 20px;}
+
+  /* Best Opportunity / Looking Ahead — narrow the index rail instead of
+     removing it, so the numbering stays visible without eating the width
+     a two-line title needs. */
+  .rpt-opp-row{grid-template-columns:36px 1fr;}
+  .rpt-opp-content{padding:20px 16px;}
+  .rpt-ahead-row{grid-template-columns:36px 1fr;padding:22px 0;}
+
+  .rpt-str-grid{grid-template-columns:1fr;}
+  .rpt-str-cell{padding:18px 20px;}
+
+  /* 30-Day Plan — full stack on phones. Four fixed columns at this width
+     left roughly 90px per week; one column per row is what's readable. */
+  .rpt-weeks{grid-template-columns:1fr;}
+  .rpt-week-col{border-right:none!important;border-bottom:1px solid var(--r-rule-dark);}
+  .rpt-week-col:last-child{border-bottom:none;}
+  .rpt-week-hd{padding:18px 20px 12px;}
+  .rpt-week-bd{padding:10px 20px 16px;}
+
+  .rpt-deprio-row{flex-direction:column;gap:6px;padding:16px 20px;}
+  .rpt-success-row{padding:18px 0;}
+  .rpt-nm-meta{flex-direction:column;gap:20px;padding-top:28px;}
+  .rpt-nm-meta-col{border-right:none!important;padding:0!important;}
 }
 
 /* RESPONSIVE */
