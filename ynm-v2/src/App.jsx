@@ -517,7 +517,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff;color:#1A1916;-w
 .checkin-btn{padding:9px 20px;background:#fff;color:#1C1917;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;white-space:nowrap;flex-shrink:0;font-family:'Plus Jakarta Sans',sans-serif;}
 
 /* PAYWALL */
-.paywall{min-height:68vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 24px;text-align:center;}
+.paywall{position:fixed;inset:0;z-index:250;background:#fff;overflow-y:auto;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 24px;text-align:center;}
 .paywall-eye{font-size:10px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:#C4B5AD;margin-bottom:14px;}
 .paywall-h{font-family:'Cormorant',serif;font-size:clamp(26px,5vw,44px);font-weight:600;color:#1A1916;line-height:1.1;margin-bottom:12px;}
 .paywall-h em{font-style:italic;color:#B0728A;}
@@ -1210,9 +1210,9 @@ export default function App() {
   const [firstName,    setFirstName]    = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showPaywall,  setShowPaywall]  = useState(false);
-  const [editSection,  setEditSection]  = useState(null);
-  const [editDraft,    setEditDraft]    = useState("");
-  const [editSaveStatus, setEditSaveStatus] = useState({}); // {sectionKey: 'saving'|'saved'|'error'}
+  const [paywallContext, setPaywallContext] = useState('strategy'); // strategy | advisor | hub — which free entitlement was hit
+  const [notesText,    setNotesText]    = useState("");
+  const [notesSaveStatus, setNotesSaveStatus] = useState(null); // 'saving'|'saved'|'error'|null
   const [fbDone,       setFbDone]       = useState(false);
   const [pdfUnlocked,  setPdfUnlocked]  = useState(false);
   const [strategyStage, setStrategyStage] = useState('reading'); // reading | saved | feedback | complete
@@ -1223,6 +1223,24 @@ export default function App() {
   const [autoSaved,    setAutoSaved]    = useState(false);
   const [shortWarn,    setShortWarn]    = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Lifetime free-entitlement flags — persisted separately from content so
+  // deleting a strategy/plan can never restore free eligibility. "One means
+  // one" per the product spec: each flips true on first successful use and
+  // never resets except by an administrator clearing the stored key directly.
+  const [freeStrategyUsed, setFreeStrategyUsed] = useState(false);
+  const [freeAdvisorUsed,  setFreeAdvisorUsed]  = useState(false);
+  const [freeHubUsed,      setFreeHubUsed]      = useState(false);
+  const [freeHubTopicId,   setFreeHubTopicId]   = useState(null); // which topic the free Hub use was spent on — revisiting/completing it again never re-consumes
+  // Synchronous mirror of freeHubUsed. React state updates are async/batched,
+  // which leaves a window where two topics clicked in quick succession can
+  // both see the entitlement as unused. This ref updates in the same tick as
+  // the check, closing that race — the state above stays the source of truth
+  // for rendering, this ref is only for the atomic guard.
+  const freeHubUsedRef = useRef(false);
+  const freeStrategyUsedRef = useRef(false); // same synchronous-lock pattern, applied to Strategy
+  const freeAdvisorUsedRef  = useRef(false); // same synchronous-lock pattern, applied to Advisor
+  const hubGenerationInFlightRef = useRef(false); // blocks duplicate /api/generate calls from rapid re-clicks on the same Hub topic
 
   // Industry Hub state
   const [hubCatId,     setHubCatId]     = useState(null);
@@ -1237,6 +1255,7 @@ export default function App() {
   const [hubQuickAnswer, setHubQuickAnswer] = useState(null);
   const [hubQuickSubmitted, setHubQuickSubmitted] = useState(false);
   const [hubExpandedTerm, setHubExpandedTerm] = useState(null);
+  const [hubCompletedIds, setHubCompletedIds] = useState([]); // topic ids the user has finished a Quick Check for
 
   // Ask Your Advisor state
   const [advisorQ,     setAdvisorQ]     = useState("");
@@ -1302,6 +1321,45 @@ export default function App() {
       const draft=await window.storage.get("draft-answers");
       if(draft){const d=JSON.parse(draft.value);if(d.catId&&d.industry){setCatId(d.catId);setIndustry(d.industry);setCustomInd(d.customInd||"");setJourneyStage(d.journeyStage);setAnswers(d.answers||{});setQIdx(d.qIdx||0);}}
     }catch(e){}
+    // Lifetime entitlement flags — read independently of any content state,
+    // so a deleted strategy/plan can never make a consumed free use reappear.
+    try{
+      const es=await window.storage.get("entitlement-strategy-used");
+      if(es&&JSON.parse(es.value).used){setFreeStrategyUsed(true);freeStrategyUsedRef.current=true;}
+    }catch(e){}
+    try{
+      const ea=await window.storage.get("entitlement-advisor-used");
+      if(ea&&JSON.parse(ea.value).used){setFreeAdvisorUsed(true);freeAdvisorUsedRef.current=true;}
+    }catch(e){}
+    try{
+      const eh=await window.storage.get("entitlement-hub-used");
+      if(eh){const d=JSON.parse(eh.value);setFreeHubUsed(!!d.used);setFreeHubTopicId(d.topicId||null);freeHubUsedRef.current=!!d.used;}
+    }catch(e){}
+    try{
+      const hc=await window.storage.get("hub-completed-topics");
+      if(hc)setHubCompletedIds(JSON.parse(hc.value)||[]);
+    }catch(e){}
+  }
+
+  async function markFreeStrategyUsed(){
+    try{await window.storage.set("entitlement-strategy-used",JSON.stringify({used:true,at:Date.now()}));}catch(e){}
+    freeStrategyUsedRef.current=true;setFreeStrategyUsed(true);
+  }
+  async function markFreeAdvisorUsed(){
+    try{await window.storage.set("entitlement-advisor-used",JSON.stringify({used:true,at:Date.now()}));}catch(e){}
+    freeAdvisorUsedRef.current=true;setFreeAdvisorUsed(true);
+  }
+  async function markFreeHubUsed(topicId){
+    try{await window.storage.set("entitlement-hub-used",JSON.stringify({used:true,topicId,at:Date.now()}));}catch(e){}
+    freeHubUsedRef.current=true;setFreeHubUsed(true);setFreeHubTopicId(topicId);
+  }
+  async function markTopicCompleted(topicId){
+    setHubCompletedIds(prev=>{
+      if(prev.includes(topicId))return prev;
+      const next=[...prev,topicId];
+      window.storage.set("hub-completed-topics",JSON.stringify(next)).catch(()=>{});
+      return next;
+    });
   }
 
   async function saveSubState(v){
@@ -1346,7 +1404,7 @@ export default function App() {
   function restart(){
     setCatId(null);setIndustry(null);setCustomInd("");setJourneyStage(null);
     setAnswers({});setQIdx(0);setResult(null);setError(null);
-    setViewingPlanId(null);setShowPaywall(false);setEditSection(null);
+    setViewingPlanId(null);setShowPaywall(false);setNotesText("");setNotesSaveStatus(null);
     setFbDone(false);setFbRating(null);setFbAns({});setShortWarn(false);setStrategyStage('reading');
     go("home");
   }
@@ -1381,46 +1439,82 @@ export default function App() {
     setShortWarn(false);
     if(qIdx<qs.length-1){setQIdx(q=>q+1);window.scrollTo(0,0);}else generate();
   }
-  function openSavedPlan(plan){setCatId(plan.catId);setIndustry(plan.industry);setJourneyStage(plan.journeyStage||null);setResult(plan.result);setViewingPlanId(plan.id);setStrategyStage('reading');setFbDone(false);setPdfUnlocked(false);go("results");}
-  function startEdit(key,val){setEditSection(key);setEditDraft(val||"");}
-  function cancelEdit(){setEditSection(null);setEditDraft("");}
-  async function saveEdit(key){
-    if(!editDraft||!editDraft.trim()){setEditSaveStatus(s=>({...s,[key]:'error'}));return;} // reject empty-value saves
-    const updated={...result,[key]:editDraft};
-    setResult(updated);setEditSection(null);
-    setEditSaveStatus(s=>({...s,[key]:'saving'}));
+  function openSavedPlan(plan){setCatId(plan.catId);setIndustry(plan.industry);setJourneyStage(plan.journeyStage||null);setResult(plan.result);setViewingPlanId(plan.id);setStrategyStage('reading');setFbDone(!!plan.feedbackSubmitted);setPdfUnlocked(!!plan.pdfUnlocked);setNotesText(plan.notes||"");setNotesSaveStatus(null);go("results");}
+
+  // Persists the mandatory-feedback unlock onto this specific saved strategy
+  // record, so reopening it later restores PDF access instead of re-demanding
+  // feedback. The unlock belongs to that one strategy — a new/different
+  // strategy still gets its own fresh feedback requirement.
+  async function persistFeedbackUnlock(){
     try{
       let pid=viewingPlanId;
       if(pid){
         const raw=await window.storage.get(`plan:${pid}`).catch(()=>null);
         if(raw){
           const plan=JSON.parse(raw.value);
-          plan.result=updated;
+          plan.feedbackSubmitted=true;plan.pdfUnlocked=true;
           await window.storage.set(`plan:${pid}`,JSON.stringify(plan));
-          setSavedPlans(prev=>prev.map(p=>p.id===pid?{...p,result:updated}:p)); // keep the in-memory My Strategies list in sync — without this, reopening the same plan without a refresh shows stale pre-edit content
+          setSavedPlans(prev=>prev.map(p=>p.id===pid?{...p,feedbackSubmitted:true,pdfUnlocked:true}:p));
         }else{
           pid=null; // referenced record no longer exists — fall through and create a fresh one
         }
       }
       if(!pid){
-        const newId=await savePlan(updated,{catId,industry:effectiveIndustry,journeyStage});
+        const newId=await savePlan(result,{catId,industry:effectiveIndustry,journeyStage,notes:notesText,feedbackSubmitted:true,pdfUnlocked:true});
+        if(newId)setViewingPlanId(newId);
+      }
+    }catch(e){
+      console.error("Failed to persist feedback/PDF unlock (non-fatal — session state still unlocked):",e.message);
+    }
+  }
+
+  async function saveNotes(){
+    setNotesSaveStatus('saving');
+    try{
+      let pid=viewingPlanId;
+      if(pid){
+        const raw=await window.storage.get(`plan:${pid}`).catch(()=>null);
+        if(raw){
+          const plan=JSON.parse(raw.value);
+          plan.notes=notesText;
+          await window.storage.set(`plan:${pid}`,JSON.stringify(plan));
+          setSavedPlans(prev=>prev.map(p=>p.id===pid?{...p,notes:notesText}:p));
+        }else{
+          pid=null; // referenced record no longer exists — fall through and create a fresh one
+        }
+      }
+      if(!pid){
+        const newId=await savePlan(result,{catId,industry:effectiveIndustry,journeyStage,notes:notesText});
         if(newId)setViewingPlanId(newId);
         else throw new Error("savePlan returned no id");
       }
-      setEditSaveStatus(s=>({...s,[key]:'saved'}));
-      setTimeout(()=>setEditSaveStatus(s=>{const n={...s};delete n[key];return n;}),2500);
+      setNotesSaveStatus('saved');
+      setTimeout(()=>setNotesSaveStatus(null),2500);
     }catch(e){
-      console.error("Edit save failed:",key,e.message);
-      setEditSaveStatus(s=>({...s,[key]:'error'}));
+      console.error("Notes save failed:",e.message);
+      setNotesSaveStatus('error');
     }
   }
 
   async function generate(){
-    if(!isSubscribed&&savedPlans.length>=FREE_PLAN_LIMIT){setShowPaywall(true);return;}
+    if(!isSubscribed&&freeStrategyUsedRef.current){setPaywallContext('strategy');setShowPaywall(true);return;}
+    const isNewFreeStrategyUse = !isSubscribed && !freeStrategyUsedRef.current;
+    if(isNewFreeStrategyUse){
+      freeStrategyUsedRef.current = true; // synchronous lock, before any await — closes the double-click race
+    }
     setShowPaywall(false);setLoading(true);setError(null);go("loading");
     const qa=qs.map((q,i)=>{const a=answers[i];return`Q: ${q.q}\nA: ${Array.isArray(a)?a.join(", "):(a||"Not specified")}`;}).join("\n\n");
 
     const prompt=`You are a senior strategist delivering a concise, premium strategy report. Think McKinsey meets a trusted mentor. Every word earns its place. No filler. No generic advice. No sentences that could apply to anyone other than this exact person.
+
+This is a GLOBAL instruction set — it must work equally well for every industry, focus area, career stage, business stage, budget level, and depth of input you might receive, not just the cases you've seen before. Do not lean on patterns from any specific example you may have encountered previously; reason fresh from what THIS person actually shared.
+
+HANDLING INPUT DEPTH:
+- If answers are brief or vague, do not pad with generic filler to sound complete. Work intelligently with what's there, avoid inventing specifics (names, numbers, tools, competitors) that were never mentioned, and where a reasonable assumption is needed, make it sound like a reasonable assumption rather than a fabricated fact.
+- If answers are detailed and sophisticated, do not simply restate them back — synthesize and add real strategic value on top of what they already know.
+- More context earns more personalization and specificity. Less context should never mean a worse-quality or lower-effort report — it means a report appropriately scoped to what's knowable.
+
+MULTIFACETED USERS: Treat this strategy as its own independent context. Do not assume this person's focus area, industry, or identity based on any other strategy they may have built before — someone can be a corporate project manager, a creator, and an entrepreneur across different sessions, and each one deserves fresh, undiluted reasoning about only what's in front of you right now.
 
 STRICT RULES — violating these fails the output:
 1. CONCISE: The entire report must be readable in 6-8 minutes. If a section feels long, cut it in half.
@@ -1428,6 +1522,7 @@ STRICT RULES — violating these fails the output:
 3. NO AI VOICE: Write like a sharp human advisor. Not "It's important to..." or "Consider..." — say what to do and why.
 4. THE INSIGHT: One sentence in Primary Challenge that is so precise it makes the person think "how did they know that." This is the sentence they screenshot.
 5. COMPLETE ALL 8: A short complete report beats a long incomplete one. Finish all 8 sections even if brief.
+6. NO FABRICATION: Never invent a specific statistic, competitor name, tool, dollar figure, or fact the person didn't provide. Reason with what's given.
 
 Client Profile:
 Name: ${firstName||"Not provided"}
@@ -1559,18 +1654,20 @@ Sentence 3: What specifically changes in 2 weeks if they do this.`;
       let savedId=null;
       try{
         savedId=await savePlan(parsed,{catId,industry:effectiveIndustry,journeyStage});
-        if(savedId)setViewingPlanId(savedId); // CRITICAL FIX: without this, saveEdit() can never find viewingPlanId and silently discards every edit made this session
+        if(savedId)setViewingPlanId(savedId); // needed so saveNotes() can find this plan and attach notes to it
       }catch(saveErr){
         // Save failed — log it but don't block the user from seeing their strategy
         console.error("Strategy save failed (non-fatal):",saveErr.message);
       }
 
       // STEP 7: Navigate to results — always happens if we got here
+      if(isNewFreeStrategyUse)await markFreeStrategyUsed();
       go("results");
 
     }catch(e){
       // Log the full technical error for debugging
       console.error("Strategy generation failed:",e.message,e.stack);
+      if(isNewFreeStrategyUse)freeStrategyUsedRef.current=false; // release the lock — a failed attempt must never permanently cost the user their free use
       const msg=e.message||"";
       let userMsg="Something went wrong generating your strategy. Your answers are saved — please try again.";
       if(msg.includes("TIMEOUT:"))userMsg="Your strategy took longer than expected. Your answers are saved — please try again.";
@@ -1584,6 +1681,11 @@ Sentence 3: What specifically changes in 2 weeks if they do this.`;
 
   async function askAdvisor(question){
     if(!question.trim())return;
+    if(!isSubscribed&&freeAdvisorUsedRef.current){setPaywallContext('advisor');setShowPaywall(true);return;}
+    const isNewFreeAdvisorUse = !isSubscribed && !freeAdvisorUsedRef.current;
+    if(isNewFreeAdvisorUse){
+      freeAdvisorUsedRef.current = true; // synchronous lock, before any await
+    }
     setAdvisorLoading(true);setAdvisorResult(null);
     const context=savedPlans[0]?`Background only, may or may not be relevant: this person previously built a strategy involving ${CATEGORIES.find(c=>c.id===savedPlans[0].catId)?.label} work in ${savedPlans[0].industry} (${savedPlans[0].journeyStage} stage). Use this ONLY if their question below actually relates to it. If their question is about something else entirely, ignore this completely and follow the question wherever it leads — do not force a connection that isn't there.`:"";
     const prompt=`You are a trusted personal advisor with deep, genuine expertise across every domain of business and life — careers, finance, real estate, marketing, operations, law, health, relationships, parenting, creative work, technology, and more. You are warm, direct, and speak plainly, like a brilliant friend who happens to know everything — not like an AI assistant, and not like a narrow specialist.
@@ -1652,10 +1754,15 @@ One sentence. The single most important action to take in the next 24 hours. Be 
         question,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),
       };
       setAdvisorResult(parsed);
+      if(isNewFreeAdvisorUse)await markFreeAdvisorUsed();
       const newHistory=[parsed,...advisorHistory].slice(0,10);
       setAdvisorHistory(newHistory);
       try{localStorage.setItem("advisor-history",JSON.stringify(newHistory));}catch(e){}
-    }catch(e){console.error("[askAdvisor] failed:",e.message);setAdvisorResult({error:`We hit a snag: ${e.message}. Your question is saved — try again when you're ready.`,question,date:""});}
+    }catch(e){
+      console.error("[askAdvisor] failed:",e.message);
+      if(isNewFreeAdvisorUse)freeAdvisorUsedRef.current=false; // release the lock — a failed attempt must never permanently cost the user their free use
+      setAdvisorResult({error:`We hit a snag: ${e.message}. Your question is saved — try again when you're ready.`,question,date:""});
+    }
     finally{setAdvisorLoading(false);}
   }
 
@@ -1744,6 +1851,28 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
   // clicking a Related Learning link back to something already opened this
   // session, loads instantly instead of re-generating.
   async function askLearningGuide(topic, category){
+    // Duplicate-call guard: ignore rapid re-clicks/re-taps on a topic while
+    // its own generation is already in flight — a ref because, same as the
+    // entitlement locks, hubGuideLoading (state) isn't guaranteed to have
+    // committed yet by the time a second click fires.
+    if(hubGenerationInFlightRef.current)return;
+
+    // Entitlement gate: free tier gets ONE topic. Revisiting that same topic,
+    // or one already marked completed, never re-consumes it. Uses the ref
+    // (not the state) for the check-and-lock so two topics clicked in quick
+    // succession can't both slip through before state catches up.
+    const alreadyAllowed = isSubscribed || !freeHubUsedRef.current || topic.id===freeHubTopicId || hubCompletedIds.includes(topic.id);
+    if(!alreadyAllowed){
+      setHubTopicId(null);setHubGuide(null);
+      setPaywallContext('hub');setShowPaywall(true);
+      return;
+    }
+    const isNewFreeUse = !isSubscribed && !freeHubUsedRef.current;
+    if(isNewFreeUse){
+      freeHubUsedRef.current = true; // synchronous lock, set before any await below
+    }
+
+    hubGenerationInFlightRef.current = true;
     setHubGuideLoading(true);setHubGuide(null);
     setHubStep(0);setHubQuickAnswer(null);setHubQuickSubmitted(false);setHubExpandedTerm(null);
 
@@ -1754,6 +1883,8 @@ For a simple factual question, "Direct Answer" alone is a complete, correct resp
         const parsed=JSON.parse(cached.value);
         setHubGuide({topic,category,...parsed});
         setHubGuideLoading(false);
+        hubGenerationInFlightRef.current=false;
+        if(isNewFreeUse)await markFreeHubUsed(topic.id);
         return;
       }
     }catch(e){/* no cached lesson yet — fall through to generation */}
@@ -1775,6 +1906,8 @@ GUARDRAILS:
 - Never promise financial, health, legal, career, or business outcomes.
 
 WRITING STYLE: Plain English. Short sentences. No jargon unless you define it. No academic tone, no essay voice, no AI-sounding filler ("It's important to note that..."). Write like a smart, approachable teacher explaining something to a curious adult who has five minutes, not a textbook. Match depth to the ${topic.level} level — foundational stays accessible, advanced can use real professional vocabulary.
+
+QUICK CHECK ACCURACY IS CRITICAL: the question must test a concept explicitly covered in the lesson content you write above it — never something outside the lesson. Exactly one option may be correct; the other three must be clearly, unambiguously wrong to anyone who understood the lesson. Never write a trick question, an opinion-based question, or a question with more than one reasonably defensible answer. Never invent a statistic, law, or rule to make a wrong option wrong — base correctness only on the concept itself. If the topic touches anything that varies by jurisdiction, employer, or time (tax rules, licensing, regulations), keep the question about the durable underlying concept rather than a fact that could be wrong somewhere or someday.
 
 Respond with ONLY a single valid JSON object. No markdown code fences, no commentary before or after, no text outside the JSON. Use exactly this shape:
 
@@ -1801,7 +1934,8 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
     "question": "one scenario-based multiple choice question testing what was just taught",
     "options": ["option A", "option B", "option C", "option D"],
     "correctIndex": 0,
-    "explanation": "one sentence explaining why the correct answer is right"
+    "correctExplanation": "1-3 sentences explaining why this answer is correct, tied directly to the lesson content above",
+    "incorrectExplanation": "1-2 sentences describing the most common misunderstanding that leads someone to pick a wrong answer here"
   }
 }
 
@@ -1818,13 +1952,14 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
       if(!lesson.basics||!lesson.howItWorks||!lesson.quickCheck)throw new Error("Response missing required lesson fields");
 
       setHubGuide({topic,category,...lesson});
+      if(isNewFreeUse)await markFreeHubUsed(topic.id);
       try{await window.storage.set(cacheKey,JSON.stringify(lesson),true);}
       catch(e){try{await window.storage.set(cacheKey,JSON.stringify(lesson),false);}catch(e2){/* caching is a nice-to-have, never block the lesson on it */}}
     }catch(e){
       console.error("[askLearningGuide] failed:",e.message);
       // Per product spec: never expose technical errors here — polished, generic, recoverable.
       setHubGuide({topic,category,error:"We couldn't load this lesson. Please try again."});
-    }finally{setHubGuideLoading(false);}
+    }finally{setHubGuideLoading(false);hubGenerationInFlightRef.current=false;}
   }
 
   // ─── RENDER ──────────────────────────────────────────────────────────────
@@ -1900,7 +2035,7 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
             </button>
             <button className="btn-out" style={{padding:"14px 24px",fontSize:11}} onClick={()=>{const el=document.querySelector(".cats");if(el)el.scrollIntoView({behavior:"smooth"});}}>See How It Works</button>
           </div>
-          <p style={{fontSize:12,color:"#A8A29E"}}>First strategy free · Then $19/month · Cancel anytime</p>
+          <p style={{fontSize:12,color:"#A8A29E"}}>First strategy free · Then $19.99/month · Cancel anytime</p>
         </>)}
       </section>
 
@@ -2173,7 +2308,7 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
               <button className="q-back" onClick={()=>{if(qIdx>0)setQIdx(q=>q-1);else go("stage");}}>← {qIdx===0?"Back":"Previous"}</button>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
                 <span className={`q-autosave${autoSaved?" show":""}`}>✓ Saved</span>
-                <button className="btn" disabled={!answered(qIdx)} onClick={nextQ}>{qIdx<qs.length-1?"Next →":"Build My Strategy →"}</button>
+                <button className="btn" disabled={!answered(qIdx)||loading} onClick={nextQ}>{qIdx<qs.length-1?"Next →":"Build My Strategy →"}</button>
               </div>
             </div>
           </div>
@@ -2186,7 +2321,7 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
       <div className="hub-page">
         <div className="bc"><span onClick={restart}>Home</span></div>
         <h1 className="hub-h1">Industry <em>Hub.</em></h1>
-        <p className="hub-sub">Browse curated questions built specifically for your industry. Each one is pre-researched and ready to go — just add your context and get a focused answer.</p>
+        <p className="hub-sub">Explore practical learning topics designed to help you understand your industry, strengthen your skills, and keep growing — from foundational concepts to advanced strategy.</p>
         {/* Global search on landing page too */}
         <div style={{marginBottom:32}}>
           <div style={{position:"relative",display:"flex",gap:0}}>
@@ -2245,6 +2380,11 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
         <button className="btn-out" style={{marginBottom:20,fontSize:10,padding:"8px 18px"}} onClick={()=>setHubCatId(null)}>← Back to Industry Hub</button>
         <h1 className="hub-q-h1">{hubCat?.label}</h1>
         <p className="hub-q-sub">Learn the industry, strengthen your knowledge, and explore concepts from foundational skills to advanced strategy.</p>
+        {hubCat&&(
+          <p style={{fontSize:12,color:"#A8A29E",marginTop:-16,marginBottom:24}}>
+            {hubCat.topics.filter(t=>hubCompletedIds.includes(t.id)).length} of {hubCat.topics.length} topics completed
+          </p>
+        )}
 
         <div style={{marginBottom:32}}>
           <div style={{position:"relative",display:"flex",gap:0}}>
@@ -2270,14 +2410,20 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
             <div key={level} style={{marginBottom:36}}>
               <p style={{fontSize:11,fontWeight:600,letterSpacing:"0.2em",textTransform:"uppercase",color:"#B0728A",marginBottom:14}}>{label}</p>
               <div className="hub-q-grid">
-                {topics.map(t=>(
-                  <div key={t.id} className="hub-q-card" onClick={()=>{setHubTopicId(t.id);setHubGuide(null);askLearningGuide(t,hubCat);}}>
-                    <div className="hub-q-card-tag">{label}</div>
-                    <div className="hub-q-card-title">{t.title}</div>
-                    <div className="hub-q-card-desc">{t.shortDescription}</div>
-                    <div className="hub-q-card-cta">Learn →</div>
-                  </div>
-                ))}
+                {topics.map(t=>{
+                  const isDone=hubCompletedIds.includes(t.id);
+                  return(
+                    <div key={t.id} className="hub-q-card" onClick={()=>{setHubTopicId(t.id);setHubGuide(null);askLearningGuide(t,hubCat);}}>
+                      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+                        <div className="hub-q-card-tag" style={{margin:0}}>{label}</div>
+                        {isDone&&<span style={{fontSize:11,fontWeight:600,color:"#6A9E8A"}}>✓ Completed</span>}
+                      </div>
+                      <div className="hub-q-card-title">{t.title}</div>
+                      <div className="hub-q-card-desc">{t.shortDescription}</div>
+                      <div className="hub-q-card-cta">{isDone?"Review →":"Learn →"}</div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
@@ -2398,7 +2544,7 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                 )}
               </>)}
               {hubGuide.goDeeper?.length>0&&(<>
-                <div className="lesson-deeper-label">Want to go deeper? (optional)</div>
+                <div className="lesson-deeper-label">Topics to Research Next</div>
                 <div className="lesson-deeper-list">
                   {hubGuide.goDeeper.map((g,i)=><span key={i} className="lesson-deeper-chip">{g}</span>)}
                 </div>
@@ -2417,19 +2563,31 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                 else if(isPicked)cls+=" picked";
                 return(
                   <button key={i} className={cls} disabled={hubQuickSubmitted}
-                    onClick={()=>{setHubQuickAnswer(i);setHubQuickSubmitted(true);}}>
+                    onClick={()=>{
+                      setHubQuickAnswer(i);setHubQuickSubmitted(true);
+                      if(activeHubTopic)markTopicCompleted(activeHubTopic.topic.id);
+                    }}>
                     {opt}
                   </button>
                 );
               })}
-              {hubQuickSubmitted&&(
-                <div className="lesson-check-feedback">
-                  <div className="lesson-check-feedback-label" style={{color:hubQuickAnswer===hubGuide.quickCheck.correctIndex?"#6A9E8A":"#B0728A"}}>
-                    {hubQuickAnswer===hubGuide.quickCheck.correctIndex?"You got it.":"Almost."}
+              {hubQuickSubmitted&&(()=>{
+                const correct=hubQuickAnswer===hubGuide.quickCheck.correctIndex;
+                const correctText=hubGuide.quickCheck?.options?.[hubGuide.quickCheck.correctIndex];
+                return(
+                  <div className="lesson-check-feedback">
+                    <div className="lesson-check-feedback-label" style={{color:correct?"#6A9E8A":"#B0728A"}}>
+                      {correct?"Correct.":"Almost."}
+                    </div>
+                    {correct?(
+                      <div className="lesson-check-feedback-text">{hubGuide.quickCheck?.correctExplanation}</div>
+                    ):(<>
+                      <div className="lesson-check-feedback-text" style={{marginBottom:8}}>{hubGuide.quickCheck?.incorrectExplanation}</div>
+                      <div className="lesson-check-feedback-text"><strong>The correct answer:</strong> {correctText} — {hubGuide.quickCheck?.correctExplanation}</div>
+                    </>)}
                   </div>
-                  <div className="lesson-check-feedback-text">{hubGuide.quickCheck?.explanation}</div>
-                </div>
-              )}
+                );
+              })()}
 
               {hubQuickSubmitted&&(
                 <div className="lesson-end-actions">
@@ -2451,7 +2609,8 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                     </div>
                   )}
                   <button className="btn" onClick={()=>{setHubTopicId(null);setHubGuide(null);}}>Explore Another Topic →</button>
-                  <button className="btn-out" onClick={()=>setHubCatId(hubCat?.id||null)}>Back to {hubCat?.label}</button>
+                  <button className="btn-out" onClick={()=>setHubStep(0)}>Review Lesson</button>
+                  <button className="btn-out" onClick={()=>{setHubTopicId(null);setHubGuide(null);}}>Back to {hubCat?.label}</button>
                 </div>
               )}
             </>)}
@@ -2646,13 +2805,13 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
               </p>
             </div>
           )}
-          {!isSubscribed&&savedPlans.length>=FREE_PLAN_LIMIT&&(
+          {!isSubscribed&&freeStrategyUsed&&(
             <div style={{background:"#FAF0F4",border:"1px solid #E8C4D4",borderRadius:4,padding:"20px 24px",marginBottom:20}}>
               <p style={{fontSize:10,fontWeight:500,letterSpacing:"0.14em",textTransform:"uppercase",color:"#B0728A",marginBottom:7}}>Unlock unlimited strategies</p>
               <p style={{fontFamily:"'Cormorant',serif",fontSize:18,fontWeight:500,color:"#1C1917",marginBottom:7}}>You've used your free strategy.</p>
-              <p style={{fontSize:13,color:"#78716C",marginBottom:16,lineHeight:1.6,fontWeight:300}}>Subscribe for $19/month to build unlimited strategies.</p>
+              <p style={{fontSize:13,color:"#78716C",marginBottom:16,lineHeight:1.6,fontWeight:300}}>Subscribe for $19.99/month to build unlimited strategies.</p>
               <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                <button className="btn" onClick={()=>window.open(STRIPE_MONTHLY,"_blank")}>Subscribe — $19/mo</button>
+                <button className="btn" onClick={()=>window.open(STRIPE_MONTHLY,"_blank")}>Subscribe — $19.99/mo</button>
                 <button className="btn-out" onClick={()=>window.open(STRIPE_ANNUAL,"_blank")}>Annual — $197/yr</button>
               </div>
             </div>
@@ -2713,32 +2872,39 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
     )}
 
     {/* ══ PAYWALL ══ */}
-    {showPaywall&&(
+    {showPaywall&&(()=>{
+      const copy={
+        strategy:{h:<>You've used your<br/><em>free strategy.</em></>,sub:"Subscribe to unlock unlimited strategy sessions across all five focus areas."},
+        advisor:{h:<>You've used your<br/><em>free advisor question.</em></>,sub:"Subscribe to unlock unlimited Ask Your Advisor sessions."},
+        hub:{h:<>You've used your<br/><em>free learning topic.</em></>,sub:"Subscribe to unlock every learning topic in the Industry Hub. You can still revisit any topic you've already opened."},
+      }[paywallContext]||{h:<>Membership<br/><em>required.</em></>,sub:"Subscribe to unlock unlimited access."};
+      return(
       <div className="paywall">
         <p className="paywall-eye">Membership Required</p>
-        <h2 className="paywall-h">You've used your<br/><em>free strategy.</em></h2>
-        <p className="paywall-sub">Subscribe to unlock unlimited strategy sessions across all five focus areas.</p>
+        <h2 className="paywall-h">{copy.h}</h2>
+        <p className="paywall-sub">{copy.sub}</p>
         <div className="pw-cards">
           <div className="pw-card">
             <div className="pw-label">Monthly</div>
-            <div className="pw-price"><span>$</span>19</div>
+            <div className="pw-price"><span>$</span>19<span>.99</span></div>
             <div className="pw-period">per month</div>
-            <div className="pw-features">{["Unlimited strategies","All 5 focus areas","Save & export plans","30-day priority plan"].map((f,i)=><div className="pw-feature" key={i}><span className="pw-check">✓</span>{f}</div>)}</div>
-            <button className="pw-btn" onClick={()=>{window.open(STRIPE_MONTHLY,"_blank");saveSubState(true);}}>Subscribe — $19/mo</button>
+            <div className="pw-features">{["Unlimited strategies","Unlimited Advisor questions","Full Industry Hub access","Save & export plans"].map((f,i)=><div className="pw-feature" key={i}><span className="pw-check">✓</span>{f}</div>)}</div>
+            <button className="pw-btn" onClick={()=>window.open(STRIPE_MONTHLY,"_blank")}>Subscribe — $19.99/mo</button>
           </div>
           <div className="pw-card pop">
             <div className="pw-pop-tag">Best value</div>
             <div className="pw-label">Annual</div>
             <div className="pw-price"><span>$</span>197</div>
             <div className="pw-period">per year · billed once</div>
-            <div className="pw-save">Save $31 vs monthly</div>
-            <div className="pw-features">{["Unlimited strategies","All 5 focus areas","Save & export plans","30-day priority plan"].map((f,i)=><div className="pw-feature" key={i}><span className="pw-check">✓</span>{f}</div>)}</div>
-            <button className="pw-btn" onClick={()=>{window.open(STRIPE_ANNUAL,"_blank");saveSubState(true);}}>Subscribe — $197/yr</button>
+            <div className="pw-save">Save vs monthly</div>
+            <div className="pw-features">{["Unlimited strategies","Unlimited Advisor questions","Full Industry Hub access","Save & export plans"].map((f,i)=><div className="pw-feature" key={i}><span className="pw-check">✓</span>{f}</div>)}</div>
+            <button className="pw-btn" onClick={()=>window.open(STRIPE_ANNUAL,"_blank")}>Subscribe — $197/yr</button>
           </div>
         </div>
         <p className="pw-free">Cancel anytime · <button onClick={()=>setShowPaywall(false)}>Go back</button></p>
       </div>
-    )}
+      );
+    })()}
 
     {/* ══ LOADING ══ */}
     {screen==="loading"&&(
@@ -2780,26 +2946,6 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
       const opportunity=opps[0]?opps[0].title||opps[0].body.split(".")[0]+".":"";
       const goal=successSentences[0]||"";
 
-      const EC=({sk,val})=>{
-        const status=editSaveStatus[sk];
-        if(editSection===sk)return(
-          <div style={{marginTop:20}}>
-            <textarea className="rpt-edit-ta" value={editDraft} onChange={e=>setEditDraft(e.target.value)} autoFocus rows={5}/>
-            <div className="rpt-edit-row">
-              <button className="rpt-edit-save" onClick={()=>saveEdit(sk)} disabled={status==='saving'||!editDraft.trim()}>{status==='saving'?'Saving…':'Save'}</button>
-              <button className="rpt-edit-cancel" onClick={cancelEdit}>Cancel</button>
-            </div>
-          </div>
-        );
-        return(
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <button className="rpt-edit" onClick={()=>startEdit(sk,val)}>✎ Edit</button>
-            {status==='saved'&&<span style={{fontSize:11,color:"var(--r-sage)"}}>✓ Saved</span>}
-            {status==='error'&&<span style={{fontSize:11,color:"#B0728A"}}>⚠ Not saved — try again</span>}
-          </div>
-        );
-      };
-
       /* ── SAVED ── */
       if(strategyStage==="saved") return(
         <div className="rpt-flow">
@@ -2815,18 +2961,22 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
       );
 
       /* ── FEEDBACK ── */
-      if(strategyStage==="feedback") return(
+      if(strategyStage==="feedback"){
+        const REQUIRED_FB_KEYS=["personalized","valuable","confusing","wouldPay","wouldRecommend"];
+        const missingCount=(fbRating===null?1:0)+REQUIRED_FB_KEYS.filter(k=>!fbAns[k]).length;
+        const fbValid=missingCount===0;
+        return(
         <div className="rpt-fb">
           <span className="rpt-fb-eyebrow">Beta Feedback</span>
           <h1 className="rpt-fb-h">Help us improve.</h1>
-          <p className="rpt-fb-sub">You are one of our first users. Your honest input shapes every future strategy on this platform.</p>
+          <p className="rpt-fb-sub">You are one of our first users. Your honest input shapes every future strategy on this platform — please complete every question below before continuing.</p>
           <div className="rpt-fb-rule"/>
           <div className="fb-q"><p className="fb-q-lbl">How useful was this strategy overall?</p><div className="fb-nums">{[1,2,3,4,5,6,7,8,9,10].map(n=><button key={n} className={`fb-num${fbRating===n?" on":""}`} onClick={()=>setFbRating(n)}>{n}</button>)}</div></div>
           {[
             {k:"personalized",q:"Did this feel personalized to your situation?",o:["Yes — very much so","Somewhat","Not really"]},
             {k:"valuable",q:"What was most valuable?",o:["Create My Strategy","Ask Your Advisor","Industry Hub","All three equally"]},
             {k:"confusing",q:"Was anything confusing?",o:["Nothing — all clear","The flow was unclear","Features were unclear","The output was unclear"]},
-            {k:"wouldPay",q:"Would you pay $19/month for this?",o:["Yes — absolutely","Probably","Not sure","Probably not"]},
+            {k:"wouldPay",q:"Would you pay $19.99/month for this?",o:["Yes — absolutely","Probably","Not sure","Probably not"]},
             {k:"wouldRecommend",q:"Would you recommend this?",o:["Yes — immediately","Maybe","Not yet"]},
           ].map(item=>(
             <div className="fb-q" key={item.k}><p className="fb-q-lbl">{item.q}</p><div className="fb-pills">{item.o.map(o=><button key={o} className={`fb-pill${fbAns[item.k]===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,[item.k]:o}))}>{o}</button>)}</div></div>
@@ -2835,13 +2985,17 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
           <div className="fb-q"><p className="fb-q-lbl">One action you are taking this week</p><textarea className="fb-ta" placeholder="Be specific." value={fbAns.action||""} onChange={e=>setFbAns(p=>({...p,action:e.target.value}))}/></div>
           <div className="fb-q"><p className="fb-q-lbl">May we use this as a testimonial?</p><div className="fb-pills">{["Yes, with my name","Yes, anonymously","No"].map(o=><button key={o} className={`fb-pill${fbAns.testimonial===o?" on":""}`} onClick={()=>setFbAns(p=>({...p,testimonial:o}))}>{o}</button>)}</div></div>
           <div className="rpt-fb-rule"/>
-          <button className="btn" style={{padding:"14px 40px"}} onClick={()=>{
+          <button className="btn" style={{padding:"14px 40px"}} disabled={!fbValid} onClick={()=>{
+            if(!fbValid)return;
             setFbDone(true);setPdfUnlocked(true);
             try{window.storage.set(`feedback:${Date.now()}`,JSON.stringify({rating:fbRating,...fbAns}));}catch(e){}
+            persistFeedbackUnlock();
             setStrategyStage("complete");
           }}>Submit Feedback</button>
+          {!fbValid&&<p style={{fontSize:12,color:"#B0728A",marginTop:10}}>{missingCount} question{missingCount===1?"":"s"} above still need{missingCount===1?"s":""} an answer.</p>}
         </div>
-      );
+        );
+      }
 
       /* ── COMPLETE ── */
       if(strategyStage==="complete") return(
@@ -2881,7 +3035,10 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
               {viewingPlanId&&<span className="rpt-cover-tag" style={{color:"#6A9E8A",borderColor:"rgba(106,158,138,0.35)"}}>✓ Saved</span>}
             </div>
             <div className="rpt-cover-actions" style={{marginTop:24}}>
-              <button className="btn-out" onClick={()=>window.print()}>Print / Save as PDF</button>
+              <button className="btn-out" onClick={()=>{
+                if(pdfUnlocked){window.print();}
+                else{setStrategyStage('saved');window.scrollTo(0,0);}
+              }}>Print / Save as PDF</button>
             </div>
           </div>
 
@@ -2934,7 +3091,6 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                 {tension&&<div className="rpt-str-cell"><div className="rpt-str-label rpt-str-label-t">What Needs Attention</div><div className="rpt-str-text">{clean(tension)}</div></div>}
               </div>
             )}
-            <EC sk="strategicAssessment" val={result.strategicAssessment||result.execSummary||""}/>
           </div>
 
           {/* 02 — PRIMARY CHALLENGE */}
@@ -2958,7 +3114,6 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                 }}>Copy insight</button>
               </div>
             )}
-            <EC sk="primaryConstraint" val={result.primaryConstraint||result.blindSpot||""}/>
           </div>
 
           {/* 03 — BEST OPPORTUNITY */}
@@ -2995,7 +3150,6 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                 ))}
               </div>
             )}
-            <EC sk="strategicOpportunity" val={result.strategicOpportunity||result.keyOpportunities||""}/>
           </div>
 
           {/* 04 — RECOMMENDED ACTIONS */}
@@ -3058,7 +3212,6 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                 </div>
               </div>
             )}
-            <EC sk="recommendedActions" val={result.recommendedActions||result.actionPlan||""}/>
           </div>
 
           {/* 05 — 30-DAY PLAN */}
@@ -3096,7 +3249,6 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                 </div>
               ))}
             </div>
-            <EC sk="priorityPlan" val={result.priorityPlan||result.roadmap||""}/>
           </div>
 
           {/* 06 — LOOKING AHEAD */}
@@ -3136,7 +3288,6 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                 })}
               </div>
             )}
-            <EC sk="longTermGrowth" val={result.longTermGrowth||result.mistakes||""}/>
           </div>
 
           {/* 07 — WHAT SUCCESS LOOKS LIKE */}
@@ -3158,7 +3309,6 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
                   ))}
                 </div>
               </div>
-              <EC sk="successLooks" val={result.successLooks||""}/>
             </div>
           )}
 
@@ -3172,7 +3322,22 @@ Respond with ONLY a single valid JSON object. No markdown code fences, no commen
               <div className="rpt-nm-meta-col"><div className="rpt-nm-meta-lbl">Priority</div><div className="rpt-nm-meta-val">Highest</div></div>
               <div className="rpt-nm-meta-col"><div className="rpt-nm-meta-lbl">Expected Impact</div><div className="rpt-nm-meta-val">High</div></div>
             </div>
-            <EC sk="yourNextMove" val={result.yourNextMove||""}/>
+          </div>
+
+          {/* NOTES — replaces the old nonfunctional per-section Edit */}
+          <div className="rpt-sec rpt-sec-alt">
+            <div className="rpt-sec-hd">
+              <span className="rpt-sec-num">Notes</span>
+              <h2 className="rpt-sec-title">Your notes.</h2>
+              <p className="rpt-sec-desc">Add your own thoughts or reminders — only visible to you, saved with this strategy.</p>
+              <div className="rpt-sec-div"/>
+            </div>
+            <textarea className="rpt-edit-ta" style={{minHeight:100}} placeholder="Add your notes here…" value={notesText} onChange={e=>setNotesText(e.target.value)}/>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginTop:12}}>
+              <button className="rpt-edit-save" onClick={saveNotes} disabled={notesSaveStatus==='saving'}>{notesSaveStatus==='saving'?'Saving…':'Save Note'}</button>
+              {notesSaveStatus==='saved'&&<span style={{fontSize:11,color:"var(--r-sage)"}}>✓ Saved</span>}
+              {notesSaveStatus==='error'&&<span style={{fontSize:11,color:"#B0728A"}}>⚠ Not saved — try again</span>}
+            </div>
           </div>
 
           {/* CONCLUSION */}
